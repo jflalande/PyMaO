@@ -15,7 +15,15 @@ class Analysis:
 
     def run(self, analysis, analysis_name, apkname, jsonanalyses):
         self.checkTMPFS()
-        self.analysis(analysis, analysis_name, apkname, jsonanalyses)
+        ret =  self.analysis(analysis, analysis_name, apkname, jsonanalyses)
+
+        # Update status of this analysis
+        if ret:
+            self.updateJsonAnalyses(analysis_name, jsonanalyses,{"status": "done"})
+        else:
+            log.warning("Analysis failed.")
+
+        return ret
 
     def analysis(self):
         raise NotImplementedError("Analysis not implemented")
@@ -27,3 +35,10 @@ class Analysis:
         if res == "":
             raise Exception("No tmpfs mount detected.")
 
+    def updateJsonAnalyses(self, analysis_name, jsonanalyses, newdata):
+        log.debug("Updating JSON with result: " + str(newdata))
+        if analysis_name in jsonanalyses:
+            info_analysis = jsonanalyses[analysis_name]
+            info_analysis.update(newdata)
+        else:
+            jsonanalyses[analysis_name] = newdata

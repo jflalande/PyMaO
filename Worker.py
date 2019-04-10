@@ -28,38 +28,46 @@ def doJob(queue, xp):
         apkname = next(iter(jsondata))
         jsonanalyses = jsondata[apkname]
 
+        # Setup of the working directory
+        xp.setupWorkingDirectory()
+
         # Looking at each analysis to see if the status is done
         # if not, do the analysis
         for analysis in xp.analyses:
             # print("==========+> " + str(analysis.__dict__))
             analysis_name = analysis.__class__.__name__
-
-            # Setup of the working directory
-            xp.setupWorkingDirectory()
+            log.debugv("Launching analysis named: " + analysis_name)
 
             if analysis_name in jsonanalyses:
                 if jsonanalyses[analysis_name]["status"] != "done":
-                    doAnalysis(analysis, analysis, apkname, jsonanalyses)
+                    ret = doAnalysis(analysis, analysis_name, apkname, jsonanalyses)
+                    # If one analysis fails, we break
+                    if not ret:
+                        break;
             else:
-                doAnalysis(analysis, analysis_name, apkname, jsonanalyses)
+                ret = doAnalysis(analysis, analysis_name, apkname, jsonanalyses)
+                # If one analysis fails, we break
+                if not ret:
+                    break;
 
-            # Clean of the working directory
-            xp.cleanWorkingDirectory()
+
+        # Clean of the working directory
+        xp.cleanWorkingDirectory()
 
         # Erasing .json file
         writeJson(apkname, xp, jsondata)
+        log.info("Finished " + apkname + " -- JSON: " + str(jsondata))
 
 """
 Perform an analysis
 """
 def doAnalysis(analysis, analysis_name, apkname, jsonanalyses):
-    log.info("Worker: ==== Performing analysis " + analysis_name + " on " + apkname + ".apk ====")
+    log.info("Worker: ==== Performing analysis " + str(analysis_name) + " on " + str(apkname) + ".apk ====")
 
     # Running analysis
-    analysis.run(analysis, analysis_name, apkname, jsonanalyses)
+    ret = analysis.run(analysis, analysis_name, apkname, jsonanalyses)
 
-    # Finally, writes the JSON file
-    jsonanalyses[analysis_name] = {"status" : "done" }
+    return ret
 
 
 """Rewrites the JSON file for an apk"""

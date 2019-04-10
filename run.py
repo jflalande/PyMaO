@@ -57,16 +57,19 @@ def logSetup(level):
                     .format(level))
 
 applyColorsToLogs()
-logSetup("veryverbose")
 
 #logging.basicConfig(stream=sys.stdout)
 
 
-
-
+"""
+PARAMETERS
+"""
+NB_WORKERS = 2
+#logSetup("veryverbose")
+logSetup("verbose")
 
 workers=[]
-NB_WORKERS = 2
+
 
 malware_queue = Queue()
 producer = Thread(target=createJobs, args=[malware_queue, XPNative()])
