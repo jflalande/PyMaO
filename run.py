@@ -66,7 +66,8 @@ PARAMETERS
 """
 NB_WORKERS = 2
 #logSetup("veryverbose")
-logSetup("verbose")
+#logSetup("verbose")
+logSetup("info")
 
 workers=[]
 
