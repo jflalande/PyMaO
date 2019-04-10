@@ -1,7 +1,11 @@
 import os
 import json
-
+import logging
 import threading
+
+
+log = logging.getLogger("orchestrator")
+
 
 """
 Get a job and launch the missing analyses.
@@ -10,12 +14,12 @@ This class is executed in a separate thread.
 """
 def doJob(queue, xp):
     xp.tid = str(threading.get_ident())
-    print("Working on thread " + xp.tid)
+    log.debug("Working on thread " + xp.tid)
 
 
     while True:
         jsondata = queue.get()
-        print("Worker: " + str(jsondata))
+        log.debug("Worker: " + str(jsondata))
 
         # End of jobs
         if jsondata == "--END--":
@@ -49,7 +53,7 @@ def doJob(queue, xp):
 Perform an analysis
 """
 def doAnalysis(analysis, analysis_name, apkname, jsonanalyses):
-    print("Worker: ==== perform analysis " + analysis_name + " ====")
+    log.info("Worker: ==== Performing analysis " + analysis_name + " on " + apkname + ".apk ====")
 
     # Running analysis
     analysis.run(analysis, analysis_name, apkname, jsonanalyses)
@@ -66,4 +70,4 @@ def writeJson(name, xp, jsondata):
         with open(jsonfilename, 'w') as json_file:
             json.dump(jsondata, json_file)
     else:
-        print("Worker: JSON SIMULATION Writing in " + str(jsonfilename) + ': ' + str(jsondata))
+        log.debug("Worker: JSON SIMULATION Writing in " + str(jsonfilename) + ': ' + str(jsondata))

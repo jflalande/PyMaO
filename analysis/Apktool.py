@@ -1,16 +1,16 @@
 from analysis.Analysis import Analysis
+import logging
 
-from command_subprocessor import exec_in_subprocess
+log = logging.getLogger("orchestrator")
+
 
 class Apktool(Analysis):
 
-
-
     def analysis(self, analysis, analysis_name, apkname, jsonanalyses):
-        print("Running Apktool analysis.")
+        log.debug("Running Apktool analysis.")
         command = "apktool decode -r " + self.xp.APKBASE + "/" + apkname + ".apk"
-        print(command)
+        log.debug(command)
 
-        errcode, res = exec_in_subprocess(command)
-        print(res)
+        errcode, res = self.xp.exec_in_subprocess(command, cwd=True)
+
 

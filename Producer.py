@@ -1,21 +1,24 @@
 import os
 import json
+import logging
+
+log = logging.getLogger("orchestrator")
 
 
 def createJobs(queue, xp):
 
     for filename in os.listdir(xp.APKBASE):
         if filename.endswith(".apk"):
-            print("Producer: doing " + filename)
+            log.debug("Producer: doing " + filename)
             packagename = getMalwareName(filename)
-            print("Producer: packagename " + packagename)
+            log.debug("Producer: packagename " + packagename)
 
             json = readJson(packagename, xp)
-            print("Producer: json " + str(json))
+            log.debug("Producer: json " + str(json))
 
             # Determine if one of the analysis should be done for this apk
             analysisToDo = redoAnalyses(packagename, json, xp)
-            print("Redo analysis: " + str(analysisToDo))
+            log.debug("Redo analysis: " + str(analysisToDo))
 
             # If one of the analyses have to be redone, queue it
             if analysisToDo:
