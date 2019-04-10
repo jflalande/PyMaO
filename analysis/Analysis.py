@@ -12,9 +12,9 @@ class Analysis:
     def getName(self):
         return __name__
 
-    def run(self):
+    def run(self, analysis, analysis_name, apkname, jsonanalyses):
         self.checkTMPFS()
-        self.analysis()
+        self.analysis(analysis, analysis_name, apkname, jsonanalyses)
 
     def analysis(self):
         print("Running Apktool analysis.")
@@ -26,3 +26,4 @@ class Analysis:
         errcode, res = exec_in_subprocess(command)
         if res == "":
             raise Exception("No tmpfs mount detected.")
+

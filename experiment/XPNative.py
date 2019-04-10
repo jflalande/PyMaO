@@ -1,9 +1,7 @@
 from experiment.Experiment import Experiment
 
-import analysis.Apktool as Apktool
-import analysis.Native as Native
-
-
+from analysis.Apktool import Apktool
+from analysis.Native import Native
 
 class XPNative(Experiment):
 
@@ -15,5 +13,5 @@ class XPNative(Experiment):
     def __init__(self):
         self.analyses = []
 
-        self.analyses.append(Apktool)
-        self.analyses.append(Native)
+        self.analyses.append(Apktool(self))
+        self.analyses.append(Native(self))

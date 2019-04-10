@@ -44,8 +44,8 @@ def redoAnalyses(packagename, json, xp):
 
     # Looking at each analysis to see if the status is done
     for analysis in xp.analyses:
-        #print("==========+> " + str(analysis.__dict__))
-        analysis_name = analysis.__name__
+        #print("============ "+ str((analysis.__class__.__name__)))
+        analysis_name = analysis.__class__.__name__
         if analysis_name in jsonanalyses:
             if jsonanalyses[analysis_name]["status"] != "done":
                 return True
