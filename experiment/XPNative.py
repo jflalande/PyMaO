@@ -15,3 +15,4 @@ class XPNative(Experiment):
 
         self.analyses.append((Apktool(self), None))
         self.analyses.append((Native(self), [{"Apktool":{"status":"done"}}]))
+#        self.analyses.append((InstallTest(self), [{"Native":{"native_methods": True}}]))

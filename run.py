@@ -3,9 +3,9 @@ from threading import Thread
 from Producer import createJobs
 from experiment.XPNative import XPNative
 from Worker import doJob
-import copy
+import time
 import logging
-import sys
+
 
 # Adds a very verbose level of logs
 DEBUG_LEVELV_NUM = 9
@@ -64,13 +64,13 @@ applyColorsToLogs()
 """
 PARAMETERS
 """
-NB_WORKERS = 2
+NB_WORKERS = 1
 #logSetup("veryverbose")
 logSetup("verbose")
 #logSetup("info")
 
 workers=[]
-
+t_start = time.time()
 
 malware_queue = Queue()
 producer = Thread(target=createJobs, args=[malware_queue, XPNative()])
@@ -93,3 +93,5 @@ for i in range(NB_WORKERS):
 for worker in workers:
     worker.join()
 
+t_end = time.time()
+log.info("TIME: " + str(round(t_end - t_start,0)) + " s")
