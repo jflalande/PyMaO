@@ -13,9 +13,16 @@ class XPNative(Experiment):
     def __init__(self):
         self.analyses = []
 
+        # Run Apktool
         self.analyses.append((Apktool(self), None))
+
+        # Check for native methods in the smali code
         self.analyses.append((Native(self), [{"Apktool":{"status":"done"}}]))
-        self.analyses.append((ManifestDecoding(self), [{"Native":{"status":"done"}}]))
+
+        # Decode the manifest and checks that the minSdkVersion is 24
+        # For apps that have native methods
+        self.analyses.append((ManifestDecoding(self, checkRunnableAndroidVersion=24), [{"Native":{"native_methods":True}}]))
+
 #        self.analyses.append((InstallTest(self), [{"Native":{"native_methods": True}}]))
 
 
