@@ -13,5 +13,5 @@ class XPNative(Experiment):
     def __init__(self):
         self.analyses = []
 
-        self.analyses.append(Apktool(self))
-        self.analyses.append(Native(self))
+        self.analyses.append((Apktool(self), None))
+        self.analyses.append((Native(self), [{"Apktool":{"status":"done"}}]))

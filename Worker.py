@@ -33,22 +33,28 @@ def doJob(queue, xp):
 
         # Looking at each analysis to see if the status is done
         # if not, do the analysis
-        for analysis in xp.analyses:
+        for analysis, precondition in xp.analyses:
             # print("==========+> " + str(analysis.__dict__))
             analysis_name = analysis.__class__.__name__
-            log.debugv("Launching analysis named: " + analysis_name)
+            log.debugv("Considering analysis named: " + analysis_name + " with precondition " + str(precondition))
 
-            if analysis_name in jsonanalyses:
-                if jsonanalyses[analysis_name]["status"] != "done":
-                    ret = doAnalysis(analysis, analysis_name, apkname, jsonanalyses)
-                    # If one analysis fails, we break
-                    if not ret:
-                        break;
-            else:
-                ret = doAnalysis(analysis, analysis_name, apkname, jsonanalyses)
-                # If one analysis fails, we break
-                if not ret:
-                    break;
+            eval = evaluatePreConditions(analysis_name, jsonanalyses, precondition)
+            if not eval:
+                break
+
+            doAnalysis(analysis, analysis_name, apkname, jsonanalyses)
+
+            # if analysis_name in jsonanalyses:
+            #     if jsonanalyses[analysis_name]["status"] != "done":
+            #         ret = doAnalysis(analysis, analysis_name, apkname, jsonanalyses)
+            #         # If one analysis fails, we break
+            #         if not ret:
+            #             break;
+            # else:
+            #     ret = doAnalysis(analysis, analysis_name, apkname, jsonanalyses)
+            #     # If one analysis fails, we break
+            #     if not ret:
+            #         break;
 
 
         # Clean of the working directory
@@ -79,3 +85,27 @@ def writeJson(name, xp, jsondata):
             json.dump(jsondata, json_file)
     else:
         log.debug("Worker: JSON SIMULATION Writing in " + str(jsonfilename) + ': ' + str(jsondata))
+
+
+def evaluatePreConditions(analysis_name, jsonanalyses, precondition):
+    log.debug("Evaluating preconditions " + str(precondition))
+    if precondition is None:
+        return True
+
+    # Checking that this analysis has not been done yet
+    if analysis_name not in jsonanalyses or jsonanalyses[analysis_name]["status"] != "done":
+
+        # Checking all preconditions i.e. the state of the previous analyses
+        for cond in precondition:
+            log.debugv("Condition: " + str(cond))
+            log.debugv("Current JSON data: " + str(jsonanalyses))
+            for past_analysis, testconditions in cond.items():
+                current_data_for_this_tool = jsonanalyses[past_analysis]
+                for onecondition_key, onecondition_value in testconditions.items():
+                    if onecondition_key not in current_data_for_this_tool:
+                        return False
+                    if current_data_for_this_tool[onecondition_key] != onecondition_value:
+                        return False
+
+    log.debugv("Conditions are ALL good :)")
+    return True
