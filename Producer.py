@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+from experiment.Statistics import Statistics
 
 log = logging.getLogger("orchestrator")
 
@@ -23,6 +24,7 @@ def createJobs(queue, xp):
             # If one of the analyses have to be redone, queue it
             if analysisToDo:
                 queue.put(json)
+                Statistics.incNbJobs()
 
 
 

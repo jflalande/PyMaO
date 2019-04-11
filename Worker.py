@@ -2,7 +2,7 @@ import os
 import json
 import logging
 import threading
-
+from experiment.Statistics import Statistics
 
 log = logging.getLogger("orchestrator")
 
@@ -19,6 +19,8 @@ def doJob(queue, xp):
 
     while True:
         jsondata = queue.get()
+        Statistics.decNbJobs()
+
         log.debug("Worker: " + str(jsondata))
 
         # End of jobs
@@ -75,7 +77,7 @@ def doJob(queue, xp):
 Perform an analysis
 """
 def doAnalysis(analysis, analysis_name, apkname, jsonanalyses):
-    log.info("Worker: ==== Performing analysis " + str(analysis_name) + " on " + str(apkname) + ".apk ====")
+    log.info("Worker: Job " + str(Statistics.getNbJobs()) + " ==== Performing analysis " + str(analysis_name) + " on " + str(apkname) + ".apk ====")
 
     # Running analysis
     ret = analysis.run(analysis, analysis_name, apkname, jsonanalyses)
