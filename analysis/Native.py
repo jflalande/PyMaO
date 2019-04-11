@@ -7,6 +7,9 @@ log = logging.getLogger("orchestrator")
 
 class Native(Analysis):
 
+    def dependencies(self):
+        return ["Apktool"]
+
     def analysis(self, analysis, analysis_name, apkname, jsonanalyses):
         log.debug("Running Native analysis.")
 

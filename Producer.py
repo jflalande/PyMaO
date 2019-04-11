@@ -33,6 +33,8 @@ def redoAnalyses(packagename, json, xp):
     { "sha256" : {
     "analysis.Apktool" : { "status" : "done"},
     "analysis.Native" : { "status" : "done"}
+    "analysis.XXX" : { "status" : "failed"}
+    "analysis.YYYY" : { }   // but dependency is Apktool
     }
     }
     :param packagename: the name of the apk
@@ -53,8 +55,8 @@ def redoAnalyses(packagename, json, xp):
         log.debugv("Considering analysis " + analysis_name)
         if analysis_name in jsonanalyses:
             log.debugv("Current status for analysis " + analysis_name + " : " + str(jsonanalyses[analysis_name]))
-            if jsonanalyses[analysis_name]["status"] != "done":
-                return True
+            #if jsonanalyses[analysis_name]["status"] != "failed":
+            #    return True
         else:
             return True
 
