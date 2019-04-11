@@ -44,19 +44,6 @@ def doJob(queue, xp):
 
             doAnalysis(analysis, analysis_name, apkname, jsonanalyses)
 
-            # if analysis_name in jsonanalyses:
-            #     if jsonanalyses[analysis_name]["status"] != "done":
-            #         ret = doAnalysis(analysis, analysis_name, apkname, jsonanalyses)
-            #         # If one analysis fails, we break
-            #         if not ret:
-            #             break;
-            # else:
-            #     ret = doAnalysis(analysis, analysis_name, apkname, jsonanalyses)
-            #     # If one analysis fails, we break
-            #     if not ret:
-            #         break;
-
-
         # Clean of the working directory
         xp.cleanWorkingDirectory()
 

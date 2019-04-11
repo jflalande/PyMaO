@@ -64,7 +64,7 @@ applyColorsToLogs()
 """
 PARAMETERS
 """
-NB_WORKERS = 1
+NB_WORKERS = 6
 #logSetup("veryverbose")
 logSetup("verbose")
 #logSetup("info")
@@ -94,4 +94,4 @@ for worker in workers:
     worker.join()
 
 t_end = time.time()
-log.info("TIME: " + str(round(t_end - t_start,0)) + " s")
+log.info("TIME: " + str(round(t_end - t_start,1)) + " s")

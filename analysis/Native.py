@@ -12,8 +12,15 @@ class Native(Analysis):
 
         command = "grep -r \"static native\""
         errcode, res = self.xp.exec_in_subprocess(command, cwd=True)
-
-        #jsonanalyses["native_methods"] = res != ""
         self.updateJsonAnalyses(analysis_name, jsonanalyses, {"native_methods" : res != ""})
+
+        command = "grep -r \"arm64\""
+        errcode, res = self.xp.exec_in_subprocess(command, cwd=True)
+        self.updateJsonAnalyses(analysis_name, jsonanalyses, {"arm64": res != ""})
+
+        command = "grep -r \"armeabi\""
+        errcode, res = self.xp.exec_in_subprocess(command, cwd=True)
+        self.updateJsonAnalyses(analysis_name, jsonanalyses, {"armeabi": res != ""})
+
         # This analysis cannot fail
         return True
