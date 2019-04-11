@@ -44,16 +44,20 @@ def redoAnalyses(packagename, json, xp):
         return True
 
     jsonanalyses = json[packagename]
-
+    log.debugv("Producer: evaluating if one of the analysis has to be performed for " + packagename)
     # Looking at each analysis to see if the status is done
-    for analysis in xp.analyses:
+    log.debugv("Current loaded JSON: " + str(jsonanalyses))
+    for analysis, precondition in xp.analyses:
         #print("============ "+ str((analysis.__class__.__name__)))
         analysis_name = analysis.__class__.__name__
+        log.debugv("Considering analysis " + analysis_name)
         if analysis_name in jsonanalyses:
+            log.debugv("Current status for analysis " + analysis_name + " : " + str(jsonanalyses[analysis_name]))
             if jsonanalyses[analysis_name]["status"] != "done":
                 return True
         else:
             return True
+
     return False
 
 

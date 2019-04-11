@@ -30,7 +30,7 @@ class Analysis:
 
     def checkTMPFS(self):
         command = "mount | grep tmpfs | grep " + self.xp.TMPFS
-        log.debug("Analysis: checking TMPFS with command " + command)
+        log.debugv("Analysis: checking TMPFS with command " + command)
         errcode, res = self.xp.exec_in_subprocess(command)
         if res == "":
             raise Exception("No tmpfs mount detected.")

@@ -88,7 +88,7 @@ def writeJson(name, xp, jsondata):
 
 
 def evaluatePreConditions(analysis_name, jsonanalyses, precondition):
-    log.debug("Evaluating preconditions " + str(precondition))
+    log.debug("Evaluating preconditions " + str(precondition) + " for analysis " + analysis_name)
     if precondition is None:
         return True
 
