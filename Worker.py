@@ -55,9 +55,11 @@ def doJob(queue, xp):
             if status[analysis_name] == "Todo":
                 # Checking the status and preconditions of this analysis before executing it
                 analysisPrecondition = evaluatePreConditions(analysis_name, jsonanalyses, precondition)
+                log.debug("Precondition result: " + str(analysisPrecondition))
                 if not analysisPrecondition:
                     analysis.updateJsonAnalyses(analysis_name, jsonanalyses, {"status": "precond_false"})
-                doAnalysis(analysis, analysis_name, apkname, jsonanalyses)
+                else:
+                    doAnalysis(analysis, analysis_name, apkname, jsonanalyses)
 
         # Clean of the working directory
         xp.cleanWorkingDirectory()
