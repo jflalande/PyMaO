@@ -22,7 +22,8 @@ class XPNative(Experiment):
 
         # Decode the manifest and checks that the minSdkVersion is 24
         # For apps that have native methods
-        self.analyses.append((ManifestDecoding(self, checkRunnableAndroidVersion=24), [{"Native":{"native_methods":True}}]))
+        self.analyses.append((ManifestDecoding(self, checkRunnableAndroidVersion=24),
+                              [{"Native":{"native_methods":True}}]))
 
         # Copying the APK that are Native and with API > 24 to a specific folder
         self.analyses.append((CopyAPK(self, targetDirectory="/home/jf/swap/nativeAPK"),

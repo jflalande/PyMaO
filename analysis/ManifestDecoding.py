@@ -27,12 +27,17 @@ class ManifestDecoding(Analysis):
                 SdkVersion = int(matched_lines[0].split('=')[1].split(')')[1],16)
                 self.updateJsonAnalyses(analysis_name, jsonanalyses, {level: SdkVersion})
 
+
         # We want to check if a specific Android version is reached
         if self.checkRunnableAndroidVersion != -1:
+
+            # Some ugly malware has no minSdkVerion !
+            if "minSdkVersion" not in jsonanalyses[analysis_name]:
+                return False  # Analysis fails
+
             self.updateJsonAnalyses(analysis_name, jsonanalyses,
                                     {"checkRunnableAndroidVersion" : jsonanalyses[analysis_name]["minSdkVersion"]
                                     <= self.checkRunnableAndroidVersion })
-
 
         # This analysis can fail if aapt fails to analyze apk
         return errcode == 0

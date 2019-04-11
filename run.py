@@ -65,8 +65,9 @@ applyColorsToLogs()
 PARAMETERS
 """
 NB_WORKERS = 1
-#logSetup("veryverbose")
+
 logSetup("verbose")
+#logSetup("veryverbose")
 #logSetup("info")
 
 workers=[]

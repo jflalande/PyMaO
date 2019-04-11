@@ -59,6 +59,9 @@ def doJob(queue, xp):
                 if not analysisPrecondition:
                     analysis.updateJsonAnalyses(analysis_name, jsonanalyses, {"status": "precond_false"})
                 else:
+                    # We setup the JSON entry for this analysis with a first write:
+                    analysis.updateJsonAnalyses(analysis_name, jsonanalyses, {"status": "doing"})
+                    # We launch the analysis
                     doAnalysis(analysis, analysis_name, apkname, jsonanalyses)
 
         # Clean of the working directory
