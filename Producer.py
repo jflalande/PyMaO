@@ -8,6 +8,9 @@ log = logging.getLogger("orchestrator")
 
 def createJobs(queue, xp):
 
+    # Cleaning TMPFS
+    xp.cleanTMPFSDirectory()
+
     for filename in os.listdir(xp.APKBASE):
         if filename.endswith(".apk"):
             log.debug("Producer: doing " + filename)
@@ -20,6 +23,10 @@ def createJobs(queue, xp):
             # Determine if one of the analysis should be done for this apk
             analysisToDo = redoAnalyses(packagename, json, xp)
             log.debug("Redo analysis: " + str(analysisToDo))
+
+            # Debug
+            if Statistics.getNbJobs() > 10:
+                return
 
             # If one of the analyses have to be redone, queue it
             if analysisToDo:

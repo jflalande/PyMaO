@@ -66,9 +66,10 @@ PARAMETERS
 """
 NB_WORKERS = 3
 
-#logSetup("verbose")
-#logSetup("veryverbose")
 logSetup("info")
+logSetup("verbose")
+#logSetup("veryverbose")
+
 
 workers=[]
 t_start = time.time()

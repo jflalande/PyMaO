@@ -1,6 +1,8 @@
 
 import logging
 import subprocess
+import os
+import shutil
 
 log = logging.getLogger("orchestrator")
 
@@ -8,6 +10,10 @@ class Experiment:
 
     APKBASE = ""
     JSONBASE = ""
+    # For debugging
+    SUBPROCESS_STDERR = os.devnull
+    # For release
+
 
     # To perform before launching the XP:
     # sudo mount -t tmpfs -o size=512M tmpfs /home/jf/swap/tmpfs/
@@ -21,19 +27,22 @@ class Experiment:
     working_directory = "NONE"
 
     def setupWorkingDirectory(self):
-        command = "mkdir " + self.TMPFS + "/" + self.tid
-        log.debug("Creating working directory " + command)
-        errcode, res = self.exec_in_subprocess(command)
-        if errcode != 0:
-            raise Exception("Experiment: Error: " + command)
-        self.working_directory = self.TMPFS + "/" + self.tid
-
+        log.debugv("Creating working directory " + self.TMPFS + "/" + self.tid)
+        try:
+            os.mkdir(self.TMPFS + "/" + self.tid)
+            self.working_directory = self.TMPFS + "/" + self.tid
+        except:
+            raise Exception("Error creating directory " + self.TMPFS + "/" + self.tid)
 
     def cleanWorkingDirectory(self):
-        command = "rm -Rf " + self.TMPFS + "/" + self.tid
-        errcode, res = self.exec_in_subprocess(command)
-        if errcode != 0:
-            raise Exception("Experiment: Error: " + command)
+        log.debugv("Cleaning TMPFS for pid " + self.tid)
+        shutil.rmtree(self.TMPFS + "/" + self.tid)
+
+    def cleanTMPFSDirectory(self):
+        log.info("Cleaning TMPFS")
+        for the_file in os.listdir(self.TMPFS):
+            shutil.rmtree(self.TMPFS + "/" + the_file)
+
 
     '''
     This is an attempt to unifiy all subprocess commands
@@ -52,26 +61,26 @@ class Experiment:
             log.debugv("Output is not captured for letting the command execute properly.")
         out = ""
         exitcode = -1
-        if not donotcaptureoutput:
-            if cwd:
-                process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=None, shell=True,
-                                           cwd=self.working_directory)
-            else:
-                process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=None, shell=True)
+        with open(self.SUBPROCESS_STDERR, 'w') as STDERR:
+            if not donotcaptureoutput:
+                if cwd:
+                    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=STDERR, shell=True, cwd=self.working_directory)
+                else:
+                    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=STDERR, shell=True)
 
-            with process.stdout: # For closing properly stdout
-                for line in iter(process.stdout.readline, b''):  # b'\n'-separated lines
-                    try:
-                        linestr = line.decode('utf-8').rstrip()
-                        out = out + line.decode('utf-8')
-                        log.debugv("  |" + linestr)
-                    except UnicodeDecodeError:
-                        log.warning("A string of the output of the cmd " + str(cmd) + " contains an illegal character (not UTF-8): ignoring.")
-        else:
-            if cwd:
-                process = subprocess.Popen(cmd, cwd=self.working_directory, shell=True)
+                with process.stdout: # For closing properly stdout
+                    for line in iter(process.stdout.readline, b''):  # b'\n'-separated lines
+                        try:
+                            linestr = line.decode('utf-8').rstrip()
+                            out = out + line.decode('utf-8')
+                            log.debugv("  |" + linestr)
+                        except UnicodeDecodeError:
+                            log.warning("A string of the output of the cmd " + str(cmd) + " contains an illegal character (not UTF-8): ignoring.")
             else:
-                process = subprocess.Popen(cmd, shell=True)
+                if cwd:
+                    process = subprocess.Popen(cmd, cwd=self.working_directory, shell=True, stderr=STDERR)
+                else:
+                    process = subprocess.Popen(cmd, shell=True, stderr=STDERR)
 
         # Wait after consuming output (if there is a capture of the output)
         exitcode = process.wait()

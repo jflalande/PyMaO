@@ -3,12 +3,12 @@ from experiment.Experiment import Experiment
 from analysis.Apktool import Apktool
 from analysis.Native import Native
 from analysis.ManifestDecoding import ManifestDecoding
-from analysis.CopyAPK import CopyAPK
+from analysis.SymlinkAPK import SymlinkAPK
 
 class XPNative(Experiment):
 
     APKBASE = "/media/jf/B006AF9A06AF5FD8/androzoo/samples"
-    JSONBASE = "/home/jf/orchestrator/jsons"
+    JSONBASE = "/media/jf/B006AF9A06AF5FD8/orchestrator/XPNative/jsons"
     SIMULATE_JSON_WRITE = False
 
     def __init__(self):
@@ -26,7 +26,7 @@ class XPNative(Experiment):
                               [{"Native":{"native_methods":True}}]))
 
         # Copying the APK that are Native and with API > 24 to a specific folder
-        self.analyses.append((CopyAPK(self, targetDirectory="/home/jf/orchestrator/nativeOutput"),
+        self.analyses.append((SymlinkAPK(self, targetDirectory="/media/jf/B006AF9A06AF5FD8/orchestrator/XPNative/apk"),
                               [{"ManifestDecoding" : {"checkRunnableAndroidVersion": True}}]))
 
 
