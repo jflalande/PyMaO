@@ -59,8 +59,7 @@ class Experiment:
             else:
                 process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=None, shell=True)
 
-            with process.stdout:
-                exitcode = process.wait()  # 0 means success
+            with process.stdout: # For closing properly stdout
                 for line in iter(process.stdout.readline, b''):  # b'\n'-separated lines
                     try:
                         linestr = line.decode('utf-8').rstrip()
@@ -70,11 +69,12 @@ class Experiment:
                         log.warning("A string of the output of the cmd " + str(cmd) + " contains an illegal character (not UTF-8): ignoring.")
         else:
             if cwd:
-                process = subprocess.Popen(cmd, cwd=self.working_directory)
+                process = subprocess.Popen(cmd, cwd=self.working_directory, shell=True)
             else:
-                process = subprocess.Popen(cmd)
+                process = subprocess.Popen(cmd, shell=True)
 
-            exitcode = process.wait()
+        # Wait after consuming output (if there is a capture of the output)
+        exitcode = process.wait()
 
         log.debugv("Result of subprocess:")
         log.debugv("Out: " + out)

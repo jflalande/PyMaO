@@ -7,8 +7,8 @@ from analysis.CopyAPK import CopyAPK
 
 class XPNative(Experiment):
 
-    APKBASE = "/home/jf/swap/malware"
-    JSONBASE = "/home/jf/swap/malware"
+    APKBASE = "/media/jf/B006AF9A06AF5FD8/androzoo/samples"
+    JSONBASE = "/home/jf/orchestrator/jsons"
     SIMULATE_JSON_WRITE = False
 
     def __init__(self):
@@ -26,7 +26,7 @@ class XPNative(Experiment):
                               [{"Native":{"native_methods":True}}]))
 
         # Copying the APK that are Native and with API > 24 to a specific folder
-        self.analyses.append((CopyAPK(self, targetDirectory="/home/jf/swap/nativeAPK"),
+        self.analyses.append((CopyAPK(self, targetDirectory="/home/jf/orchestrator/nativeOutput"),
                               [{"ManifestDecoding" : {"checkRunnableAndroidVersion": True}}]))
 
 

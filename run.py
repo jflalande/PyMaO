@@ -64,11 +64,11 @@ applyColorsToLogs()
 """
 PARAMETERS
 """
-NB_WORKERS = 2
+NB_WORKERS = 3
 
-logSetup("verbose")
+#logSetup("verbose")
 #logSetup("veryverbose")
-#logSetup("info")
+logSetup("info")
 
 workers=[]
 t_start = time.time()

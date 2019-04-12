@@ -15,6 +15,7 @@ class ManifestDecoding(Analysis):
         log.debug("Running ManifestDecoding analysis.")
 
         command = "aapt d xmltree " + self.xp.APKBASE + "/" + apkname + ".apk AndroidManifest.xml"
+
         errcode, res = self.xp.exec_in_subprocess(command, cwd=True)
 
         for level in ["minSdkVersion", "targetSdkVersion"]:
