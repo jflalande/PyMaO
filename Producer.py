@@ -25,8 +25,8 @@ def createJobs(queue, xp):
             log.debug("Redo analysis: " + str(analysisToDo))
 
             # Debug
-            if Statistics.getNbJobs() > 10:
-                return
+            #if Statistics.getNbJobs() > 10:
+            #    return
 
             # If one of the analyses have to be redone, queue it
             if analysisToDo:
