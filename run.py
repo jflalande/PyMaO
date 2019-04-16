@@ -1,11 +1,13 @@
 from queue import Queue
 from threading import Thread
 from Producer import createJobs
-from experiment.XPNative import XPNative
 from Worker import doJob
 import time
 import logging
 
+# importing XPs
+from experiment.XPNative import XPNative
+from experiment.XPInstallLaunch import XPInstallLauch
 
 # Adds a very verbose level of logs
 DEBUG_LEVELV_NUM = 9
@@ -64,10 +66,10 @@ applyColorsToLogs()
 """
 PARAMETERS
 """
-NB_WORKERS = 3
+NB_WORKERS = 1
 
 logSetup("info")
-#logSetup("verbose")
+logSetup("verbose")
 #logSetup("veryverbose")
 
 
@@ -75,12 +77,12 @@ workers=[]
 t_start = time.time()
 
 malware_queue = Queue()
-producer = Thread(target=createJobs, args=[malware_queue, XPNative()])
+producer = Thread(target=createJobs, args=[malware_queue, XPInstallLauch()])
 producer.start()
 
 # Creating workers
 for i in range(NB_WORKERS):
-    worker = Thread(target=doJob, args=[malware_queue, XPNative()])
+    worker = Thread(target=doJob, args=[malware_queue, XPInstallLauch()])
     worker.start()
     workers.append(worker)
 

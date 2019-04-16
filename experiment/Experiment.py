@@ -6,13 +6,20 @@ import shutil
 
 log = logging.getLogger("orchestrator")
 
+"""
+This class implements all common codes of an experiment.
+"""
 class Experiment:
 
     APKBASE = ""
     JSONBASE = ""
-    # For debugging
-    SUBPROCESS_STDERR = os.devnull
+    SDKHOME = ""
+    devicesesrial = "XXX"
     # For release
+    SUBPROCESS_STDERR = os.devnull
+    # For debugging
+    #
+    #SUBPROCESS_STDERR = os.stdout
 
 
     # To perform before launching the XP:
@@ -52,7 +59,7 @@ class Experiment:
     For commands that manipulates the output, the output should not be captured. For this purpose the
     donotcpatureoutput arguments helps to achieve this.
     '''
-    def exec_in_subprocess(self, cmd, cwd=False, donotcaptureoutput=False):
+    def exec_in_subprocess(self, cmd, cwd=False, donotcaptureoutput=False, shell=True):
 
         log.debugv('Subprocess: ' + str(cmd))
         if cwd:
@@ -63,10 +70,11 @@ class Experiment:
         exitcode = -1
         with open(self.SUBPROCESS_STDERR, 'w') as STDERR:
             if not donotcaptureoutput:
+                log.debugv("Output is captured and redirected to debugv and returned.")
                 if cwd:
-                    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=STDERR, shell=True, cwd=self.working_directory)
+                    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=STDERR, shell=shell, cwd=self.working_directory)
                 else:
-                    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=STDERR, shell=True)
+                    process = subprocess.Popen(cmd, stdout=subprocess.PIPE,  shell=shell)
 
                 with process.stdout: # For closing properly stdout
                     for line in iter(process.stdout.readline, b''):  # b'\n'-separated lines
@@ -77,10 +85,11 @@ class Experiment:
                         except UnicodeDecodeError:
                             log.warning("A string of the output of the cmd " + str(cmd) + " contains an illegal character (not UTF-8): ignoring.")
             else:
+                log.debugv("Output is NOT captured (you should see it) and lost.")
                 if cwd:
-                    process = subprocess.Popen(cmd, cwd=self.working_directory, shell=True, stderr=STDERR)
+                    process = subprocess.Popen(cmd, cwd=self.working_directory, shell=shell, stderr=STDERR)
                 else:
-                    process = subprocess.Popen(cmd, shell=True, stderr=STDERR)
+                    process = subprocess.Popen(cmd, shell=shell, stderr=STDERR)
 
         # Wait after consuming output (if there is a capture of the output)
         exitcode = process.wait()
@@ -88,4 +97,14 @@ class Experiment:
         log.debugv("Result of subprocess:")
         log.debugv("Out: " + out)
         log.debugv("Exit code: " + str(exitcode))
+        return exitcode, out
+
+    """
+    Sends command to the smartphone using ADB.
+    """
+    def adb_send_command(self, command, donotcaptureoutput=False):
+        """ Send a command to this device (by default through ADB). """
+        tool_command = [self.SDKHOME + "/platform-tools/adb", "-s", self.devicesesrial] + command
+        log.debug("Sending command: " + str(tool_command))
+        exitcode, out = self.exec_in_subprocess(tool_command, donotcaptureoutput, shell=False)
         return exitcode, out

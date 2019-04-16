@@ -30,7 +30,3 @@ class XPNative(Experiment):
                               [{"ManifestDecoding" : {"checkRunnableAndroidVersion": True}}]))
 
 
-
-# install tel
-# lance + sleep 1s + check PS
-# uninstall
