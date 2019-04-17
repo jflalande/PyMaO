@@ -26,21 +26,8 @@ class ManifestDecoding(Analysis):
 
         errcode, res = self.xp.exec_in_subprocess(command, cwd=True)
 
-        # try:
-        #     for level in ["minSdkVersion", "targetSdkVersion", ""]:
-        #         matched_lines = [line for line in res.split('\n') if level in line]
-        #         log.debugv("Matched line: " + str(matched_lines))
-        #         if len(matched_lines) == 1:
-        #             # Converting:
-        #             #       A: android:minSdkVersion(0x0101020c)=(type 0x10)0x18
-        #             # into  24
-        #             SdkVersion = int(matched_lines[0].split('=')[1].split(')')[1],16)
-        #             self.updateJsonAnalyses(analysis_name, jsonanalyses, {level: SdkVersion})
-        # except ValueError: # For exampe, some manifest contains 0x13 (Raw: "19"
-        #     log.warning("Error decoding the Manifest for the matched lines:")
-        #     log.warning(str(matched_lines))
-        #     return False
-        for line in res.split('\n'  ):
+        # Single value capture: minSdkVersion, targetSdkVersion, package
+        for line in res.split('\n'):
 
             for attribute in self.regexAttributes:
                 regex = self.regexAttributes[attribute]
@@ -56,12 +43,49 @@ class ManifestDecoding(Analysis):
                         log.warning("Error decoding the Manifest for the matched lines:")
                         log.warning(str(line))
 
+        # Activity decoding
+        activity = None
+        activities = []
+        indent = 1000
+        for line in res.split('\n'):
+            print(line)
+            # Detecting a new activity tag or other tag indented on the current activity
+            m = re.match("^(\s+)E:.*$", line)
+            if m:
+                current_indent = len(m.group(1))
+                if current_indent <= indent:
+                    if activity is not None:
+                        activities.append(activity)
+                        indent = 1000
+                        activity = None
 
+            # Detecting a start of activity
+            m = re.match("^(\s+)E: activity.*$", line)
+            if m:
+                activity = {}
+                indent = len(m.group(1))
+
+            # Detecting the name of the activity
+            m = re.match("^(\s+)A: android:name\(\w+\)=\"([\w\.]+)\".*$", line)
+            if m and len(m.group(1)) == indent + 2:
+                activity["name"] = m.group(2)
+
+            # Detecting the MAIN activity
+            m = re.match("^(\s+)A: android:name\(\w+\)=\"(android\.intent\.action\.MAIN)\".*$", line)
+            if m and len(m.group(1)) > indent:
+                activity["main"] = True
+
+        # Pushing last activity
+        if activity is not None:
+            activities.append(activity)
+
+        # Updateing JSON
+        self.updateJsonAnalyses(analysis_name, jsonanalyses, {"activities": activities})
 
         # We want to check if a specific Android version is reached
         if self.checkRunnableAndroidVersion != -1:
 
-            # Some ugly malware has no minSdkVerion !
+            # Some ugly malware has no minSdkVersion !
             if "minSdkVersion" not in jsonanalyses[analysis_name]:
                 return False  # Analysis fails
 

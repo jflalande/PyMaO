@@ -70,7 +70,7 @@ NB_WORKERS = 1
 
 logSetup("info")
 logSetup("verbose")
-#logSetup("veryverbose")
+logSetup("veryverbose")
 
 
 workers=[]
