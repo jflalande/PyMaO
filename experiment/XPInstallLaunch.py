@@ -3,6 +3,7 @@ from experiment.Experiment import Experiment
 from analysis.AdbInstall import AdbInstall
 from analysis.ManifestDecoding import ManifestDecoding
 from analysis.AdbUninstall import AdbUninstall
+from analysis.LaunchAndSurvive import LaunchAndSurvive
 
 # install tel
 # lance + sleep 1s + check PS
@@ -24,6 +25,11 @@ class XPInstallLauch(Experiment):
 
         # Run AdbInstall
         self.analyses.append((AdbInstall(self),  [{"ManifestDecoding": {"status": "done"}}]))
+
+        self.analyses.append((LaunchAndSurvive(self),
+                              [{"ManifestDecoding": {"status": "done"}},
+                               {"ManifestDecoding": {"launchable": True}},
+                               {"AdbInstall" : {"install": True }}]))
 
         # Run AdbUninstall if installed
         self.analyses.append((AdbUninstall(self),

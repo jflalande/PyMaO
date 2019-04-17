@@ -43,12 +43,12 @@ class ManifestDecoding(Analysis):
                         log.warning("Error decoding the Manifest for the matched lines:")
                         log.warning(str(line))
 
-        # Activity decoding
+        # Activity decoding + detection of main activity
+        self.updateJsonAnalyses(analysis_name, jsonanalyses, {"launchable": False})
         activity = None
         activities = []
         indent = 1000
         for line in res.split('\n'):
-            print(line)
             # Detecting a new activity tag or other tag indented on the current activity
             m = re.match("^(\s+)E:.*$", line)
             if m:
@@ -74,12 +74,13 @@ class ManifestDecoding(Analysis):
             m = re.match("^(\s+)A: android:name\(\w+\)=\"(android\.intent\.action\.MAIN)\".*$", line)
             if m and len(m.group(1)) > indent:
                 activity["main"] = True
+                self.updateJsonAnalyses(analysis_name, jsonanalyses, {"launchable": True})
 
         # Pushing last activity
         if activity is not None:
             activities.append(activity)
 
-        # Updateing JSON
+        # Updating JSON
         self.updateJsonAnalyses(analysis_name, jsonanalyses, {"activities": activities})
 
         # We want to check if a specific Android version is reached

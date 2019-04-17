@@ -45,7 +45,7 @@ def doJob(queue, xp):
             if status[analysis_name] == "Todo":
                 for analysis_dependency_name in analysis.dependencies():
                     status[analysis_dependency_name] = "Todo"
-                    if analysis_dependency_name not in xp.analyses:
+                    if analysis_dependency_name not in status:
                         raise Exception("The analysis " + analysis_dependency_name + " is missing as a dependency of " + analysis_name + ".")
 
 
