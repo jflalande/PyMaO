@@ -15,7 +15,7 @@ class Experiment:
     APKBASE = ""
     JSONBASE = ""
     SDKHOME = ""
-    deviceserial = "XXX"
+    deviceserial = None
     # For release
     SUBPROCESS_STDERR = os.devnull
     # For debugging
@@ -51,6 +51,15 @@ class Experiment:
         for the_file in os.listdir(self.TMPFS):
             shutil.rmtree(self.TMPFS + "/" + the_file)
 
+    def setupDeviceUsingAdb(self):
+        if self.deviceserial == None:
+            return
+        exitcode, res = self.adb_send_command(["devices"])
+        for line in res.split('\n'):
+            if line.startswith(self.deviceserial):
+                return
+        log.error("No device " + self.deviceserial + " detecting using adb.")
+        quit()
 
     '''
     This is an attempt to unifiy all subprocess commands

@@ -23,6 +23,9 @@ def doJob(queue, xp):
 
         log.debug("Worker: " + str(jsondata))
 
+        xp.setupDeviceUsingAdb()
+
+
         # End of jobs
         if jsondata == "--END--":
             break;
