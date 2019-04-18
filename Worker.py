@@ -93,7 +93,7 @@ def writeJson(name, xp, jsondata):
 
     if not xp.SIMULATE_JSON_WRITE:
         with open(jsonfilename, 'w') as json_file:
-            json.dump(jsondata, json_file)
+            json.dump(jsondata, json_file, indent=4)
     else:
         log.debug("Worker: JSON SIMULATION Writing in " + str(jsonfilename) + ': ' + str(jsondata))
 

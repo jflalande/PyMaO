@@ -3,6 +3,7 @@ import logging
 import subprocess
 import os
 import shutil
+import time
 
 log = logging.getLogger("orchestrator")
 
@@ -108,3 +109,17 @@ class Experiment:
         log.debug("Sending command: " + str(tool_command))
         exitcode, out = self.exec_in_subprocess(tool_command, donotcaptureoutput, shell=False)
         return exitcode, out
+
+    def wake_up_and_unlock_device(self):
+        log.debug("Waking up screen")
+        # https://stackoverflow.com/questions/35275828/is-there-a-way-to-check-if-android-device-screen-is-locked-via-adb
+        # adb shell service call power 12
+        # Result: Parcel(00000000 00000001   '........')
+        exitcode, res = self.adb_send_command(["shell", "service", "call", "power", "12"])
+        while res != "Result: Parcel(00000000 00000001   '........')\n":
+            self.adb_send_command(["shell", "input", "keyevent", "26"])
+            time.sleep(0.5)
+            exitcode, res = self.adb_send_command(["shell", "service", "call", "power", "12"])
+
+        self.adb_send_command(["shell", "input", "keyevent", "82"])
+

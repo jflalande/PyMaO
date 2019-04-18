@@ -55,6 +55,7 @@ class ManifestDecoding(Analysis):
                 current_indent = len(m.group(1))
                 if current_indent <= indent:
                     if activity is not None:
+                        log.debugv("ManifestDecoding: pushing activity: " + str(activity))
                         activities.append(activity)
                         indent = 1000
                         activity = None
@@ -62,17 +63,23 @@ class ManifestDecoding(Analysis):
             # Detecting a start of activity
             m = re.match("^(\s+)E: activity.*$", line)
             if m:
+                log.debugv("ManifestDecoding: start of activity detected.")
                 activity = {}
                 indent = len(m.group(1))
 
+
             # Detecting the name of the activity
-            m = re.match("^(\s+)A: android:name\(\w+\)=\"([\w\.]+)\".*$", line)
+            # The name can contain caracters, dots, and $
+            m = re.match("^(\s+)A: android:name\(\w+\)=\"([\w\.\$]+)\".*$", line)
             if m and len(m.group(1)) == indent + 2:
+                log.debugv("ManifestDecoding: name of activity detected.")
                 activity["name"] = m.group(2)
 
             # Detecting the MAIN activity
             m = re.match("^(\s+)A: android:name\(\w+\)=\"(android\.intent\.action\.MAIN)\".*$", line)
-            if m and len(m.group(1)) > indent:
+            # If the indent increases and the name of activity has been captured by the regex
+            if m and len(m.group(1)) > indent and "name" in activity:
+                log.debugv("ManifestDecoding: LAUNCHER intent of activity detected.")
                 activity["main"] = True
                 self.updateJsonAnalyses(analysis_name, jsonanalyses, {"launchable": True})
 
