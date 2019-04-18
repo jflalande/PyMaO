@@ -60,37 +60,37 @@ class Experiment:
     For commands that manipulates the output, the output should not be captured. For this purpose the
     donotcpatureoutput arguments helps to achieve this.
     '''
-    def exec_in_subprocess(self, cmd, cwd=False, donotcaptureoutput=False, shell=True):
+    def exec_in_subprocess(self, cmd, donotcaptureoutput=False, cwd=None, shell=True):
 
         log.debugv('Subprocess: ' + str(cmd))
         if cwd:
             log.debugv('Working directory: ' + self.working_directory)
+            cwd = self.working_directory
+
         if donotcaptureoutput:
             log.debugv("Output is not captured for letting the command execute properly.")
-        out = ""
-        exitcode = -1
-        with open(self.SUBPROCESS_STDERR, 'w') as STDERR:
-            if not donotcaptureoutput:
-                log.debugv("Output is captured and redirected to debugv and returned.")
-                if cwd:
-                    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=STDERR, shell=shell, cwd=self.working_directory)
-                else:
-                    process = subprocess.Popen(cmd, stdout=subprocess.PIPE,  shell=shell)
+            stdout = None
+            stderr = None
+        else:
+            stdout = subprocess.PIPE
+            stderr = subprocess.STDOUT
 
-                with process.stdout: # For closing properly stdout
-                    for line in iter(process.stdout.readline, b''):  # b'\n'-separated lines
-                        try:
-                            linestr = line.decode('utf-8').rstrip()
-                            out = out + line.decode('utf-8')
-                            log.debugv("  |" + linestr)
-                        except UnicodeDecodeError:
-                            log.warning("A string of the output of the cmd " + str(cmd) + " contains an illegal character (not UTF-8): ignoring.")
-            else:
-                log.debugv("Output is NOT captured (you should see it) and lost.")
-                if cwd:
-                    process = subprocess.Popen(cmd, cwd=self.working_directory, shell=shell, stderr=STDERR)
-                else:
-                    process = subprocess.Popen(cmd, shell=shell, stderr=STDERR)
+        # Execute the command
+        log.debugv("Executing: " + str(cmd) + " cwd=" + str(cwd) + " shell=" + str(shell) + " stdout=" + str(stdout))
+        process = subprocess.Popen(cmd, cwd=cwd, shell=shell, stdout=stdout, stderr=stderr)
+
+        # Consume output
+        out = ""
+        if not donotcaptureoutput:
+            with process.stdout:  # For closing properly stdout
+                for line in iter(process.stdout.readline, b''):  # b'\n'-separated lines
+                    try:
+                        linestr = line.decode('utf-8').rstrip()
+                        out = out + line.decode('utf-8')
+                        log.debugv("  |" + linestr)
+                    except UnicodeDecodeError:
+                        log.warning("A string of the output of the cmd " + str(
+                            cmd) + " contains an illegal character (not UTF-8): ignoring.")
 
         # Wait after consuming output (if there is a capture of the output)
         exitcode = process.wait()
@@ -100,6 +100,7 @@ class Experiment:
         log.debugv("Exit code: " + str(exitcode))
         return exitcode, out
 
+
     """
     Sends command to the smartphone using ADB.
     """
@@ -107,7 +108,7 @@ class Experiment:
         """ Send a command to this device (by default through ADB). """
         tool_command = [self.SDKHOME + "/platform-tools/adb", "-s", self.deviceserial] + command
         log.debug("Sending command: " + str(tool_command))
-        exitcode, out = self.exec_in_subprocess(tool_command, donotcaptureoutput, shell=False)
+        exitcode, out = self.exec_in_subprocess(tool_command, donotcaptureoutput=donotcaptureoutput, shell=False)
         return exitcode, out
 
     def wake_up_and_unlock_device(self):
@@ -121,5 +122,6 @@ class Experiment:
             time.sleep(0.5)
             exitcode, res = self.adb_send_command(["shell", "service", "call", "power", "12"])
 
+        # https://stackoverflow.com/questions/29072501/how-to-unlock-android-phone-through-adb
         self.adb_send_command(["shell", "input", "keyevent", "82"])
 
