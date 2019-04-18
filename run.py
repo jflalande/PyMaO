@@ -68,8 +68,8 @@ PARAMETERS
 """
 NB_WORKERS = 1
 
-logSetup("info")
-logSetup("verbose")
+logSetup("normal")
+#logSetup("verbose")
 #logSetup("veryverbose")
 
 
@@ -79,6 +79,9 @@ t_start = time.time()
 malware_queue = Queue()
 producer = Thread(target=createJobs, args=[malware_queue, XPInstallLauch()])
 producer.start()
+
+# Waiting the producer to work first (helps for debugging purpose)
+time.sleep(1)
 
 # Creating workers
 for i in range(NB_WORKERS):

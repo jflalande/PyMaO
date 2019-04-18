@@ -22,7 +22,7 @@ class ManifestDecoding(Analysis):
     def analysis(self, analysis, analysis_name, apkname, jsonanalyses):
         log.debug("Running ManifestDecoding analysis.")
 
-        command = "aapt d xmltree " + self.xp.APKBASE + "/" + apkname + ".apk AndroidManifest.xml"
+        command = "aapt d xmltree '" + self.xp.APKBASE + "/" + apkname + ".apk' AndroidManifest.xml"
 
         errcode, res = self.xp.exec_in_subprocess(command, cwd=True)
 
