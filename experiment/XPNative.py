@@ -9,11 +9,14 @@ class XPNative(Experiment):
 
     #APKBASE = "/media/jf/B006AF9A06AF5FD8/androzoo/samples"
     #JSONBASE = "/media/jf/B006AF9A06AF5FD8/orchestrator/XPNative/jsons"
+
     #TARGETSYMLINK = "/media/jf/B006AF9A06AF5FD8/orchestrator/XPNative/apk"
-    TARGETSYMLINK = "/home/jf/swap/nativeAPK"
+
     APKBASE = "/home/jf/swap/malware"
     JSONBASE = "/home/jf/swap/malware"
     SIMULATE_JSON_WRITE = False
+
+    TARGETSYMLINK = "/home/jf/swap/nativeAPK"
 
     def __init__(self):
         self.analyses = []
