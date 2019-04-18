@@ -15,7 +15,7 @@ class Experiment:
     APKBASE = ""
     JSONBASE = ""
     SDKHOME = ""
-    devicesesrial = "XXX"
+    deviceserial = "XXX"
     # For release
     SUBPROCESS_STDERR = os.devnull
     # For debugging
@@ -105,7 +105,7 @@ class Experiment:
     """
     def adb_send_command(self, command, donotcaptureoutput=False):
         """ Send a command to this device (by default through ADB). """
-        tool_command = [self.SDKHOME + "/platform-tools/adb", "-s", self.devicesesrial] + command
+        tool_command = [self.SDKHOME + "/platform-tools/adb", "-s", self.deviceserial] + command
         log.debug("Sending command: " + str(tool_command))
         exitcode, out = self.exec_in_subprocess(tool_command, donotcaptureoutput, shell=False)
         return exitcode, out

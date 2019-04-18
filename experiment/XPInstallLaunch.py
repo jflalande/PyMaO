@@ -14,7 +14,7 @@ class XPInstallLauch(Experiment):
     JSONBASE = "/home/jf/swap/malware"
     SIMULATE_JSON_WRITE = False
     SDKHOME = "/home/jf/Android/Sdk"
-    devicesesrial = "CB512FEL52"
+    deviceserial = "CB512FEL52"
 
     def __init__(self):
         self.analyses = []
@@ -26,6 +26,7 @@ class XPInstallLauch(Experiment):
         # Run AdbInstall
         self.analyses.append((AdbInstall(self),  [{"ManifestDecoding": {"status": "done"}}]))
 
+        # Launch the application and test if it survives
         self.analyses.append((LaunchAndSurvive(self),
                               [{"ManifestDecoding": {"status": "done"}},
                                {"ManifestDecoding": {"launchable": True}},
