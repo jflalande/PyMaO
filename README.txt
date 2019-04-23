@@ -1,9 +1,9 @@
-
 # Installation process
 
 ```
 pip3 install < requirements.txt
 sudo apt install openjdk-8-jre-headless
+sudo apt install apktool
 ```
 
 Download the Android SDK, and unzip it in ~/Android/Sdk. Then:
