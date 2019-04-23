@@ -13,16 +13,16 @@ def createJobs(queue, xp):
 
     for filename in os.listdir(xp.APKBASE):
         if filename.endswith(".apk"):
-            log.debug("Producer: doing " + filename)
+            log.debugv("Producer: doing " + filename)
             packagename = getMalwareName(filename)
-            log.debug("Producer: packagename " + packagename)
+            log.debugv("Producer: packagename " + packagename)
 
             json = readJson(packagename, xp)
-            log.debug("Producer: json " + str(json))
+            log.debugv("Producer: json " + str(json))
 
             # Determine if one of the analysis should be done for this apk
             analysisToDo = redoAnalyses(packagename, json, xp)
-            log.debug("Redo analysis: " + str(analysisToDo))
+            log.debugv("Redo analysis: " + str(analysisToDo))
 
             # Debug
             #if Statistics.getNbJobs() > 10:
