@@ -11,6 +11,7 @@ def createJobs(queue, xp):
     # Cleaning TMPFS
     xp.cleanTMPFSDirectory()
 
+    log.info("Prodcuer: iterating over apk files in " + str(xp.APKBASE) + " - It can take some time...")
     for filename in os.listdir(xp.APKBASE):
         if filename.endswith(".apk"):
             log.debugv("Producer: doing " + filename)
