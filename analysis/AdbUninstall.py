@@ -14,8 +14,11 @@ class AdbUninstall(Analysis):
 
         exitcode, res = self.xp.adb_send_command(["uninstall", package_name ])
 
-        self.updateJsonAnalyses(analysis_name, jsonanalyses, {"uninstall": exitcode == 0})
+        for line in res.split('\n'):
+            if "Success" in line:
+                self.updateJsonAnalyses(analysis_name, jsonanalyses, {"uninstall": True})
+                return True
 
-        return True
+        return False
 
 
