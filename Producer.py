@@ -2,6 +2,7 @@ import os
 import json
 import logging
 from experiment.Statistics import Statistics
+from json import JSONDecodeError
 
 log = logging.getLogger("orchestrator")
 
@@ -79,9 +80,14 @@ def getMalwareName(filename):
 def readJson(name, xp):
     jsonfilename = os.path.join(xp.JSONBASE, name + ".json")
 
-    if not os.path.isfile(jsonfilename):
-        return { name : {}}
-    else:
-        with open(jsonfilename) as json_file:
-            return json.load(json_file)
+    try:
+        if not os.path.isfile(jsonfilename):
+            return { name : {}}
+        else:
+            with open(jsonfilename) as json_file:
+                return json.load(json_file)
+    except JSONDecodeError:
+        # File is empty or contains errors
+        return {name: {}}
+
 
