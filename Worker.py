@@ -68,6 +68,11 @@ def doJob(queue, xp):
                 else:
                     # We setup the JSON entry for this analysis with a first write:
                     analysis.updateJsonAnalyses(analysis_name, jsonanalyses, {"status": "doing"})
+
+                    # Checking device status
+                    if xp.usesADevice():
+                        xp.check_device_online()
+
                     # We launch the analysis
                     doAnalysis(analysis, analysis_name, apkname, jsonanalyses)
 

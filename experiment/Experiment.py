@@ -129,17 +129,17 @@ class Experiment:
 
     """ Checks that the "adb device" command returns "device" (and not offline) """
     def check_device_online(self):
+        log.debug("Checking device " + self.deviceserial)
         exitcode, res = self.adb_send_command(["devices"])
         for line in res.split('\n'):
             if self.deviceserial in line and "device" in line:
-                return True
-        return False
+                return
+        log.error("Device " + self.deviceserial + " seems offline !")
+        quit()
 
     def wake_up_and_unlock_device(self):
-        log.debut("Checking device")
-        if not self.check_device_online():
-            log.error("Device "+ self.deviceserial + " seems offline !")
-            quit()
+
+        self.check_device_online()
 
         log.debug("Waking up screen")
         # https://stackoverflow.com/questions/35275828/is-there-a-way-to-check-if-android-device-screen-is-locked-via-adb
