@@ -37,7 +37,9 @@ class Analysis:
         log.debugv("Analysis: checking TMPFS with command " + command)
         errcode, res = self.xp.exec_in_subprocess(command)
         if res == "":
-            raise Exception("No tmpfs mount detected.")
+            log.error("No tmpfs mount detected.")
+            log.error("Suggestion: sudo mount -t tmpfs -o size=1G tmpfs " + self.xp.TMPFS)
+            quit()
 
     def updateJsonAnalyses(self, analysis_name, jsonanalyses, newdata):
         log.debug("Updating JSON with result: " + str(newdata))

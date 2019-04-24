@@ -11,15 +11,19 @@ from analysis.SymlinkAPK import SymlinkAPK
 # uninstall
 class XPInstallLauch(Experiment):
 
-    APKBASE = "/home/jf/swap/nativeAPK"
+    APKBASE = "/home/jf/swap/malware"
     JSONBASE = "/home/jf/swap/nativeAPK"
     SIMULATE_JSON_WRITE = False
     SDKHOME = "/home/jf/Android/Sdk"
-    deviceserial = "CB512FEL52"
 
     TARGETSYMLINK = "/home/jf/swap/runningAPK"
 
-    def __init__(self):
+    ''' By defautl, an XP does not use a drvice '''
+    def usesADevice(self):
+        return True
+
+    def __init__(self, deviceserial=None):
+        self.deviceserial = deviceserial
         self.analyses = []
 
         # Decode the manifest and checks that the minSdkVersion is 24

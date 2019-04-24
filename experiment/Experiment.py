@@ -51,6 +51,10 @@ class Experiment:
         for the_file in os.listdir(self.TMPFS):
             shutil.rmtree(self.TMPFS + "/" + the_file)
 
+    ''' By defautl, an XP does not use a drvice '''
+    def usesADevice(self):
+        return False
+
     def setupDeviceUsingAdb(self):
         if self.deviceserial == None:
             return

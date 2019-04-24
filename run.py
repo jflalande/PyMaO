@@ -66,8 +66,8 @@ applyColorsToLogs()
 """
 PARAMETERS
 """
-NB_WORKERS = 1
-
+NB_WORKERS = 4 # No more workers than devices if using devices !
+DEVICES = ["CB512DXH1C", "CB512FCYAS", "CB512FEL52", "CB512DXF13"]
 logSetup("normal")
 #logSetup("verbose")
 #logSetup("veryverbose")
@@ -77,7 +77,13 @@ workers=[]
 t_start = time.time()
 
 malware_queue = Queue()
-producer = Thread(target=createJobs, args=[malware_queue, XPInstallLauch()])
+xpModel = XPInstallLauch()
+xpUsesADevice = xpModel.usesADevice()
+if len(DEVICES) < NB_WORKERS and xpUsesADevice:
+    log.error("No more workers than number of devices !")
+    quit()
+
+producer = Thread(target=createJobs, args=[malware_queue, xpModel])
 producer.start()
 
 # Waiting the producer to work first (helps for debugging purpose)
@@ -85,7 +91,11 @@ time.sleep(1)
 
 # Creating workers
 for i in range(NB_WORKERS):
-    worker = Thread(target=doJob, args=[malware_queue, XPInstallLauch()])
+    deviceserial = None
+    if xpUsesADevice:
+        deviceserial = DEVICES[i]
+
+    worker = Thread(target=doJob, args=[malware_queue, XPInstallLauch(deviceserial)])
     worker.start()
     workers.append(worker)
 
