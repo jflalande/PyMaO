@@ -4,6 +4,7 @@ import subprocess
 import os
 import shutil
 import time
+import threading
 
 log = logging.getLogger("orchestrator")
 
@@ -34,6 +35,10 @@ class Experiment:
     tid = "NONE"
     working_directory = "NONE"
 
+    ''' By defautl, an XP does not use a drvice '''
+    def usesADevice(self):
+        return False
+
     def setupWorkingDirectory(self):
         log.debugv("Creating working directory " + self.TMPFS + "/" + self.tid)
         try:
@@ -50,20 +55,6 @@ class Experiment:
         log.info("Cleaning TMPFS")
         for the_file in os.listdir(self.TMPFS):
             shutil.rmtree(self.TMPFS + "/" + the_file)
-
-    ''' By defautl, an XP does not use a drvice '''
-    def usesADevice(self):
-        return False
-
-    def setupDeviceUsingAdb(self):
-        if self.deviceserial == None:
-            return
-        exitcode, res = self.adb_send_command(["devices"])
-        for line in res.split('\n'):
-            if line.startswith(self.deviceserial):
-                return
-        log.error("No device " + self.deviceserial + " detecting using adb.")
-        quit()
 
     '''
     This is an attempt to unifiy all subprocess commands
@@ -124,7 +115,32 @@ class Experiment:
         exitcode, out = self.exec_in_subprocess(tool_command, donotcaptureoutput=donotcaptureoutput, shell=False)
         return exitcode, out
 
+
+    """ One time check a device """
+    def setupDeviceUsingAdb(self):
+        if self.deviceserial == None:
+            return
+        exitcode, res = self.adb_send_command(["devices"])
+        for line in res.split('\n'):
+            if line.startswith(self.deviceserial):
+                return
+        log.error("No device " + self.deviceserial + " detecting using adb.")
+        quit()
+
+    """ Checks that the "adb device" command returns "device" (and not offline) """
+    def check_device_online(self):
+        exitcode, res = self.adb_send_command(["devices"])
+        for line in res.split('\n'):
+            if self.deviceserial in line and "device" in line:
+                return True
+        return False
+
     def wake_up_and_unlock_device(self):
+        log.debut("Checking device")
+        if not self.check_device_online():
+            log.error("Device "+ self.deviceserial + " seems offline !")
+            quit()
+
         log.debug("Waking up screen")
         # https://stackoverflow.com/questions/35275828/is-there-a-way-to-check-if-android-device-screen-is-locked-via-adb
         # adb shell service call power 12
