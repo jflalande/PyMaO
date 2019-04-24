@@ -79,6 +79,7 @@ def getMalwareName(filename):
 
 def readJson(name, xp):
     jsonfilename = os.path.join(xp.JSONBASE, name + ".json")
+    log.debugv("Producer: will read JSON " + str(jsonfilename))
 
     try:
         if not os.path.isfile(jsonfilename):
