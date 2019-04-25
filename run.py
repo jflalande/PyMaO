@@ -66,11 +66,11 @@ applyColorsToLogs()
 """
 PARAMETERS
 """
-NB_WORKERS = 4 # No more workers than devices if using devices !
-DEVICES = ["CB512DXH1C", "CB512FCYAS", "CB512FEL52", "CB512DXF13"]
+NB_WORKERS = 1 # No more workers than devices if using devices !
+DEVICES = ["CB512ENX66", "CB512DXH1C", "CB512FCYAS", "CB512FEL52"]
 logSetup("normal")
-#logSetup("verbose")
-#logSetup("veryverbose")
+logSetup("verbose")
+logSetup("veryverbose")
 
 
 workers=[]
@@ -95,7 +95,7 @@ for i in range(NB_WORKERS):
     if xpUsesADevice:
         deviceserial = DEVICES[i]
 
-    worker = Thread(target=doJob, args=[malware_queue, XPInstallLauch(deviceserial)])
+    worker = Thread(target=doJob, args=[malware_queue, XPInstallLauch(deviceserial), i+1])
     worker.start()
     workers.append(worker)
 

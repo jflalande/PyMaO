@@ -17,6 +17,9 @@ class Experiment:
     JSONBASE = ""
     SDKHOME = ""
     deviceserial = None
+    worker_nb = -1
+    device_local_port = -1
+
     # For release
     SUBPROCESS_STDERR = os.devnull
     # For debugging
@@ -118,14 +121,43 @@ class Experiment:
 
     """ One time check a device """
     def setupDeviceUsingAdb(self):
+        log.info("Checking and preparing device " + self.deviceserial)
         if self.deviceserial == None:
             return
         exitcode, res = self.adb_send_command(["devices"])
         for line in res.split('\n'):
             if line.startswith(self.deviceserial):
-                return
-        log.error("No device " + self.deviceserial + " detecting using adb.")
-        quit()
+                log.info(" - found")
+                break
+        # We cannot find the device
+        if not line.startswith(self.deviceserial):
+            log.error("No device " + self.deviceserial + " detecting using adb.")
+            quit()
+
+        # Killing previous remaining process (if any)
+        self.cleanDeviceUsingAdb()
+
+        # Installing the watchdog
+        log.info(" - pushing watchdog.arm64")
+        _,res = self.adb_send_command(["push", "watchdog.arm64", "/data/local/tmp/watchdog.arm64"])
+        if not res.startswith("watchdog.arm64: 1 file pushed"):
+            log.error("Error pushing watchdog.arm64")
+            quit()
+
+        # Forwaring ports
+        self.device_local_port = 4446 + self.worker_nb
+        log.info(" - redirecting local port " + str(self.device_local_port) + " to smartphone port 4446")
+        _,res = self.adb_send_command(["forward", "tcp:" + str(self.device_local_port), "tcp:4446"])
+
+        # Launching the watchdog
+        log.info(" - activating watchdog.arm64")
+        self.adb_send_command(["shell", "daemonize", "/data/local/tmp/watchdog.arm64", "4446"])
+
+    """ Kill the watchdog.arm64 """
+    def cleanDeviceUsingAdb(self):
+
+        log.info(" - killing previous watchdog.arm64")
+        self.adb_send_command(["shell", "pkill", "watchdog.arm64"])
 
     """ Checks that the "adb device" command returns "device" (and not offline) """
     def check_device_online(self):
@@ -133,9 +165,34 @@ class Experiment:
         exitcode, res = self.adb_send_command(["devices"])
         for line in res.split('\n'):
             if self.deviceserial in line and "device" in line:
-                return
-        log.error("Device " + self.deviceserial + " seems offline !")
-        quit()
+                return True
+        return False
+
+    def check_device_online_or_wait_reboot(self):
+
+        if self.check_device_online():
+            # Updating watchdog
+            # echo -n "ALIVE" | nc localhost 444x
+            self.exec_in_subprocess("echo -n 'ALIVE' | nc localhost " + str(self.device_local_port), shell=True)
+            return
+
+        log.warning("Device " + self.deviceserial + " seems offline !")
+        log.warning("Waiting the reboot initiated by watchdog.arm64")
+        log.debug("Sleeping 60s...")
+        time.sleep(60)
+        log.debug("The reboot should have occurred")
+        log.debug("Waiting the boot process...")
+        time.sleep(20)
+
+        while not self.check_device_online():
+            time.sleep(5)
+        log.debug("Waiting an additional 30s to have the welcome screen...")
+        time.sleep(30)
+        log.debug("It should be ok now.")
+
+        if not self.check_device_online():
+            log.error("The reboot process FAILED :-(")
+            quit()
 
     def wake_up_and_unlock_device(self):
 

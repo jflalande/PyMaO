@@ -12,22 +12,22 @@ Get a job and launch the missing analyses.
 
 This class is executed in a separate thread.
 """
-def doJob(queue, xp):
+def doJob(queue, xp, worker_nb):
     xp.tid = str(threading.get_ident())
+    xp.worker_nb = worker_nb
     log.debug("Working on thread " + xp.tid)
 
+    xp.setupDeviceUsingAdb()
 
     while True:
         jsondata = queue.get()
         Statistics.decNbJobs()
 
-        log.debug("Worker: " + str(jsondata))
-
-        xp.setupDeviceUsingAdb()
-
+        log.debug("Worker " + str(xp.worker_nb) + " : " + str(jsondata))
 
         # End of jobs
         if jsondata == "--END--":
+            xp.cleanDeviceUsingAdb()
             break;
 
         apkname = next(iter(jsondata))
@@ -71,7 +71,7 @@ def doJob(queue, xp):
 
                     # Checking device status
                     if xp.usesADevice():
-                        xp.check_device_online()
+                        xp.check_device_online_or_wait_reboot()
 
                     # We launch the analysis
                     doAnalysis(analysis, analysis_name, apkname, jsonanalyses)
