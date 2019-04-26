@@ -17,11 +17,16 @@ def doJob(queue, xp, worker_nb):
     xp.worker_nb = worker_nb
     log.debug("Working on thread " + xp.tid)
 
-    xp.setupDeviceUsingAdb()
+    setupHasBeenDone = False
 
     while True:
         jsondata = queue.get()
         Statistics.decNbJobs()
+
+        # Preparing the device the first time and arming watchdog
+        if not setupHasBeenDone:
+            xp.setupDeviceUsingAdb()
+            setupHasBeenDone = True
 
         # End of jobs
         if jsondata == "--END--":
