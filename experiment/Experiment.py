@@ -183,13 +183,14 @@ class Experiment:
         log.debug("Sleeping 60s...")
         time.sleep(60)
         log.warning("The reboot should have occurred")
-        log.warning("Waiting the boot process...")
+        log.warning("Waiting 30s for the boot process makes adb appearing...")
         time.sleep(30)
 
         while not self.check_device_online():
+            log.warning("Checking device via adb...")
             time.sleep(5)
-        log.warning("Waiting an additional 40s to have the welcome screen...")
-        time.sleep(40)
+        log.warning("Waiting an additional 70s to have the welcome screen...")
+        time.sleep(70)
 
         if not self.check_device_online():
             log.error("The reboot process FAILED :-(")
