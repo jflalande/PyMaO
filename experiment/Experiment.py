@@ -161,11 +161,17 @@ class Experiment:
 
     """ Checks that the "adb device" command returns "device" (and not offline) """
     def check_device_online(self):
-        log.debug("Checking device " + self.deviceserial)
-        exitcode, res = self.adb_send_command(["devices"])
-        for line in res.split('\n'):
-            if self.deviceserial in line and "device" in line:
-                return True
+
+        # Double check the device...
+        for i in range(2):
+            log.debug("Checking device " + self.deviceserial)
+            exitcode, res = self.adb_send_command(["devices"])
+            for line in res.split('\n'):
+                if self.deviceserial in line and "device" in line:
+                    return True
+            # Wow ! The device is gone ??? Check again one time more...
+            time.sleep(1)
+
         return False
 
     def check_device_online_or_wait_reboot(self):
