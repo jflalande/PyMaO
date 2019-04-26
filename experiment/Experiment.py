@@ -178,6 +178,8 @@ class Experiment:
 
         log.warning("Device " + self.deviceserial + " seems offline !")
         log.warning("Waiting the reboot initiated by watchdog.arm64")
+        print('\a') # BEEP
+
         log.debug("Sleeping 60s...")
         time.sleep(60)
         log.warning("The reboot should have occurred")
