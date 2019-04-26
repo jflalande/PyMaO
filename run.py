@@ -64,7 +64,7 @@ applyColorsToLogs()
 PARAMETERS
 """
 NB_WORKERS = 1 # No more workers than devices if using devices !
-DEVICES = ["CB512DXH1C", "CB512ENX66", "CB512FCYAS", "CB512FEL52"]
+DEVICES = ["CB512DXH1C", "CB512ENX66", "CB512FCYAS", "CB512FEL52","CB512DXGVS"]
 #DEVICES = ["CB512DXGVS"]
 logSetup("normal")
 #logSetup("verbose")
