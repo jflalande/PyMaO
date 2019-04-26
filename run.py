@@ -60,14 +60,12 @@ def logSetup(level):
 
 applyColorsToLogs()
 
-#logging.basicConfig(stream=sys.stdout)
-
-
 """
 PARAMETERS
 """
 NB_WORKERS = 1 # No more workers than devices if using devices !
 DEVICES = ["CB512DXH1C", "CB512ENX66", "CB512FCYAS", "CB512FEL52"]
+#DEVICES = ["CB512DXGVS"]
 logSetup("normal")
 #logSetup("verbose")
 #logSetup("veryverbose")

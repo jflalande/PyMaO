@@ -23,8 +23,6 @@ def doJob(queue, xp, worker_nb):
         jsondata = queue.get()
         Statistics.decNbJobs()
 
-        log.debug("Worker " + str(xp.worker_nb) + " : " + str(jsondata))
-
         # End of jobs
         if jsondata == "--END--":
             xp.cleanDeviceUsingAdb()
@@ -32,6 +30,8 @@ def doJob(queue, xp, worker_nb):
 
         apkname = next(iter(jsondata))
         jsonanalyses = jsondata[apkname]
+
+        log.info("Worker " + str(xp.worker_nb) + " : Job " + str(Statistics.getNbJobs()) + " ==== Doing " + str(apkname) + ".apk ====")
 
         # Setup of the working directory
         xp.setupWorkingDirectory()
@@ -74,27 +74,18 @@ def doJob(queue, xp, worker_nb):
                         xp.check_device_online_or_wait_reboot()
 
                     # We launch the analysis
-                    doAnalysis(analysis, analysis_name, apkname, jsonanalyses)
+                    log.debug("Worker " + str(xp.worker_nb) + " : Job " + str(
+                        Statistics.getNbJobs()) + " ==== Performing analysis " + str(analysis_name) + " on " + str(
+                        apkname) + ".apk ====")
+                    analysis.run(analysis, analysis_name, apkname, jsonanalyses)
 
         # Clean of the working directory
         xp.cleanWorkingDirectory()
 
         # Erasing .json file
         writeJson(apkname, xp, jsondata)
-        log.info("Finished " + apkname + " -- JSON: " + str(jsondata))
+        log.debug("Finished " + apkname + " -- JSON: " + str(jsondata))
 
-
-
-"""
-Perform an analysis
-"""
-def doAnalysis(analysis, analysis_name, apkname, jsonanalyses):
-    log.info("Worker: Job " + str(Statistics.getNbJobs()) + " ==== Performing analysis " + str(analysis_name) + " on " + str(apkname) + ".apk ====")
-
-    # Running analysis
-    ret = analysis.run(analysis, analysis_name, apkname, jsonanalyses)
-
-    return ret
 
 
 """Rewrites the JSON file for an apk"""

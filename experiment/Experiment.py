@@ -180,19 +180,23 @@ class Experiment:
         log.warning("Waiting the reboot initiated by watchdog.arm64")
         log.debug("Sleeping 60s...")
         time.sleep(60)
-        log.debug("The reboot should have occurred")
-        log.debug("Waiting the boot process...")
-        time.sleep(20)
+        log.warning("The reboot should have occurred")
+        log.warning("Waiting the boot process...")
+        time.sleep(30)
 
         while not self.check_device_online():
             time.sleep(5)
-        log.debug("Waiting an additional 30s to have the welcome screen...")
-        time.sleep(30)
-        log.debug("It should be ok now.")
+        log.warning("Waiting an additional 40s to have the welcome screen...")
+        time.sleep(40)
 
         if not self.check_device_online():
             log.error("The reboot process FAILED :-(")
             quit()
+
+        log.warning("Rearming the watchdog...")
+        self.setupDeviceUsingAdb()
+
+        log.warning("It should be ok now.")
 
     def wake_up_and_unlock_device(self):
 
