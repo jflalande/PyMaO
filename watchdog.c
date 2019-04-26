@@ -13,6 +13,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <signal.h>
 
 #define BUFSIZE 1024
 
@@ -68,6 +69,23 @@ int main(int argc, char **argv) {
   char *hostaddrp; /* dotted decimal host addr string */
   int optval; /* flag value for setsockopt */
   int n; /* message byte size */
+
+  /* ignores the SIGHUP signal in the child */
+  signal(SIGHUP, SIG_IGN);
+  
+  int pid = fork();
+  if (pid > 0) {
+    printf("Father\n");
+
+    return 0;
+  }
+  
+  /* redirect_fds(): redirect stdin, stdout, and stderr to /dev/NULL */
+  (void) close(0);
+  (void) close(1);
+  (void) close(2);
+  (void) dup(0);
+  (void) dup(0);
 
   /* 
    * check command line arguments 

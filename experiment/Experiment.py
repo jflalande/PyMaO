@@ -151,7 +151,7 @@ class Experiment:
 
         # Launching the watchdog
         log.info(" - activating watchdog.arm64")
-        self.adb_send_command(["shell", "daemonize", "/data/local/tmp/watchdog.arm64", "4446"])
+        self.adb_send_command(["shell", "/data/local/tmp/watchdog.arm64", "4446"])
 
     """ Kill the watchdog.arm64 """
     def cleanDeviceUsingAdb(self):
