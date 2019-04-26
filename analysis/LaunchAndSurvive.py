@@ -29,7 +29,7 @@ class LaunchAndSurvive(Analysis):
         exitcode, res = self.xp.adb_send_command(["shell", "am", "start", "-n", package_activity_name ])
 
         log.debug("LaunchAndSurvive: Sleeping...")
-        time.sleep(0.5) # Timer adjusted
+        time.sleep(0.7) # Timer adjusted
 
         log.debug("Touching screen")
         # Closing app requires to touch the screen in case of error
@@ -37,7 +37,7 @@ class LaunchAndSurvive(Analysis):
         exitcode, res = self.xp.adb_send_command(["shell", "input", "tap", "1000", "1000"])
 
         log.debug("LaunchAndSurvive: Sleeping...")
-        time.sleep(0.25) # Timer adjusted
+        time.sleep(0.5) # Timer adjusted
 
         exitcode, res = self.xp.adb_send_command(["shell", "pidof", jsonanalyses["ManifestDecoding"]["package"]])
         log.debug("Detected PID of " + jsonanalyses["ManifestDecoding"]["package"] + " : " + res)

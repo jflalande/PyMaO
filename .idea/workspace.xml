@@ -6,7 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c7ceb433-fc77-4c14-988b-1b9398d89388" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/experiment/Experiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/Experiment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis/LaunchAndSurvive.py" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/LaunchAndSurvive.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -17,7 +17,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Experiment.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Experiment.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/experiment/Experiment.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="287">
@@ -53,8 +53,8 @@
       <file leaf-file-name="run.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/run.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-36">
-              <caret line="58" column="23" selection-start-line="58" selection-start-column="23" selection-end-line="58" selection-end-column="23" />
+            <state relative-caret-position="108">
+              <caret line="66" column="78" selection-start-line="66" selection-start-column="78" selection-end-line="66" selection-end-column="78" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -119,11 +119,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="LaunchAndSurvive.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="LaunchAndSurvive.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/analysis/LaunchAndSurvive.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="504">
-              <caret line="28" column="1" selection-start-line="28" selection-start-column="1" selection-end-line="28" selection-end-column="104" />
+            <state relative-caret-position="324">
+              <caret line="39" column="22" selection-start-line="39" selection-start-column="22" selection-end-line="39" selection-end-column="22" />
               <folding>
                 <element signature="e#0#38#0" expanded="true" />
               </folding>
@@ -165,7 +165,6 @@
         <option value="$PROJECT_DIR$/experiment/Statistics.py" />
         <option value="$PROJECT_DIR$/analysis/Apktool.py" />
         <option value="$PROJECT_DIR$/analysis/AdbInstall.py" />
-        <option value="$PROJECT_DIR$/analysis/LaunchAndSurvive.py" />
         <option value="$PROJECT_DIR$/analysis/ManifestDecoding.py" />
         <option value="$PROJECT_DIR$/analysis/SymlinkAPK.py" />
         <option value="$PROJECT_DIR$/experiment/XPNative.py" />
@@ -173,15 +172,16 @@
         <option value="$PROJECT_DIR$/analysis/AdbUninstall.py" />
         <option value="$PROJECT_DIR$/experiment/XPInstallLaunch.py" />
         <option value="$PROJECT_DIR$/Producer.py" />
-        <option value="$PROJECT_DIR$/run.py" />
         <option value="$PROJECT_DIR$/Worker.py" />
         <option value="$PROJECT_DIR$/experiment/Experiment.py" />
+        <option value="$PROJECT_DIR$/run.py" />
+        <option value="$PROJECT_DIR$/analysis/LaunchAndSurvive.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="203" />
-    <option name="y" value="41" />
+    <option name="x" value="202" />
+    <option name="y" value="42" />
     <option name="width" value="1635" />
     <option name="height" value="1125" />
   </component>
@@ -586,19 +586,33 @@
       <option name="project" value="LOCAL" />
       <updated>1556291581853</updated>
     </task>
-    <option name="localTasksCounter" value="45" />
+    <task id="LOCAL-00045" summary="Timers update.">
+      <created>1556291880611</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1556291880611</updated>
+    </task>
+    <task id="LOCAL-00046" summary="serial update.">
+      <created>1556292049390</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1556292049390</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="203" y="41" width="1635" height="1125" extended-state="0" />
+    <frame x="202" y="42" width="1635" height="1125" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17003058" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17003058" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="9" weight="0.32906404" />
       <window_info anchor="bottom" id="Python Console" order="7" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.4502463" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.4502463" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.32906404" />
       <window_info id="Favorites" order="2" side_tool="true" />
@@ -617,8 +631,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Symbolic link Native." />
-    <MESSAGE value="Bug fix for manifest decoding (that can fail when ugly minSdkVersion are used)." />
     <MESSAGE value="Checking if a dependency is missing." />
     <MESSAGE value="First working version of Install/Uninstall." />
     <MESSAGE value="Detecting name of activities and main activity." />
@@ -642,7 +654,9 @@
     <MESSAGE value="Better timing values when watchdog triggers." />
     <MESSAGE value="Moving watchdog at first job." />
     <MESSAGE value="BEEP when a smartphone goes offline." />
-    <option name="LAST_COMMIT_MESSAGE" value="BEEP when a smartphone goes offline." />
+    <MESSAGE value="Timers update." />
+    <MESSAGE value="serial update." />
+    <option name="LAST_COMMIT_MESSAGE" value="serial update." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1007,16 +1021,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/analysis/LaunchAndSurvive.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="504">
-          <caret line="28" column="1" selection-start-line="28" selection-start-column="1" selection-end-line="28" selection-end-column="104" />
-          <folding>
-            <element signature="e#0#38#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/experiment/XPInstallLaunch.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="594">
@@ -1037,16 +1041,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/run.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-36">
-          <caret line="58" column="23" selection-start-line="58" selection-start-column="23" selection-end-line="58" selection-end-column="23" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Worker.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="360">
@@ -1057,12 +1051,32 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/run.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="108">
+          <caret line="66" column="78" selection-start-line="66" selection-start-column="78" selection-end-line="66" selection-end-column="78" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/experiment/Experiment.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="287">
           <caret line="192" column="20" selection-start-line="192" selection-start-column="20" selection-end-line="192" selection-end-column="20" />
           <folding>
             <element signature="e#1#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/analysis/LaunchAndSurvive.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="324">
+          <caret line="39" column="22" selection-start-line="39" selection-start-column="22" selection-end-line="39" selection-end-column="22" />
+          <folding>
+            <element signature="e#0#38#0" expanded="true" />
           </folding>
         </state>
       </provider>
