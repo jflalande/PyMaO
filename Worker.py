@@ -30,7 +30,8 @@ def doJob(queue, xp, worker_nb):
 
         # End of jobs
         if jsondata == "--END--":
-            xp.cleanDeviceUsingAdb()
+            if xp.usesADevice():
+                xp.cleanDeviceUsingAdb()
             break;
 
         apkname = next(iter(jsondata))
@@ -76,6 +77,7 @@ def doJob(queue, xp, worker_nb):
 
                     # Checking device status
                     if xp.usesADevice():
+                        print("========> " + str(xp.usesADevice()))
                         xp.check_device_online_or_wait_reboot()
 
                     # We launch the analysis

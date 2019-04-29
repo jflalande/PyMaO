@@ -7,16 +7,17 @@ from analysis.SymlinkAPK import SymlinkAPK
 
 class XPNative(Experiment):
 
-    APKBASE = "/media/jf/B006AF9A06AF5FD8/androzoo/samples"
-    JSONBASE = "/media/jf/B006AF9A06AF5FD8/orchestrator/XPNative/jsons"
-    TARGETSYMLINK = "/media/jf/B006AF9A06AF5FD8/orchestrator/XPNative/apk"
+    #APKBASE = "/media/jf/B006AF9A06AF5FD8/androzoo/samples"
+    #JSONBASE = "/media/jf/B006AF9A06AF5FD8/orchestrator/XPNative/jsons"
+    #TARGETSYMLINK = "/media/jf/B006AF9A06AF5FD8/orchestrator/XPNative/apk"
 
-    #APKBASE = "/home/jf/swap/malware"
-    #JSONBASE = "/home/jf/swap/malware"
-    #TARGETSYMLINK = "/home/jf/swap/nativeAPK"
+    APKBASE = "/home/jf/swap/malware"
+    JSONBASE = "/home/jf/swap/malware"
+    TARGETSYMLINK = "/home/jf/swap/nativeAPK"
 
     SIMULATE_JSON_WRITE = False
-    def __init__(self):
+
+    def __init__(self, deviceserial=None):
         self.analyses = []
 
         # Run Apktool

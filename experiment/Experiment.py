@@ -38,7 +38,7 @@ class Experiment:
     tid = "NONE"
     working_directory = "NONE"
 
-    ''' By defautl, an XP does not use a drvice '''
+    ''' By defautl, an XP does not use a device '''
     def usesADevice(self):
         return False
 
@@ -121,7 +121,7 @@ class Experiment:
 
     """ One time check a device """
     def setupDeviceUsingAdb(self):
-        log.info("Checking and preparing device " + self.deviceserial)
+        log.info("Checking and preparing device " + str(self.deviceserial))
         if self.deviceserial == None:
             return
         exitcode, res = self.adb_send_command(["devices"])
@@ -164,7 +164,7 @@ class Experiment:
 
         # Double check the device...
         for i in range(2):
-            log.debug("Checking device " + self.deviceserial)
+            log.debug("Checking device " + str(self.deviceserial))
             exitcode, res = self.adb_send_command(["devices"])
             for line in res.split('\n'):
                 if self.deviceserial in line and "device" in line:
