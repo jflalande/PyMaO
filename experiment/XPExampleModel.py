@@ -1,12 +1,17 @@
 from experiment.Experiment import Experiment
 
 from analysis.Unzip import Unzip
+from analysis.GetManifAndDexDates import GetManifAndDexDates
+
+import os
 
 class XPExampleModel(Experiment):
 
-    APKBASE = "/home/jf/swap/malware"
-    JSONBASE = "/home/jf/swap/malware"
-    TARGETSYMLINK = "/home/jf/swap/nativeAPK"
+    HOME = os.path.expanduser('~') # Names can changes
+
+    APKBASE = HOME + "/gits/malware-goodware-small-dataset"
+    JSONBASE = HOME + "/orch/malware_json"
+    TARGETSYMLINK =  HOME + "/orch/nativeAPK"
 
     SIMULATE_JSON_WRITE = False
 
@@ -16,7 +21,10 @@ class XPExampleModel(Experiment):
         # Run Unzip
         self.analyses.append((Unzip(self), None))
 
-        # Run Timestamp
-        #self.analyses.append((TimeStamp(self, checkFile="AndroidManifest.xml"),
-        #                      [{"Unzip":{"status": "done"}}]))
 
+        self.analyses.append((GetManifAndDexDates(self),
+                            [{"Unzip":{"status": "done"}}]))
+
+        # Run Timestamp
+        # self.analyses.append((TimeStamp(self, checkFile="AndroidManifest.xml"),
+        #                      [{"Unzip":{"status": "done"}}]))
