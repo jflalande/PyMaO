@@ -176,9 +176,10 @@ class Experiment:
         device_detected = False
         for i in range(2):
             exitcode, res = self.adb_send_command(["devices"])
-            secondline = res.split('\n')[1] # Second line should contain "uid device"
-            if self.deviceserial in secondline and "device" in secondline:
-                device_detected = True
+            for line in res.split('\n'):
+                if self.deviceserial in line and "device" in line:
+                    device_detected = True
+            if device_detected: # We found it: exiting
                 break
             # Wow ! The device is gone ??? Check again one time more...
             log.warning("WTF? device offline ? Waiting 2 x 10.")
