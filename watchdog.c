@@ -169,8 +169,11 @@ int main(int argc, char **argv) {
   else
   if (resselect == 0)
   {
-    printf("TIMEOUT");
-           system("reboot"); 
+	printf("TIMEOUT");
+	printf("Deleting file /data/local/tmp/traced_uid for Oat's inside.");
+	system("rm /data/local/tmp/traced_uid");
+	printf("Rebooting");
+	system("reboot"); 
   }
   else
   if (resselect == 1)

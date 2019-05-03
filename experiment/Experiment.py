@@ -159,20 +159,64 @@ class Experiment:
         log.info(" - killing previous watchdog.arm64")
         self.adb_send_command(["shell", "pkill", "watchdog.arm64"])
 
-    """ Checks that the "adb device" command returns "device" (and not offline) """
+    """ Clean /data/local/tmp/traced_uid """
+    def cleanOatSInsideTracing(self):
+
+        log.warning("Cleaning oat's inside tracing file because we are booting ?!")
+        self.adb_send_command(["shell", "rm", "/data/local/tmp/traced_uid"])
+
+    """ Checks that the  device is ok
+        Multiple tests are done because the device may reboot unexpectivelly
+        - "adb device" command should returns "device" (and not offline) 
+        - service package should be ready
+    """
     def check_device_online(self):
 
-        # Double check the device...
+        log.debug("Checking device online/offline " + str(self.deviceserial))
+        device_detected = False
         for i in range(2):
-            log.debug("Checking device " + str(self.deviceserial))
             exitcode, res = self.adb_send_command(["devices"])
-            for line in res.split('\n'):
-                if self.deviceserial in line and "device" in line:
-                    return True
+            secondline = res.split('\n')[1] # Second line should contain "uid device"
+            if self.deviceserial in secondline and "device" in secondline:
+                device_detected = True
+                break
             # Wow ! The device is gone ??? Check again one time more...
-            time.sleep(1)
+            log.warning("WTF? device offline ? Waiting 10.")
+            time.sleep(2)
+        if not device_detected:
+            return False
 
-        return False
+
+        log.debug("Checking package service " + str(self.deviceserial))
+        detected_package = False
+        for i in range(6):
+            exitcode, res = self.adb_send_command(["shell", "service", "check", "package"])
+            if "Service package: found" in res:
+                detected_package = True
+                break
+            # Wow ! The device is gone ??? Check again one time more...
+            log.warning("WTF? service package not there ? Waiting 10.")
+            time.sleep(10)
+
+            self.cleanOatSInsideTracing()
+        if not detected_package:
+            return False
+
+        log.debug("Checking boot completed " + str(self.deviceserial))
+        detected_boot = False
+        for i in range(5):
+            exitcode, res = self.adb_send_command(["shell", "getprop", "dev.bootcomplete"])
+            if "1" in res:
+                detected_boot = True
+                break
+            # Wow ! The device is gone ??? Check again one time more...
+            log.warning("WTF? service package not there ? Waiting 10.")
+            time.sleep(10)
+        if not detected_boot:
+            return False
+
+        # All is going well :)
+        return True
 
     def check_device_online_or_wait_reboot(self):
 
@@ -185,6 +229,8 @@ class Experiment:
         log.warning("Device " + self.deviceserial + " seems offline !")
         log.warning("Waiting the reboot initiated by watchdog.arm64")
         print('\a') # BEEP
+
+        self.cleanOatSInsideTracing()
 
         log.debug("Sleeping 60s...")
         time.sleep(60)
