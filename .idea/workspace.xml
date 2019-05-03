@@ -7,7 +7,6 @@
     <list default="true" id="c7ceb433-fc77-4c14-988b-1b9398d89388" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/experiment/Experiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/Experiment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -57,8 +56,8 @@
       <file leaf-file-name="Experiment.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/experiment/Experiment.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="253">
-              <caret line="206" column="25" selection-start-line="206" selection-start-column="25" selection-end-line="206" selection-end-column="25" />
+            <state relative-caret-position="312">
+              <caret line="242" column="25" lean-forward="true" selection-start-line="242" selection-start-column="25" selection-end-line="242" selection-end-column="25" />
               <folding>
                 <element signature="e#1#15#0" expanded="true" />
               </folding>
@@ -278,13 +277,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1554815508674</updated>
-    </task>
-    <task id="LOCAL-00004" summary="First run of apktool.">
-      <created>1554923216268</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1554923216268</updated>
     </task>
     <task id="LOCAL-00005" summary="Native detection first release.">
       <created>1554930544184</created>
@@ -622,7 +614,14 @@
       <option name="project" value="LOCAL" />
       <updated>1556893671745</updated>
     </task>
-    <option name="localTasksCounter" value="53" />
+    <task id="LOCAL-00053" summary="Adjusting timers.">
+      <created>1556893859903</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1556893859903</updated>
+    </task>
+    <option name="localTasksCounter" value="54" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -653,7 +652,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Bug fix for manifest decoding." />
     <MESSAGE value="Typo and comments." />
     <MESSAGE value="Merged stderr in stdout for subprocess." />
     <MESSAGE value="Bug fix after checks for new version of subprocess." />
@@ -678,7 +676,8 @@
     <MESSAGE value="Adjust DHT." />
     <MESSAGE value="Watchdog now clean the /data/local/tmp/traced_uid file." />
     <MESSAGE value="More checks for device state." />
-    <option name="LAST_COMMIT_MESSAGE" value="More checks for device state." />
+    <MESSAGE value="Adjusting timers." />
+    <option name="LAST_COMMIT_MESSAGE" value="Adjusting timers." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1083,8 +1082,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/experiment/Experiment.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="253">
-          <caret line="206" column="25" selection-start-line="206" selection-start-column="25" selection-end-line="206" selection-end-column="25" />
+        <state relative-caret-position="312">
+          <caret line="242" column="25" lean-forward="true" selection-start-line="242" selection-start-column="25" selection-end-line="242" selection-end-column="25" />
           <folding>
             <element signature="e#1#15#0" expanded="true" />
           </folding>

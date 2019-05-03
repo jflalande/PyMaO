@@ -239,14 +239,8 @@ class Experiment:
         time.sleep(30)
 
         while not self.check_device_online():
-            log.warning("Checking device via adb...")
+            log.warning("Waiting device INDEFINITELY...")
             time.sleep(5)
-        log.warning("Waiting an additional 70s to have the welcome screen...")
-        time.sleep(70)
-
-        if not self.check_device_online():
-            log.error("The reboot process FAILED :-(")
-            quit()
 
         log.warning("Rearming the watchdog...")
         self.setupDeviceUsingAdb()
