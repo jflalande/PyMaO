@@ -5,11 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c7ceb433-fc77-4c14-988b-1b9398d89388" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/analysis/DHTCheck.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/experiment/XPDetectDHT.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Worker.py" beforeDir="false" afterPath="$PROJECT_DIR$/Worker.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/watchdog.arm" beforeDir="false" afterPath="$PROJECT_DIR$/watchdog.arm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/watchdog.arm64" beforeDir="false" afterPath="$PROJECT_DIR$/watchdog.arm64" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/watchdog.c" beforeDir="false" afterPath="$PROJECT_DIR$/watchdog.c" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -24,7 +23,7 @@
         <entry file="file://$PROJECT_DIR$/analysis/Unzip.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="288">
-              <caret line="17" lean-forward="true" selection-start-line="17" selection-end-line="17" />
+              <caret line="17" selection-start-line="17" selection-end-line="17" />
             </state>
           </provider>
         </entry>
@@ -32,7 +31,7 @@
       <file leaf-file-name="ManifestDecoding.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/analysis/ManifestDecoding.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1404">
+            <state relative-caret-position="1368">
               <caret line="78" column="87" selection-start-line="78" selection-start-column="83" selection-end-line="78" selection-end-column="87" />
               <folding>
                 <element signature="e#0#38#0" expanded="true" />
@@ -44,8 +43,8 @@
       <file leaf-file-name="run.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/run.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="72">
-              <caret line="67" column="14" selection-start-line="67" selection-start-column="14" selection-end-line="67" selection-end-column="14" />
+            <state relative-caret-position="216">
+              <caret line="72" column="1" selection-start-line="72" selection-start-column="1" selection-end-line="72" selection-end-column="1" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -56,7 +55,7 @@
       <file leaf-file-name="Worker.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Worker.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="77">
+            <state relative-caret-position="1044">
               <caret line="62" column="50" selection-start-line="62" selection-start-column="50" selection-end-line="62" selection-end-column="50" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
@@ -68,8 +67,8 @@
       <file leaf-file-name="XPInstallLaunch.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/experiment/XPInstallLaunch.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="44">
-              <caret line="27" lean-forward="true" selection-start-line="27" selection-end-line="27" />
+            <state relative-caret-position="378">
+              <caret line="27" selection-start-line="27" selection-end-line="27" />
               <folding>
                 <element signature="e#0#44#0" expanded="true" />
               </folding>
@@ -80,10 +79,22 @@
       <file leaf-file-name="XPDetectDHT.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/experiment/XPDetectDHT.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="275">
-              <caret line="48" column="62" lean-forward="true" selection-start-line="48" selection-start-column="62" selection-end-line="48" selection-end-column="62" />
+            <state relative-caret-position="70">
+              <caret line="14" column="12" selection-start-line="14" selection-start-column="4" selection-end-line="14" selection-end-column="12" />
               <folding>
                 <element signature="e#0#44#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AdbInstall.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/analysis/AdbInstall.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="216">
+              <caret line="12" column="67" selection-start-line="12" selection-start-column="67" selection-end-line="12" selection-end-column="67" />
+              <folding>
+                <element signature="e#0#38#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -92,8 +103,11 @@
       <file leaf-file-name="DHTCheck.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/analysis/DHTCheck.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="270">
-              <caret line="38" column="20" selection-start-line="38" selection-start-column="20" selection-end-line="38" selection-end-column="20" />
+            <state relative-caret-position="756">
+              <caret line="67" column="43" selection-start-line="67" selection-start-column="43" selection-end-line="67" selection-end-column="43" />
+              <folding>
+                <element signature="e#0#38#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -101,7 +115,7 @@
       <file leaf-file-name="SymlinkAPK.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/analysis/SymlinkAPK.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="432">
+            <state relative-caret-position="360">
               <caret line="24" column="16" selection-start-line="24" selection-start-column="16" selection-end-line="24" selection-end-column="16" />
               <folding>
                 <element signature="e#1#39#0" expanded="true" />
@@ -113,8 +127,8 @@
       <file leaf-file-name="LaunchAndSurvive.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/analysis/LaunchAndSurvive.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="422">
-              <caret line="36" column="91" lean-forward="true" selection-start-line="33" selection-start-column="6" selection-end-line="36" selection-end-column="91" />
+            <state relative-caret-position="612">
+              <caret line="36" column="91" selection-start-line="33" selection-start-column="6" selection-end-line="36" selection-end-column="91" />
               <folding>
                 <element signature="e#0#38#0" expanded="true" />
               </folding>
@@ -156,7 +170,6 @@
         <option value="$PROJECT_DIR$/analysis/CopyAPK.py" />
         <option value="$PROJECT_DIR$/experiment/Statistics.py" />
         <option value="$PROJECT_DIR$/analysis/Apktool.py" />
-        <option value="$PROJECT_DIR$/analysis/AdbInstall.py" />
         <option value="$PROJECT_DIR$/analysis/ManifestDecoding.py" />
         <option value="$PROJECT_DIR$/analysis/SymlinkAPK.py" />
         <option value="$PROJECT_DIR$/analysis/Analysis.py" />
@@ -170,14 +183,15 @@
         <option value="$PROJECT_DIR$/experiment/XPExampleModel.py" />
         <option value="$PROJECT_DIR$/Worker.py" />
         <option value="$PROJECT_DIR$/experiment/XPDetectDHT.py" />
-        <option value="$PROJECT_DIR$/analysis/DHTCheck.py" />
+        <option value="$PROJECT_DIR$/analysis/AdbInstall.py" />
         <option value="$PROJECT_DIR$/run.py" />
+        <option value="$PROJECT_DIR$/analysis/DHTCheck.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="181" />
-    <option name="y" value="33" />
+    <option name="x" value="107" />
+    <option name="y" value="29" />
     <option name="width" value="1635" />
     <option name="height" value="1125" />
   </component>
@@ -274,13 +288,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1554815508674</updated>
-    </task>
-    <task id="LOCAL-00001" summary="Initial commit.">
-      <created>1554894695944</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1554894695944</updated>
     </task>
     <task id="LOCAL-00002" summary="Detecting TMPFS.">
       <created>1554902227963</created>
@@ -618,19 +625,25 @@
       <option name="project" value="LOCAL" />
       <updated>1556547281170</updated>
     </task>
-    <option name="localTasksCounter" value="50" />
+    <task id="LOCAL-00050" summary="Adjust DHT.">
+      <created>1556876001203</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1556876001204</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="181" y="33" width="1635" height="1125" extended-state="0" />
-    <editor active="true" />
+    <frame x="107" y="29" width="1635" height="1125" extended-state="0" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17003058" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="9" weight="0.23546799" />
       <window_info anchor="bottom" id="Python Console" order="7" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32512316" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.41379312" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.32906404" />
       <window_info id="Favorites" order="2" side_tool="true" />
@@ -649,7 +662,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Better manifest decoding + preparing launching of activity." />
     <MESSAGE value="A first working version of execution test :)" />
     <MESSAGE value="Adjusting timers." />
     <MESSAGE value="Bug fix for manifest decoding." />
@@ -674,7 +686,8 @@
     <MESSAGE value="Upgrading timer." />
     <MESSAGE value="Double check the device." />
     <MESSAGE value="A lot of bug fix for XP not requiring a device." />
-    <option name="LAST_COMMIT_MESSAGE" value="A lot of bug fix for XP not requiring a device." />
+    <MESSAGE value="Adjust DHT." />
+    <option name="LAST_COMMIT_MESSAGE" value="Adjust DHT." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -696,9 +709,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="540">
           <caret line="33" column="30" lean-forward="true" selection-start-line="33" selection-start-column="30" selection-end-line="33" selection-end-column="30" />
-          <folding>
-            <element signature="e#1#15#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -764,9 +774,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="36">
           <caret line="2" column="36" selection-start-line="2" selection-start-column="36" selection-end-line="2" selection-end-column="36" />
-          <folding>
-            <element signature="e#0#44#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -781,9 +788,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="594">
           <caret line="34" column="60" lean-forward="true" selection-start-line="34" selection-start-column="60" selection-end-line="34" selection-end-column="60" />
-          <folding>
-            <element signature="e#1#15#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -938,9 +942,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
           <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -948,16 +949,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="156">
           <caret line="863" selection-start-line="863" selection-end-line="863" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/analysis/AdbInstall.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="148">
-          <caret line="12" selection-start-line="12" selection-end-line="12" />
-          <folding>
-            <element signature="e#0#38#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -979,9 +970,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="324">
           <caret line="30" selection-start-line="30" selection-end-line="31" selection-end-column="68" />
-          <folding>
-            <element signature="e#0#44#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -989,9 +977,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="162">
           <caret line="69" column="26" selection-start-line="69" selection-start-column="8" selection-end-line="69" selection-end-column="26" />
-          <folding>
-            <element signature="e#1#15#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1004,7 +989,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/analysis/ManifestDecoding.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1404">
+        <state relative-caret-position="1368">
           <caret line="78" column="87" selection-start-line="78" selection-start-column="83" selection-end-line="78" selection-end-column="87" />
           <folding>
             <element signature="e#0#38#0" expanded="true" />
@@ -1015,7 +1000,7 @@
     <entry file="file://$PROJECT_DIR$/analysis/Unzip.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="288">
-          <caret line="17" lean-forward="true" selection-start-line="17" selection-end-line="17" />
+          <caret line="17" selection-start-line="17" selection-end-line="17" />
         </state>
       </provider>
     </entry>
@@ -1023,15 +1008,12 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="360">
           <caret line="20" column="26" lean-forward="true" selection-start-line="20" selection-start-column="26" selection-end-line="20" selection-end-column="26" />
-          <folding>
-            <element signature="e#0#44#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/analysis/SymlinkAPK.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="432">
+        <state relative-caret-position="360">
           <caret line="24" column="16" selection-start-line="24" selection-start-column="16" selection-end-line="24" selection-end-column="16" />
           <folding>
             <element signature="e#1#39#0" expanded="true" />
@@ -1041,7 +1023,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Worker.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="77">
+        <state relative-caret-position="1044">
           <caret line="62" column="50" selection-start-line="62" selection-start-column="50" selection-end-line="62" selection-end-column="50" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
@@ -1051,18 +1033,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/experiment/XPInstallLaunch.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="44">
-          <caret line="27" lean-forward="true" selection-start-line="27" selection-end-line="27" />
-          <folding>
-            <element signature="e#0#44#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/experiment/XPDetectDHT.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="275">
-          <caret line="48" column="62" lean-forward="true" selection-start-line="48" selection-start-column="62" selection-end-line="48" selection-end-column="62" />
+        <state relative-caret-position="378">
+          <caret line="27" selection-start-line="27" selection-end-line="27" />
           <folding>
             <element signature="e#0#44#0" expanded="true" />
           </folding>
@@ -1071,25 +1043,48 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/analysis/LaunchAndSurvive.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="422">
-          <caret line="36" column="91" lean-forward="true" selection-start-line="33" selection-start-column="6" selection-end-line="36" selection-end-column="91" />
+        <state relative-caret-position="612">
+          <caret line="36" column="91" selection-start-line="33" selection-start-column="6" selection-end-line="36" selection-end-column="91" />
           <folding>
             <element signature="e#0#38#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/analysis/AdbInstall.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="216">
+          <caret line="12" column="67" selection-start-line="12" selection-start-column="67" selection-end-line="12" selection-end-column="67" />
+          <folding>
+            <element signature="e#0#38#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiment/XPDetectDHT.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="70">
+          <caret line="14" column="12" selection-start-line="14" selection-start-column="4" selection-end-line="14" selection-end-column="12" />
+          <folding>
+            <element signature="e#0#44#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/analysis/DHTCheck.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="38" column="20" selection-start-line="38" selection-start-column="20" selection-end-line="38" selection-end-column="20" />
+        <state relative-caret-position="756">
+          <caret line="67" column="43" selection-start-line="67" selection-start-column="43" selection-end-line="67" selection-end-column="43" />
+          <folding>
+            <element signature="e#0#38#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/run.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="72">
-          <caret line="67" column="14" selection-start-line="67" selection-start-column="14" selection-end-line="67" selection-end-column="14" />
+        <state relative-caret-position="216">
+          <caret line="72" column="1" selection-start-line="72" selection-start-column="1" selection-end-line="72" selection-end-column="1" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>
