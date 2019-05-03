@@ -195,16 +195,16 @@ class Experiment:
                 detected_package = True
                 break
             # Wow ! The device is gone ??? Check again one time more...
-            log.warning("WTF? service package not there ? Waiting 10.")
-            time.sleep(10)
 
             self.cleanOatSInsideTracing()
+            log.warning("WTF? service package not there ? Waiting 10.")
+            time.sleep(10)
         if not detected_package:
             return False
 
         log.debug("Checking boot completed " + str(self.deviceserial))
         detected_boot = False
-        for i in range(5):
+        for i in range(10):
             exitcode, res = self.adb_send_command(["shell", "getprop", "dev.bootcomplete"])
             if "1" in res:
                 detected_boot = True

@@ -6,9 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="c7ceb433-fc77-4c14-988b-1b9398d89388" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/watchdog.arm" beforeDir="false" afterPath="$PROJECT_DIR$/watchdog.arm" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/watchdog.arm64" beforeDir="false" afterPath="$PROJECT_DIR$/watchdog.arm64" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/watchdog.c" beforeDir="false" afterPath="$PROJECT_DIR$/watchdog.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiment/Experiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/Experiment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -19,31 +18,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Unzip.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/analysis/Unzip.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="288">
-              <caret line="17" selection-start-line="17" selection-end-line="17" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ManifestDecoding.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/analysis/ManifestDecoding.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1368">
-              <caret line="78" column="87" selection-start-line="78" selection-start-column="83" selection-end-line="78" selection-end-column="87" />
-              <folding>
-                <element signature="e#0#38#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="run.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="run.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/run.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="216">
+            <state relative-caret-position="162">
               <caret line="72" column="1" selection-start-line="72" selection-start-column="1" selection-end-line="72" selection-end-column="1" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
@@ -55,8 +33,8 @@
       <file leaf-file-name="Worker.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Worker.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1044">
-              <caret line="62" column="50" selection-start-line="62" selection-start-column="50" selection-end-line="62" selection-end-column="50" />
+            <state relative-caret-position="257">
+              <caret line="33" column="30" lean-forward="true" selection-start-line="33" selection-start-column="30" selection-end-line="33" selection-end-column="30" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -67,10 +45,22 @@
       <file leaf-file-name="XPInstallLaunch.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/experiment/XPInstallLaunch.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="378">
+            <state relative-caret-position="44">
               <caret line="27" selection-start-line="27" selection-end-line="27" />
               <folding>
                 <element signature="e#0#44#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Experiment.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/experiment/Experiment.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="253">
+              <caret line="206" column="25" selection-start-line="206" selection-start-column="25" selection-end-line="206" selection-end-column="25" />
+              <folding>
+                <element signature="e#1#15#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -177,21 +167,21 @@
         <option value="$PROJECT_DIR$/experiment/XPInstallLaunch.py" />
         <option value="$PROJECT_DIR$/Producer.py" />
         <option value="$PROJECT_DIR$/analysis/LaunchAndSurvive.py" />
-        <option value="$PROJECT_DIR$/experiment/Experiment.py" />
         <option value="$PROJECT_DIR$/experiment/XPNative.py" />
         <option value="$PROJECT_DIR$/analysis/Unzip.py" />
         <option value="$PROJECT_DIR$/experiment/XPExampleModel.py" />
         <option value="$PROJECT_DIR$/Worker.py" />
         <option value="$PROJECT_DIR$/experiment/XPDetectDHT.py" />
         <option value="$PROJECT_DIR$/analysis/AdbInstall.py" />
-        <option value="$PROJECT_DIR$/run.py" />
         <option value="$PROJECT_DIR$/analysis/DHTCheck.py" />
+        <option value="$PROJECT_DIR$/run.py" />
+        <option value="$PROJECT_DIR$/experiment/Experiment.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="107" />
-    <option name="y" value="29" />
+    <option name="x" value="104" />
+    <option name="y" value="28" />
     <option name="width" value="1635" />
     <option name="height" value="1125" />
   </component>
@@ -288,20 +278,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1554815508674</updated>
-    </task>
-    <task id="LOCAL-00002" summary="Detecting TMPFS.">
-      <created>1554902227963</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1554902227963</updated>
-    </task>
-    <task id="LOCAL-00003" summary="First run of apktool.">
-      <created>1554908031315</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1554908031315</updated>
     </task>
     <task id="LOCAL-00004" summary="First run of apktool.">
       <created>1554923216268</created>
@@ -632,18 +608,33 @@
       <option name="project" value="LOCAL" />
       <updated>1556876001204</updated>
     </task>
-    <option name="localTasksCounter" value="51" />
+    <task id="LOCAL-00051" summary="Watchdog now clean the /data/local/tmp/traced_uid file.">
+      <created>1556882563379</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1556882563379</updated>
+    </task>
+    <task id="LOCAL-00052" summary="More checks for device state.">
+      <created>1556893671745</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1556893671745</updated>
+    </task>
+    <option name="localTasksCounter" value="53" />
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="107" y="29" width="1635" height="1125" extended-state="0" />
+    <frame x="104" y="28" width="1635" height="1125" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17003058" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="9" weight="0.23546799" />
       <window_info anchor="bottom" id="Python Console" order="7" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.41379312" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.47881773" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.32906404" />
       <window_info id="Favorites" order="2" side_tool="true" />
@@ -662,8 +653,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="A first working version of execution test :)" />
-    <MESSAGE value="Adjusting timers." />
     <MESSAGE value="Bug fix for manifest decoding." />
     <MESSAGE value="Typo and comments." />
     <MESSAGE value="Merged stderr in stdout for subprocess." />
@@ -687,7 +676,9 @@
     <MESSAGE value="Double check the device." />
     <MESSAGE value="A lot of bug fix for XP not requiring a device." />
     <MESSAGE value="Adjust DHT." />
-    <option name="LAST_COMMIT_MESSAGE" value="Adjust DHT." />
+    <MESSAGE value="Watchdog now clean the /data/local/tmp/traced_uid file." />
+    <MESSAGE value="More checks for device state." />
+    <option name="LAST_COMMIT_MESSAGE" value="More checks for device state." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -709,6 +700,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="540">
           <caret line="33" column="30" lean-forward="true" selection-start-line="33" selection-start-column="30" selection-end-line="33" selection-end-column="30" />
+          <folding>
+            <element signature="e#1#15#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -788,6 +782,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="594">
           <caret line="34" column="60" lean-forward="true" selection-start-line="34" selection-start-column="60" selection-end-line="34" selection-end-column="60" />
+          <folding>
+            <element signature="e#1#15#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -973,13 +970,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/experiment/Experiment.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="162">
-          <caret line="69" column="26" selection-start-line="69" selection-start-column="8" selection-end-line="69" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/analysis/Apktool.py">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -994,13 +984,6 @@
           <folding>
             <element signature="e#0#38#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/analysis/Unzip.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="17" selection-start-line="17" selection-end-line="17" />
         </state>
       </provider>
     </entry>
@@ -1021,40 +1004,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Worker.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1044">
-          <caret line="62" column="50" selection-start-line="62" selection-start-column="50" selection-end-line="62" selection-end-column="50" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/experiment/XPInstallLaunch.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="378">
-          <caret line="27" selection-start-line="27" selection-end-line="27" />
-          <folding>
-            <element signature="e#0#44#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/analysis/LaunchAndSurvive.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="612">
           <caret line="36" column="91" selection-start-line="33" selection-start-column="6" selection-end-line="36" selection-end-column="91" />
-          <folding>
-            <element signature="e#0#38#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/analysis/AdbInstall.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="12" column="67" selection-start-line="12" selection-start-column="67" selection-end-line="12" selection-end-column="67" />
           <folding>
             <element signature="e#0#38#0" expanded="true" />
           </folding>
@@ -1081,12 +1034,59 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/run.py">
+    <entry file="file://$PROJECT_DIR$/analysis/AdbInstall.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="216">
+          <caret line="12" column="67" selection-start-line="12" selection-start-column="67" selection-end-line="12" selection-end-column="67" />
+          <folding>
+            <element signature="e#0#38#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiment/XPInstallLaunch.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="44">
+          <caret line="27" selection-start-line="27" selection-end-line="27" />
+          <folding>
+            <element signature="e#0#44#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Worker.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="257">
+          <caret line="33" column="30" lean-forward="true" selection-start-line="33" selection-start-column="30" selection-end-line="33" selection-end-column="30" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/analysis/Unzip.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="288">
+          <caret line="17" selection-start-line="17" selection-end-line="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/run.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
           <caret line="72" column="1" selection-start-line="72" selection-start-column="1" selection-end-line="72" selection-end-column="1" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiment/Experiment.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="253">
+          <caret line="206" column="25" selection-start-line="206" selection-start-column="25" selection-end-line="206" selection-end-column="25" />
+          <folding>
+            <element signature="e#1#15#0" expanded="true" />
           </folding>
         </state>
       </provider>

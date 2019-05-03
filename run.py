@@ -70,7 +70,7 @@ DEVICES = ["CB512DXH1C", "CB512ENX66", "CB512FCYAS", "CB512FEL52","CB512DXGVS"]
 DEVICES = ["CB512DXGVS"]
 logSetup("normal")
 logSetup("verbose")
-logSetup("veryverbose")
+#logSetup("veryverbose")
 
 
 workers=[]
