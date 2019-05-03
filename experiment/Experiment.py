@@ -96,7 +96,7 @@ class Experiment:
                         out = out + line.decode('utf-8')
                         log.debugv("  |" + linestr)
                     except UnicodeDecodeError:
-                        log.warning("A string of the output of the cmd " + str(
+                        log.warning(self.me() + "A string of the output of the cmd " + str(
                             cmd) + " contains an illegal character (not UTF-8): ignoring.")
 
         # Wait after consuming output (if there is a capture of the output)
@@ -107,6 +107,11 @@ class Experiment:
         log.debugv("Exit code: " + str(exitcode))
         return exitcode, out
 
+    def me(self):
+        if self.deviceserial is None:
+            return ""
+        else:
+            return str(self.deviceserial + " | ")
 
     """
     Sends command to the smartphone using ADB.
@@ -121,7 +126,7 @@ class Experiment:
 
     """ One time check a device """
     def setupDeviceUsingAdb(self):
-        log.info("Checking and preparing device " + str(self.deviceserial))
+        log.info(self.me() + "Checking and preparing device " + str(self.deviceserial))
         if self.deviceserial == None:
             return
         exitcode, res = self.adb_send_command(["devices"])
@@ -162,7 +167,7 @@ class Experiment:
     """ Clean /data/local/tmp/traced_uid """
     def cleanOatSInsideTracing(self):
 
-        log.warning("Cleaning oat's inside tracing file because we are booting ?!")
+        log.warning(self.me() + "Cleaning oat's inside tracing file because we are booting ?!")
         self.adb_send_command(["shell", "rm", "/data/local/tmp/traced_uid"])
 
     """ Checks that the  device is ok
@@ -182,7 +187,7 @@ class Experiment:
             if device_detected: # We found it: exiting
                 break
             # Wow ! The device is gone ??? Check again one time more...
-            log.warning("WTF? device offline ? Waiting 2 x 10.")
+            log.warning(self.me() + "WTF? device offline ? Waiting 2 x 10: step " + str(i))
             time.sleep(2)
         if not device_detected:
             return False
@@ -197,9 +202,9 @@ class Experiment:
                 break
 
             # Wow ! The device miss the package service ??? Check again one time more...
-            log.warning("WTF? service package not there ? Waiting 6 x 10.")
+            log.warning(self.me() + "WTF? service package not there ? Waiting 6 x 10: step " + str(i))
             self.cleanOatSInsideTracing()
-            log.warning("Keep device ALIVE by pinging it.")
+            log.warning(self.me() + "Keep device ALIVE by pinging it.")
             self.keep_device_ALIVE_he_is_ALIVE()
             time.sleep(10)
         if not detected_package:
@@ -213,8 +218,8 @@ class Experiment:
                 detected_boot = True
                 break
             # Wow ! The device is not fully booted ??? Check again one time more...
-            log.warning("WTF? device online but not fully booted ? Waiting 10 x 10.")
-            log.warning("Keep device ALIVE by pinging it.")
+            log.warning(self.me() + "WTF? device online but not fully booted ? Waiting 10 x 10: step " + str(i))
+            log.warning(self.me() + "Keep device ALIVE by pinging it.")
             self.keep_device_ALIVE_he_is_ALIVE()
             time.sleep(10)
         if not detected_boot:
@@ -238,8 +243,8 @@ class Experiment:
         if self.check_device_online():
             return
 
-        log.warning("Device " + self.deviceserial + " seems offline !")
-        log.warning("Waiting the reboot initiated by watchdog.arm64")
+        log.warning(self.me() + "Device " + self.deviceserial + " seems offline !")
+        log.warning(self.me() + "Waiting the reboot initiated by watchdog.arm64")
         print('\a') # BEEP
 
         # Clean oat's inside because we will reboot
@@ -247,18 +252,18 @@ class Experiment:
 
         log.debug("Sleeping 60s...")
         time.sleep(60)
-        log.warning("The reboot should have occurred")
-        log.warning("Waiting 30s for the boot process makes adb appearing...")
+        log.warning(self.me() + "The reboot should have occurred")
+        log.warning(self.me() + "Waiting 30s for the boot process makes adb appearing...")
         time.sleep(30)
 
         while not self.check_device_online():
-            log.warning("Waiting device INDEFINITELY...")
+            log.warning(self.me() + "Waiting device INDEFINITELY...")
             time.sleep(5)
 
-        log.warning("Rearming the watchdog...")
+        log.warning(self.me() + "Rearming the watchdog...")
         self.setupDeviceUsingAdb()
 
-        log.warning("It should be ok now.")
+        log.warning(self.me() + "It should be ok now.")
 
     def wake_up_and_unlock_device(self):
 

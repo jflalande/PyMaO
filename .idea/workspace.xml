@@ -4,7 +4,7 @@
     <bookmark url="file://$PROJECT_DIR$/Worker.py" line="92" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c7ceb433-fc77-4c14-988b-1b9398d89388" name="Default" comment="">
+    <list default="true" id="c7ceb433-fc77-4c14-988b-1b9398d89388" name="Default" comment="Bug fix for device detection.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/experiment/Experiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/Experiment.py" afterDir="false" />
     </list>
@@ -56,8 +56,8 @@
       <file leaf-file-name="Experiment.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/experiment/Experiment.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="312">
-              <caret line="242" column="25" lean-forward="true" selection-start-line="242" selection-start-column="25" selection-end-line="242" selection-end-column="25" />
+            <state relative-caret-position="418">
+              <caret line="113" column="47" selection-start-line="113" selection-start-column="47" selection-end-line="113" selection-end-column="47" />
               <folding>
                 <element signature="e#1#15#0" expanded="true" />
               </folding>
@@ -139,6 +139,7 @@
       <find>working</find>
       <find>print</find>
       <find>instal</find>
+      <find>info</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -179,7 +180,7 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="104" />
+    <option name="x" value="103" />
     <option name="y" value="28" />
     <option name="width" value="1635" />
     <option name="height" value="1125" />
@@ -277,27 +278,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1554815508674</updated>
-    </task>
-    <task id="LOCAL-00005" summary="Native detection first release.">
-      <created>1554930544184</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1554930544184</updated>
-    </task>
-    <task id="LOCAL-00006" summary="Native detection first release.">
-      <created>1554930831740</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1554930831740</updated>
-    </task>
-    <task id="LOCAL-00007" summary="Preconditions for chaining analyses.">
-      <created>1554967320125</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1554967320125</updated>
     </task>
     <task id="LOCAL-00008" summary="Time measurement.">
       <created>1554967825838</created>
@@ -621,11 +601,32 @@
       <option name="project" value="LOCAL" />
       <updated>1556893859903</updated>
     </task>
-    <option name="localTasksCounter" value="54" />
+    <task id="LOCAL-00054" summary="Adjusting timers.">
+      <created>1556894010800</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1556894010800</updated>
+    </task>
+    <task id="LOCAL-00055" summary="Adjusting timers.">
+      <created>1556894793241</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1556894793241</updated>
+    </task>
+    <task id="LOCAL-00056" summary="Bug fix for device detection.">
+      <created>1556895109765</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1556895109765</updated>
+    </task>
+    <option name="localTasksCounter" value="57" />
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="104" y="28" width="1635" height="1125" extended-state="0" />
+    <frame x="103" y="28" width="1635" height="1125" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17003058" />
@@ -633,7 +634,7 @@
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="9" weight="0.23546799" />
       <window_info anchor="bottom" id="Python Console" order="7" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.47881773" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.26502463" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.32906404" />
       <window_info id="Favorites" order="2" side_tool="true" />
@@ -652,7 +653,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Typo and comments." />
     <MESSAGE value="Merged stderr in stdout for subprocess." />
     <MESSAGE value="Bug fix after checks for new version of subprocess." />
     <MESSAGE value="Detection of the device." />
@@ -677,7 +677,8 @@
     <MESSAGE value="Watchdog now clean the /data/local/tmp/traced_uid file." />
     <MESSAGE value="More checks for device state." />
     <MESSAGE value="Adjusting timers." />
-    <option name="LAST_COMMIT_MESSAGE" value="Adjusting timers." />
+    <MESSAGE value="Bug fix for device detection." />
+    <option name="LAST_COMMIT_MESSAGE" value="Bug fix for device detection." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1082,8 +1083,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/experiment/Experiment.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="312">
-          <caret line="242" column="25" lean-forward="true" selection-start-line="242" selection-start-column="25" selection-end-line="242" selection-end-column="25" />
+        <state relative-caret-position="418">
+          <caret line="113" column="47" selection-start-line="113" selection-start-column="47" selection-end-line="113" selection-end-column="47" />
           <folding>
             <element signature="e#1#15#0" expanded="true" />
           </folding>
