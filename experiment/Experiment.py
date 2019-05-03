@@ -195,16 +195,16 @@ class Experiment:
                 detected_package = True
                 break
             # Wow ! The device is gone ??? Check again one time more...
-            log.warning("WTF? service package not there ? Waiting 10.")
-            time.sleep(10)
 
             self.cleanOatSInsideTracing()
+            log.warning("WTF? service package not there ? Waiting 10.")
+            time.sleep(10)
         if not detected_package:
             return False
 
         log.debug("Checking boot completed " + str(self.deviceserial))
         detected_boot = False
-        for i in range(5):
+        for i in range(10):
             exitcode, res = self.adb_send_command(["shell", "getprop", "dev.bootcomplete"])
             if "1" in res:
                 detected_boot = True
@@ -239,14 +239,8 @@ class Experiment:
         time.sleep(30)
 
         while not self.check_device_online():
-            log.warning("Checking device via adb...")
+            log.warning("Waiting device INDEFINITELY...")
             time.sleep(5)
-        log.warning("Waiting an additional 70s to have the welcome screen...")
-        time.sleep(70)
-
-        if not self.check_device_online():
-            log.error("The reboot process FAILED :-(")
-            quit()
 
         log.warning("Rearming the watchdog...")
         self.setupDeviceUsingAdb()
