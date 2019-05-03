@@ -61,7 +61,6 @@ def doJob(queue, xp, worker_nb):
         # Looking at each analysis to see if the status is done, the preconditions and dependencies
         # Determines if each analysis should be done
         for analysis, precondition in xp.analyses:
-            # print("==========+> " + str(analysis.__dict__))
             analysis_name = analysis.__class__.__name__
             log.debugv("Considering analysis named: " + analysis_name + " with precondition " + str(precondition))
 
@@ -77,7 +76,6 @@ def doJob(queue, xp, worker_nb):
 
                     # Checking device status
                     if xp.usesADevice():
-                        print("========> " + str(xp.usesADevice()))
                         xp.check_device_online_or_wait_reboot()
 
                     # We launch the analysis

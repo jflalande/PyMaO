@@ -9,6 +9,7 @@ import logging
 from experiment.XPNative import XPNative
 from experiment.XPInstallLaunch import XPInstallLauch
 from experiment.XPExampleModel import XPExampleModel
+from experiment.XPDetectDHT import XPDetectDHT
 
 # Adds a very verbose level of logs
 DEBUG_LEVELV_NUM = 9
@@ -64,7 +65,7 @@ applyColorsToLogs()
 """
 PARAMETERS
 """
-NB_WORKERS = 4 # No more workers than devices if using devices !
+NB_WORKERS = 5 # No more workers than devices if using devices !
 DEVICES = ["CB512DXH1C", "CB512ENX66", "CB512FCYAS", "CB512FEL52","CB512DXGVS"]
 #DEVICES = ["CB512DXGVS"]
 logSetup("normal")
@@ -76,13 +77,13 @@ workers=[]
 t_start = time.time()
 
 malware_queue = Queue()
-xpModel = XPExampleModel() # This line has to be patched with the experiment to run
+xpModel = XPDetectDHT() # This line has to be patched with the experiment to run
 xpUsesADevice = xpModel.usesADevice()
 if len(DEVICES) < NB_WORKERS and xpUsesADevice:
     log.error("No more workers than number of devices !")
     quit()
 
-producer = Thread(target=createJobs, args=[malware_queue, XPExampleModel()]) # This line has to be patched with the experiment to run
+producer = Thread(target=createJobs, args=[malware_queue, XPDetectDHT()]) # This line has to be patched with the experiment to run
 producer.start()
 
 # Waiting the producer to work first (helps for debugging purpose)
@@ -94,7 +95,7 @@ for i in range(NB_WORKERS):
     if xpUsesADevice:
         deviceserial = DEVICES[i]
 
-    worker = Thread(target=doJob, args=[malware_queue, XPExampleModel(deviceserial), i+1]) # This line has to be patched with the experiment to run
+    worker = Thread(target=doJob, args=[malware_queue, XPDetectDHT(deviceserial), i+1]) # This line has to be patched with the experiment to run
     worker.start()
     workers.append(worker)
 
