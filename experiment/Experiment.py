@@ -181,7 +181,7 @@ class Experiment:
                 device_detected = True
                 break
             # Wow ! The device is gone ??? Check again one time more...
-            log.warning("WTF? device offline ? Waiting 10.")
+            log.warning("WTF? device offline ? Waiting 2 x 10.")
             time.sleep(2)
         if not device_detected:
             return False
@@ -194,10 +194,12 @@ class Experiment:
             if "Service package: found" in res:
                 detected_package = True
                 break
-            # Wow ! The device is gone ??? Check again one time more...
 
+            # Wow ! The device miss the package service ??? Check again one time more...
+            log.warning("WTF? service package not there ? Waiting 6 x 10.")
             self.cleanOatSInsideTracing()
-            log.warning("WTF? service package not there ? Waiting 10.")
+            log.warning("Keep device ALIVE by pinging it.")
+            self.keep_device_ALIVE_he_is_ALIVE()
             time.sleep(10)
         if not detected_package:
             return False
@@ -209,27 +211,37 @@ class Experiment:
             if "1" in res:
                 detected_boot = True
                 break
-            # Wow ! The device is gone ??? Check again one time more...
-            log.warning("WTF? service package not there ? Waiting 10.")
+            # Wow ! The device is not fully booted ??? Check again one time more...
+            log.warning("WTF? device online but not fully booted ? Waiting 10 x 10.")
+            log.warning("Keep device ALIVE by pinging it.")
+            self.keep_device_ALIVE_he_is_ALIVE()
             time.sleep(10)
         if not detected_boot:
             return False
 
+        ######################
         # All is going well :)
+        ######################
+
+        # Keeping device ALIVE by pinging
+        self.keep_device_ALIVE_he_is_ALIVE()
         return True
+
+    def keep_device_ALIVE_he_is_ALIVE(self):
+        # Updating watchdog
+        # echo -n "ALIVE" | nc localhost 444x
+        self.exec_in_subprocess("echo -n 'ALIVE' | nc localhost " + str(self.device_local_port), shell=True)
 
     def check_device_online_or_wait_reboot(self):
 
         if self.check_device_online():
-            # Updating watchdog
-            # echo -n "ALIVE" | nc localhost 444x
-            self.exec_in_subprocess("echo -n 'ALIVE' | nc localhost " + str(self.device_local_port), shell=True)
             return
 
         log.warning("Device " + self.deviceserial + " seems offline !")
         log.warning("Waiting the reboot initiated by watchdog.arm64")
         print('\a') # BEEP
 
+        # Clean oat's inside because we will reboot
         self.cleanOatSInsideTracing()
 
         log.debug("Sleeping 60s...")
