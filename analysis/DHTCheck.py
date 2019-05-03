@@ -47,7 +47,7 @@ class DHTCheck(Analysis):
         self.updateJsonAnalyses(analysis_name, jsonanalyses, {"DHT": False})
         exitcode, res = self.xp.adb_send_command(["logcat", "-d", "-e", "DHT"])
         for line in res.split("\n"):
-            if "DHT" in line:
+            if "[DHT]" in line:
                 self.updateJsonAnalyses(analysis_name, jsonanalyses, {"DHT": True})
                 self.updateJsonAnalyses(analysis_name, jsonanalyses, {"DHTLine": line})
                 break

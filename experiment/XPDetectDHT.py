@@ -44,7 +44,7 @@ class XPDetectDHT(Experiment):
                               [{"ManifestDecoding": {"status": "done"}},
                                {"AdbInstall" : {"install": True }}]))
 
-        # Copying the APK that are Native and with API > 24 to a specific folder
+        # Copying the APK that uses Direct Heap Touch
         self.analyses.append((SymlinkAPK(self, targetDirectory=self.TARGETSYMLINK),
                               [{"DHTCheck" : {"DHT": True}}]))
 
