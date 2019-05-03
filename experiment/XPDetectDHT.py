@@ -11,7 +11,7 @@ from analysis.SymlinkAPK import SymlinkAPK
 # uninstall
 class XPDetectDHT(Experiment):
 
-    APKBASE = "/home/jf/swap/malware"
+    APKBASE = "/home/jf/swap/malwaredebug"
     JSONBASE = "/home/jf/swap/DHT/jsons"
     SIMULATE_JSON_WRITE = False
     SDKHOME = "/home/jf/Android/Sdk"

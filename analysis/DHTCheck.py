@@ -1,6 +1,7 @@
 from analysis.Analysis import Analysis
 import logging
 import time
+from collections import defaultdict
 
 log = logging.getLogger("orchestrator")
 
@@ -26,6 +27,11 @@ class DHTCheck(Analysis):
 
         log.debug("Computed package/activity name to launch: " + package_activity_name)
 
+        # dumpsys package com.ex.pg.bypassjnileak |grep userId | cut -d "=" -f 2 > /data/local/tmp/traced_uid
+        exitcode, res = self.xp.adb_send_command(
+            "shell dumpsys package com.ex.pg.bypassjnileak |grep userId | cut -d '=' -f 2 > /data/local/tmp/traced_uid"
+                .split())
+
         log.debug("Setting logcat buffer size to 16MB.")
         exitcode, res = self.xp.adb_send_command(["logcat", "-G", "16M"])
 
@@ -36,7 +42,7 @@ class DHTCheck(Analysis):
         exitcode, res = self.xp.adb_send_command(["shell", "am", "start", "-n", package_activity_name ])
 
         log.debug("DHTCheck: Sleeping...")
-        time.sleep(3)
+        time.sleep(10)
 
         log.debug("Touching screen")
         # Closing app requires to touch the screen in case of error
@@ -45,12 +51,22 @@ class DHTCheck(Analysis):
 
         # Searching a DHT log in the logcat
         self.updateJsonAnalyses(analysis_name, jsonanalyses, {"DHT": False})
-        exitcode, res = self.xp.adb_send_command(["logcat", "-d", "-e", "DHT"])
+        exitcode, res = self.xp.adb_send_command(["logcat", "-d"])
+
+
+        classnames = defaultdict(int)
         for line in res.split("\n"):
             if "[DHT]" in line:
+                classname = line.split("[DHT]")[1].split()[0] # field is dropped
+                classnames[classname] += 1
                 self.updateJsonAnalyses(analysis_name, jsonanalyses, {"DHT": True})
-                self.updateJsonAnalyses(analysis_name, jsonanalyses, {"DHTLine": line})
-                break
+        if classnames:
+            self.updateJsonAnalyses(analysis_name, jsonanalyses, {"DHTclassnames": dict(classnames)})
+
+        # Dumping in a file for DEBUG purpose
+        log.debug("Dumping in the file: " + self.xp.JSONBASE + apkname)
+        with  open(self.xp.JSONBASE + "/" + apkname + ".log" , "w" ) as f:
+            f.write(res)
 
         return True
 
