@@ -24,30 +24,38 @@ where:
 Example of config file:
     see datasets.json
 
+{
+    "row":{
+        "Dataset 1":"/path/to/dataset/1"
+        "Dataset 2":"/path/to/dataset/2"
+        "Dataset 3":"/path/to/dataset/3"
+    }
+    "columns":{
+        "Column 1":[
+            "<jspath boolean expression>",
+            null
+        ],
+        "Column 2":[
+            "<jspath boolean expression>",
+            null
+        ],
+        "Column 3":[
+            "<jspath boolean expression>",
+            "Column 2"
+        ]
+    }
+}
+
 """
 
-################################################################################
-#                                                                              #
-#                       Test zone. Proceed with caution                        #
-#                                                                              #
-################################################################################
+outputfilename = "res.json"
 
-# req = BooleanParser.BooleanParser("$..GetManifAndDexDates.dex_date < 2013")
-# print('expression parsed')
-# print(req.evaluate({"$..GetManifAndDexDates.dex_date":2012}))
-
-# year_2013 = int(datetime.datetime(2013,1,1,0,0).timestamp())
-
-# check = "$..GetManifAndDexDates.dex_date < 2013"
-# poll = "$..ManifestDecoding.minSdkVersion:top:5"
+# myjson = {'Drebin': {'date < 2013': [15, 25.862068965517242, 25.862068965517242], 'date > 2012': [43, 74.13793103448276, 74.13793103448276], '15 after 2012': [47, 81.03448275862068, 109.30232558139534], 'Popular SDK Min Version': {'15': 15, '8': 13, '14': 4, '9': 4, '7': 4}}}
 # 
+# print(str(myjson))
 # 
-# if len(check.split(":")) > 1:
-#     print("The second part is: " + check.split(":")[1])
-# else:
-#     print("There is no second part, therefore is a bool")
-# if len(poll.split(":")) > 1:
-#     print("The second part is: " + poll.split(":")[1])
+# with open(outputfilename, 'w') as out:
+#     json.dump(myjson, out)
 # 
 # quit()
 
@@ -63,21 +71,28 @@ def epoch_to_date(epoch):
 
 os.stat_float_times(False)
 
-def output_json(datasets):
+def output_json(datasets,outfile):
     dico = {}
 
-    for row_name in datasets:
-        # print("Assigning row " + row_name)
-        row = datasets[row_name]
-        dico[row_name] = {}
-        for column in row.columns:
-            # print("Assiging column " + column.name)
-            column.get_total()
-            if column.req_type == None:
-                dico[row_name][column.name] = [column.total,column.pct_total,column.pct_depend]
-            else:
-                dico[row_name][column.name] = column.res_poll
-    print(str(dico))
+    if not os.path.isfile(outfile):
+        for row_name in datasets:
+            # print("Assigning row " + row_name)
+            row = datasets[row_name]
+            dico[row_name] = {}
+            for column in row.columns:
+                # print("Assiging column " + column.name)
+                column.get_total()
+                if column.req_type == None:
+                    dico[row_name][column.name] = [column.total,column.pct_total,column.pct_depend]
+                else:
+                    dico[row_name][column.name] = column.res_poll
+        # print(str(dico))
+
+        print('Creating file at ' + outfile)
+        with open(outfile, 'w') as out:
+            json.dump(dico, out)
+    else:
+        print("file already written. finishing")
 
 def topN(dico,N,poll_type):
     if poll_type == 'top':
@@ -173,52 +188,51 @@ class Row:
 
 print("your arguments are: " + str(sys.argv))
 
-my_file = Path(sys.argv[1])
+filename = sys.argv[1]
 
-if not my_file.is_file():
+if not os.path.isfile(filename):
     print("The file doesn't exist. Quitting")
     quit()
-
-filename = sys.argv[1]
 
 with open(filename) as f:
     myjson = json.load(f)
 
-datasets={} # An empty dataset (dictionary)
+outfile = myjson['output_dir'] +  "/" + outputfilename
 
-# for each row # because they are different datasets
-for row in myjson['rows']:
-
-#     create row object
-    datasets[row] = Row(row)
-    # print()
-
-#     create columns
-    for column in myjson['columns']:
-        # print("the column is " + str(column))
-        # create_column(self,name,req,depends=None):
-        datasets[row].create_column(column, myjson['columns'][column][0], myjson['columns'][column][1])
-
-    print()
-     
-#     for each file
-    mypath = myjson['rows'][row]
-    try:
-        files = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-    except:
-        raise "Cannot open dir"
+if os.path.isfile(outfile):
+    print("The output file already exist. Quitting")
+else:
+    datasets={} # An empty dataset (dictionary)
     
-    for filename in files:
-        # print("Processing " + filename + " JSON file")
-        with open(mypath + "/" + filename) as f:
-            mwjson = json.load(f)
-
-        datasets[row].process(mwjson)
-
-output_json(datasets)
+    # for each row # because they are different datasets
+    for row in myjson['rows']:
+    
+    #     create row object
+        datasets[row] = Row(row)
+        # print()
+    
+    #     create columns
+        for column in myjson['columns']:
+            # print("the column is " + str(column))
+            # create_column(self,name,req,depends=None):
+            datasets[row].create_column(column, myjson['columns'][column][0], myjson['columns'][column][1])
+    
+        print()
+         
+    #     for each file
+        mypath = myjson['rows'][row]
+        try:
+            files = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+        except:
+            raise "Cannot open dir"
+        
+        for filename in files:
+            # print("Processing " + filename + " JSON file")
+            with open(mypath + "/" + filename) as f:
+                mwjson = json.load(f)
+    
+            datasets[row].process(mwjson)
+    
+    output_json(datasets,outfile)
 
 quit()
-
-# get config file
-# calculate data
-# calculate output
