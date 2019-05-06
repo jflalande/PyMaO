@@ -1,0 +1,36 @@
+{
+	"rows":{
+		"Drebin":"/home/tomas/orch/drebin"
+	},
+	"columns":{
+		"dex_date < 2013":[
+			"$..GetManifAndDexDates.dex_date < 1356994800",
+			null
+		],
+		"dex_date < 2012":[
+			"$..GetManifAndDexDates.dex_date < 1325372400",
+			null
+		],
+		"dex_date > 2012":[
+			"$..GetManifAndDexDates.dex_date >= 1356994800",
+			null
+		],
+		"manif_date < 2013":[
+			"$..GetManifAndDexDates.manif_date < 1356994800",
+			null
+		],
+		"manif_date < 2012":[
+			"$..GetManifAndDexDates.dex_date < 1325372400",
+			null
+		],
+		"manif_date > 2012":[
+			"$..GetManifAndDexDates.manif_date >= 1356994800",
+			null
+		],
+		"Popular SDK Min Version":[
+			"$..ManifestDecoding.minSdkVersion:top:5",
+			null
+		]
+	},
+	"output_dir":"/home/tomas/orch"
+}
