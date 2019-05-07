@@ -5,8 +5,22 @@ import os
 import shutil
 import time
 import threading
+from enum import Enum
 
 log = logging.getLogger("orchestrator")
+
+""" Helps to encode the device status """
+class DeviceStatus(Enum):
+
+    OFFLINE = 0
+    ONLINE = 1
+    PACKAGE = 2
+    BOOTCOMPLETED = 3
+
+    def __bool__(self):
+        return self.value == DeviceStatus.BOOTCOMPLETED.value
+
+a = DeviceStatus.OFFLINE
 
 """
 This class implements all common codes of an experiment.
@@ -161,6 +175,7 @@ class Experiment:
     """ Kill the watchdog.arm64 """
     def cleanDeviceUsingAdb(self):
 
+        log.info(self.me() + "Cleaning device " + str(self.deviceserial))
         log.info(" - killing previous watchdog.arm64")
         self.adb_send_command(["shell", "pkill", "watchdog.arm64"])
 
@@ -187,10 +202,10 @@ class Experiment:
             if device_detected: # We found it: exiting
                 break
             # Wow ! The device is gone ??? Check again one time more...
-            log.warning(self.me() + "WTF? device offline ? Waiting 2 x 10: step " + str(i))
+            log.warning(self.me() + "WTF? device offline ? Waiting 2 x 2s: step " + str(i))
             time.sleep(2)
         if not device_detected:
-            return False
+            return DeviceStatus.OFFLINE
 
 
         log.debug("Checking package service " + str(self.deviceserial))
@@ -202,13 +217,13 @@ class Experiment:
                 break
 
             # Wow ! The device miss the package service ??? Check again one time more...
-            log.warning(self.me() + "WTF? service package not there ? Waiting 6 x 10: step " + str(i))
+            log.warning(self.me() + "WTF? service package not there ? Waiting 6 x 10s: step " + str(i))
             self.cleanOatSInsideTracing()
             log.warning(self.me() + "Keep device ALIVE by pinging it.")
             self.keep_device_ALIVE_he_is_ALIVE()
             time.sleep(10)
         if not detected_package:
-            return False
+            return DeviceStatus.OFFLINE
 
         log.debug("Checking boot completed " + str(self.deviceserial))
         detected_boot = False
@@ -218,12 +233,12 @@ class Experiment:
                 detected_boot = True
                 break
             # Wow ! The device is not fully booted ??? Check again one time more...
-            log.warning(self.me() + "WTF? device online but not fully booted ? Waiting 10 x 10: step " + str(i))
+            log.warning(self.me() + "WTF? device online but not fully booted ? Waiting 10 x 10s: step " + str(i))
             log.warning(self.me() + "Keep device ALIVE by pinging it.")
             self.keep_device_ALIVE_he_is_ALIVE()
             time.sleep(10)
         if not detected_boot:
-            return False
+            return DeviceStatus.PACKAGE
 
         ######################
         # All is going well :)
@@ -231,7 +246,7 @@ class Experiment:
 
         # Keeping device ALIVE by pinging
         self.keep_device_ALIVE_he_is_ALIVE()
-        return True
+        return DeviceStatus.BOOTCOMPLETED
 
     def keep_device_ALIVE_he_is_ALIVE(self):
         # Updating watchdog
@@ -240,15 +255,20 @@ class Experiment:
 
     def check_device_online_or_wait_reboot(self):
 
-        if self.check_device_online():
+        device_status = self.check_device_online()
+        if device_status:
             return
 
-        log.warning(self.me() + "Device " + self.deviceserial + " seems offline !")
-        log.warning(self.me() + "Waiting the reboot initiated by watchdog.arm64")
+        log.warning(self.me() + "Device " + self.deviceserial + " seems UNSTABLE !")
         print('\a') # BEEP
 
-        # Clean oat's inside because we will reboot
-        self.cleanOatSInsideTracing()
+        if device_status == DeviceStatus.ONLINE or device_status == DeviceStatus.PACKAGE:
+            log.warning(self.me() + "Device " + self.deviceserial + " FORCING REBOOT.")
+            # Clean oat's inside because we will reboot
+            self.cleanOatSInsideTracing()
+            self.adb_send_command(["shell", "reboot"])
+        else:
+            log.warning(self.me() + "Waiting the reboot initiated by watchdog.arm64")
 
         log.debug("Sleeping 60s...")
         time.sleep(60)
@@ -256,9 +276,15 @@ class Experiment:
         log.warning(self.me() + "Waiting 30s for the boot process makes adb appearing...")
         time.sleep(30)
 
-        while not self.check_device_online():
+        while True:
+            device_status = self.check_device_online()
+            if device_status == DeviceStatus.BOOTCOMPLETED:
+                break
             log.warning(self.me() + "Waiting device INDEFINITELY...")
-            time.sleep(5)
+            if device_status == DeviceStatus.ONLINE or device_status == DeviceStatus.PACKAGE:
+                self.adb_send_command(["shell", "reboot"])
+            if device_status == DeviceStatus.OFFLINE:
+                log.warning("Device is offline. THIS IS BAD !!! WE CANNOT DO ANYTHING AT THIS STAGE !")
 
         log.warning(self.me() + "Rearming the watchdog...")
         self.setupDeviceUsingAdb()
