@@ -193,6 +193,7 @@ class Row:
     def __init__(self,name):
         self.name = name
         self.total = 0
+        self.var_dict = {}
         # print("Row " + self.name + " created")
 
     def create_column(self,name,req,depend_name=None):
@@ -205,14 +206,17 @@ class Row:
 
     def process(self,json_file):
         self.total += 1
+
         for column in self.columns:
             # print('parsing: ' + str(column.name))
             # for var in column.var_list:
-            parse_res = parse(column.jpath).find(mwjson)
+            if column.jpath not in self.var_dict.keys():
+                self.var_dict[column.jpath] = parse(column.jpath).find(json_file)
+            # parse_res = parse(column.jpath).find(json_file)
             #print("This is the result of the parsing: " + str(parse_res))
             #print()
-            if len(parse_res) != 0:
-                val = parse_res[0].value
+            if len(self.var_dict[column.jpath]) != 0:
+                val = self.var_dict[column.jpath][0].value
                 if column.req_type == None:
                     # print('changing ' + column.jpath + ' -> ' + str(val))
                     req = column.req_parser
@@ -225,61 +229,68 @@ class Row:
                         column.poll[val] += 1
                     else:
                         column.poll[val] = 1
-
+        # Reinitialize
+        self.var_dict = {}
 
 ################################################################################
 
 ################################################################################
 
+def postprocessing(myjsonconfig):
 
-print("your arguments are: " + str(sys.argv))
+    filename = myjsonconfig
 
-filename = sys.argv[1]
+    if not os.path.isfile(filename):
+        print("The file doesn't exist. Quitting")
+        quit()
 
-if not os.path.isfile(filename):
-    print("The file doesn't exist. Quitting")
+    with open(filename) as f:
+        myjson = json.load(f)
+
+    jsonfile = myjson['output_dir'] +  "/" + outputfilename + ".json"
+    xlsxfile = myjson['output_dir'] +  "/" + outputfilename + ".xlsx"
+
+    if os.path.isfile(jsonfile):
+        print("The output file already exist. Quitting")
+    else:
+        datasets={} # An empty dataset (dictionary)
+
+        # for each row # because they are different datasets
+        for row in myjson['rows']:
+
+        #     create row object
+            datasets[row] = Row(row)
+            # print()
+
+        #     create columns
+            for column in myjson['columns']:
+                # print("the column is " + str(column))
+                # create_column(self,name,req,depends=None):
+                datasets[row].create_column(column, myjson['columns'][column][0], myjson['columns'][column][1])
+
+            print()
+
+        #     for each file
+            mypath = myjson['rows'][row]
+            try:
+                files = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+            except:
+                raise "Cannot open dir"
+
+            for filename in files:
+                # print("Processing " + filename + " JSON file")
+                with open(mypath + "/" + filename) as f:
+                    mwjson = json.load(f)
+
+                datasets[row].process(mwjson)
+
+        output_to_files(datasets,jsonfile,xlsxfile)
+
+def main():
+    print("your arguments are: " + str(sys.argv))
+
+    postprocessing(sys.argv[1])
+
+if __name__ == "__main__":
+    main()
     quit()
-
-with open(filename) as f:
-    myjson = json.load(f)
-
-jsonfile = myjson['output_dir'] +  "/" + outputfilename + ".json"
-xlsxfile = myjson['output_dir'] +  "/" + outputfilename + ".xlsx"
-
-if os.path.isfile(jsonfile):
-    print("The output file already exist. Quitting")
-else:
-    datasets={} # An empty dataset (dictionary)
-
-    # for each row # because they are different datasets
-    for row in myjson['rows']:
-
-    #     create row object
-        datasets[row] = Row(row)
-        # print()
-
-    #     create columns
-        for column in myjson['columns']:
-            # print("the column is " + str(column))
-            # create_column(self,name,req,depends=None):
-            datasets[row].create_column(column, myjson['columns'][column][0], myjson['columns'][column][1])
-
-        print()
-
-    #     for each file
-        mypath = myjson['rows'][row]
-        try:
-            files = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-        except:
-            raise "Cannot open dir"
-
-        for filename in files:
-            # print("Processing " + filename + " JSON file")
-            with open(mypath + "/" + filename) as f:
-                mwjson = json.load(f)
-
-            datasets[row].process(mwjson)
-
-    # output_to_files(datasets,jsonfile,xlsxfile)
-
-quit()

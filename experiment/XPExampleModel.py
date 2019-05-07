@@ -10,8 +10,9 @@ class XPExampleModel(Experiment):
 
     HOME = os.path.expanduser('~') # Names can changes
 
-    APKBASE = HOME + "/gits/malware-goodware-small-dataset"
-    JSONBASE = HOME + "/orch/malware_json"
+    # APKBASE = HOME + "/gits/malware-goodware-small-dataset"
+    APKBASE = HOME + "/malware_datasets/drebin/malware/uncompressed"
+    JSONBASE = HOME + "/orch/drebin"
     TARGETSYMLINK =  HOME + "/orch/nativeAPK"
 
     SIMULATE_JSON_WRITE = False
