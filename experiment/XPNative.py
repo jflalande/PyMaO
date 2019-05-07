@@ -11,8 +11,8 @@ class XPNative(Experiment):
     #JSONBASE = "/media/jf/B006AF9A06AF5FD8/orchestrator/XPNative/jsons"
     #TARGETSYMLINK = "/media/jf/B006AF9A06AF5FD8/orchestrator/XPNative/apk"
 
-    APKBASE = "/home/jf/swap/malware"
-    JSONBASE = "/home/jf/swap/malware"
+    APKBASE = "/home/jf/swap/malwaredebug"
+    JSONBASE = "/home/jf/swap/malwaredebug"
     TARGETSYMLINK = "/home/jf/swap/nativeAPK"
 
     SIMULATE_JSON_WRITE = False
@@ -29,7 +29,7 @@ class XPNative(Experiment):
         # Decode the manifest and checks that the minSdkVersion is 24
         # For apps that have native methods
         self.analyses.append((ManifestDecoding(self, checkRunnableAndroidVersion=24),
-                              [{"Native":{"native_methods":True}}]))
+                              [{"Native":{"lib64_or_suspicious": True}}]))
 
         # Copying the APK that are Native and with API > 24 to a specific folder
         self.analyses.append((SymlinkAPK(self, targetDirectory=self.TARGETSYMLINK),

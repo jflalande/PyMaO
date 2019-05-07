@@ -29,9 +29,13 @@ class DHTCheck(Analysis):
 
         # dumpsys package com.ex.pg.bypassjnileak |grep userId | cut -d "=" -f 2 > /data/local/tmp/traced_uid
         exitcode, res = self.xp.adb_send_command(
-            "shell dumpsys package com.ex.pg.bypassjnileak |grep userId | cut -d '=' -f 2 > /data/local/tmp/traced_uid"
-                .split())
+            ("shell dumpsys package " + jsonanalyses["ManifestDecoding"]["package"] + " |grep userId | cut -d '=' -f 2").split())
+        if res == "": # Very bad error !
+            return False
 
+        exitcode, res = self.xp.adb_send_command((
+            "echo " + res + " > /data/local/tmp/traced_uid"
+                                                 ).split())
         log.debug("Setting logcat buffer size to 16MB.")
         exitcode, res = self.xp.adb_send_command(["logcat", "-G", "16M"])
 
