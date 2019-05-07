@@ -203,6 +203,7 @@ class Experiment:
                 break
             # Wow ! The device is gone ??? Check again one time more...
             log.warning(self.me() + "WTF? device offline ? Waiting 2 x 2s: step " + str(i))
+            log.warning(res)
             time.sleep(2)
         if not device_detected:
             return DeviceStatus.OFFLINE
@@ -282,7 +283,8 @@ class Experiment:
                 break
             log.warning(self.me() + "Waiting device INDEFINITELY...")
             if device_status == DeviceStatus.ONLINE or device_status == DeviceStatus.PACKAGE:
-                self.adb_send_command(["shell", "reboot"])
+                log.warning("Forcing reboot of "+ self.me())
+                self.adb_send_command(["reboot"])
             if device_status == DeviceStatus.OFFLINE:
                 log.warning("Device is offline. THIS IS BAD !!! WE CANNOT DO ANYTHING AT THIS STAGE !")
 

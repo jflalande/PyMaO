@@ -26,11 +26,11 @@ Example of config file:
     see datasets.json
 
 {
-    "row":{
-        "Dataset 1":"/path/to/dataset/1"
-        "Dataset 2":"/path/to/dataset/2"
+    "rows":{
+        "Dataset 1":"/path/to/dataset/1",
+        "Dataset 2":"/path/to/dataset/2",
         "Dataset 3":"/path/to/dataset/3"
-    }
+    },
     "columns":{
         "Column 1":[
             "<jspath boolean expression>",
@@ -44,7 +44,8 @@ Example of config file:
             "<jspath boolean expression>",
             "Column 2"
         ]
-    }
+    },
+	"output_dir":"/home/tomas/orch"
 }
 
 IDEA:
