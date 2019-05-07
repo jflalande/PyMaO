@@ -1,0 +1,24 @@
+{
+	"rows":{
+		"Drebin":"/home/tomas/orch/malware_json"
+	},
+	"columns":{
+		"date < 2013":[
+			"$..GetManifAndDexDates.dex_date < 1356994800",
+			null
+		],
+		"date > 2012":[
+			"$..GetManifAndDexDates.dex_date >= 1356994800",
+			null
+		],
+		"15 after 2012":[
+			"$..ManifestDecoding.minSdkVersion <= 15",
+			"date > 2012"
+		],
+		"Popular SDK Min Version":[
+			"$..ManifestDecoding.minSdkVersion:top:5",
+			null
+		]
+	},
+	"output_dir":"/home/tomas/ramdisk"
+}
