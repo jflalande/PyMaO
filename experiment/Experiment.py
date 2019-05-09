@@ -203,7 +203,7 @@ class Experiment:
                 break
             # Wow ! The device is gone ??? Check again one time more...
             log.warning(self.me() + "WTF? device offline ? Waiting 2 x 2s: step " + str(i))
-            log.warning(res)
+            #log.warning(res)
             time.sleep(2)
         if not device_detected:
             return DeviceStatus.OFFLINE
