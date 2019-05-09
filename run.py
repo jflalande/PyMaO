@@ -7,7 +7,7 @@ import logging
 
 # importing XPs
 from experiment.XPNative import XPNative
-from experiment.XPInstallLaunch import XPInstallLauch
+from experiment.XPInstallLaunch import XPInstallLaunch
 from experiment.XPExampleModel import XPExampleModel
 from experiment.XPDetectDHT import XPDetectDHT
 

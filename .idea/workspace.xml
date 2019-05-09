@@ -6,11 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c7ceb433-fc77-4c14-988b-1b9398d89388" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/Apktool.py" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/Apktool.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/DHTCheck.py" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/DHTCheck.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analysis/Native.py" beforeDir="false" afterPath="$PROJECT_DIR$/analysis/Native.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/experiment/XPNative.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/XPNative.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiment/XPInstallLaunch.py" beforeDir="false" afterPath="$PROJECT_DIR$/experiment/XPInstallLaunch.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -21,7 +17,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="run.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="run.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/run.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="146">
@@ -42,11 +38,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="XPInstallLaunch.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="XPInstallLaunch.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/experiment/XPInstallLaunch.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="216">
-              <caret line="27" selection-start-line="27" selection-end-line="27" />
+            <state relative-caret-position="198">
+              <caret line="11" column="19" selection-start-line="11" selection-start-column="19" selection-end-line="11" selection-end-column="19" />
               <folding>
                 <element signature="e#0#44#0" expanded="true" />
               </folding>
@@ -170,7 +166,6 @@
         <option value="$PROJECT_DIR$/analysis/SymlinkAPK.py" />
         <option value="$PROJECT_DIR$/analysis/Analysis.py" />
         <option value="$PROJECT_DIR$/analysis/AdbUninstall.py" />
-        <option value="$PROJECT_DIR$/experiment/XPInstallLaunch.py" />
         <option value="$PROJECT_DIR$/Producer.py" />
         <option value="$PROJECT_DIR$/analysis/LaunchAndSurvive.py" />
         <option value="$PROJECT_DIR$/analysis/Unzip.py" />
@@ -185,12 +180,13 @@
         <option value="$PROJECT_DIR$/analysis/DHTCheck.py" />
         <option value="$PROJECT_DIR$/experiment/XPNative.py" />
         <option value="$PROJECT_DIR$/run.py" />
+        <option value="$PROJECT_DIR$/experiment/XPInstallLaunch.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="252" />
-    <option name="y" value="26" />
+    <option name="x" value="250" />
+    <option name="y" value="25" />
     <option name="width" value="1635" />
     <option name="height" value="1125" />
   </component>
@@ -298,13 +294,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1554815508674</updated>
-    </task>
-    <task id="LOCAL-00010" summary="Extraction of minSdkVersion and targetSdkVersion.">
-      <created>1554982577018</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1554982577018</updated>
     </task>
     <task id="LOCAL-00011" summary="Implemented test of minSdkVersion.">
       <created>1554989370855</created>
@@ -642,19 +631,26 @@
       <option name="project" value="LOCAL" />
       <updated>1557229268875</updated>
     </task>
-    <option name="localTasksCounter" value="59" />
+    <task id="LOCAL-00059" summary="Improved reboot process.">
+      <created>1557244272098</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1557244272098</updated>
+    </task>
+    <option name="localTasksCounter" value="60" />
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="252" y="26" width="1635" height="1125" extended-state="0" />
+    <frame x="250" y="25" width="1635" height="1125" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17003058" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17003058" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
-      <window_info anchor="bottom" id="Version Control" order="9" weight="0.23546799" />
+      <window_info anchor="bottom" id="Version Control" order="9" visible="true" weight="0.23546799" />
       <window_info anchor="bottom" id="Python Console" order="7" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.36945814" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.36945814" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.32906404" />
       <window_info id="Favorites" order="2" side_tool="true" />
@@ -989,16 +985,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/experiment/XPInstallLaunch.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="27" selection-start-line="27" selection-end-line="27" />
-          <folding>
-            <element signature="e#0#44#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/analysis/CopyAPK.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="342">
@@ -1086,6 +1072,16 @@
           <caret line="71" column="1" selection-start-line="71" selection-start-column="1" selection-end-line="71" selection-end-column="1" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/experiment/XPInstallLaunch.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="198">
+          <caret line="11" column="19" selection-start-line="11" selection-start-column="19" selection-end-line="11" selection-end-column="19" />
+          <folding>
+            <element signature="e#0#44#0" expanded="true" />
           </folding>
         </state>
       </provider>

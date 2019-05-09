@@ -9,7 +9,7 @@ from analysis.SymlinkAPK import SymlinkAPK
 # install tel
 # lance + sleep 1s + check PS
 # uninstall
-class XPInstallLauch(Experiment):
+class XPInstallLaunch(Experiment):
 
     APKBASE = "/home/jf/swap/malware"
     JSONBASE = "/home/jf/swap/nativeAPK"
