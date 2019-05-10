@@ -4,6 +4,7 @@ from Producer import createJobs
 from Worker import doJob
 import time
 import logging
+import experiment
 
 # importing XPs
 from experiment.XPNative import XPNative
@@ -25,6 +26,8 @@ def debugv(self, message, *args, **kws):
 logging.Logger.debugv = debugv
 log = logging.getLogger("orchestrator")
 
+def generateXP(s, *args, **kwargs):
+    return getattr(getattr(experiment,s), s)(*args, **kwargs)
 
 # Tries to apply colors to logs
 def applyColorsToLogs():
@@ -72,18 +75,21 @@ logSetup("normal")
 #logSetup("verbose")
 #logSetup("veryverbose")
 
+targetXP = "XPNative"
+
+
 
 workers=[]
 t_start = time.time()
 
 malware_queue = Queue()
-xpModel = XPNative() # This line has to be patched with the experiment to run
+xpModel = generateXP(targetXP)
 xpUsesADevice = xpModel.usesADevice()
 if len(DEVICES) < NB_WORKERS and xpUsesADevice:
     log.error("No more workers than number of devices !")
     quit()
 
-producer = Thread(target=createJobs, args=[malware_queue, XPNative()]) # This line has to be patched with the experiment to run
+producer = Thread(target=createJobs, args=[malware_queue, generateXP(targetXP)])
 producer.start()
 
 # Waiting the producer to work first (helps for debugging purpose)
@@ -95,7 +101,7 @@ for i in range(NB_WORKERS):
     if xpUsesADevice:
         deviceserial = DEVICES[i]
 
-    worker = Thread(target=doJob, args=[malware_queue, XPNative(deviceserial), i+1]) # This line has to be patched with the experiment to run
+    worker = Thread(target=doJob, args=[malware_queue, generateXP(targetXP, deviceserial), i+1])
     worker.start()
     workers.append(worker)
 

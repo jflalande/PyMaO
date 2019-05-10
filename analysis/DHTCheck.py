@@ -48,11 +48,6 @@ class DHTCheck(Analysis):
         log.debug("DHTCheck: Sleeping...")
         time.sleep(10)
 
-        log.debug("Touching screen")
-        # Closing app requires to touch the screen in case of error
-        # adb shell input tap 1000 1000
-        exitcode, res = self.xp.adb_send_command(["shell", "input", "tap", "1000", "1000"])
-
         # Searching a DHT log in the logcat
         self.updateJsonAnalyses(analysis_name, jsonanalyses, {"DHT": False})
         exitcode, res = self.xp.adb_send_command(["logcat", "-d"])
