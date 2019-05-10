@@ -8,6 +8,21 @@ import experiment
 import importlib
 
 
+"""
+PARAMETERS
+"""
+# The experiment to run
+targetXP = "XPNative"
+
+NB_WORKERS = 4 # No more workers than devices if using devices !
+
+# If you need devices:
+DEVICES = ["CB512DXH1C", "CB512ENX66", "CB512FCYAS", "CB512FEL52","CB512DXGVS"]
+# DEVICES = ["CB512DXGVS"]
+
+# =============================================================================
+
+
 # Adds a very verbose level of logs
 DEBUG_LEVELV_NUM = 9
 logging.addLevelName(DEBUG_LEVELV_NUM, "DEBUGV")
@@ -68,21 +83,11 @@ def logSetup(level):
 
 applyColorsToLogs()
 
-"""
-PARAMETERS
-"""
-# The experiment to run
-targetXP = "XPNative"
-
-NB_WORKERS = 4 # No more workers than devices if using devices !
-
-# If you need a device:
-DEVICES = ["CB512DXH1C", "CB512ENX66", "CB512FCYAS", "CB512FEL52","CB512DXGVS"]
-DEVICES = ["CB512DXGVS"]
+# For debugging purpose:
+########################
 logSetup("normal")
 #logSetup("verbose")
 #logSetup("veryverbose")
-
 
 
 
