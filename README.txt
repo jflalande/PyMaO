@@ -16,5 +16,6 @@ cd ~/Android/Sdk/tools
 
 # Usage
 
+- create a new XP in the experiment/ folder
+- customize your experiment by being inspired by XPExampleModel.py
 - customize run.py
-- customize your experiment
