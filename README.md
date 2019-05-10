@@ -87,8 +87,9 @@ To compare a variable to a string, they must be enclosed in <""> in the JSON fil
 
     $..Unzip.status == \"done\"
 
-This expression compares if the variable '$..Unzip.status' is equal to the string 'done'.
+This expression compares if the variable `$..Unzip.status` is equal to the string `done`.
+
 For our purposes, all the JSONPath expressions are variables.
 
 ### TODO:
-- Expand expression for multiple requests
+* [ ]  Expand expression for multiple requests
