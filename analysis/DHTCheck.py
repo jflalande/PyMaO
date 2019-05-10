@@ -34,7 +34,7 @@ class DHTCheck(Analysis):
             return False
 
         exitcode, res = self.xp.adb_send_command((
-            "echo " + res + " > /data/local/tmp/traced_uid"
+            "shell echo " + res + " > /data/local/tmp/traced_uid"
                                                  ).split())
         log.debug("Setting logcat buffer size to 16MB.")
         exitcode, res = self.xp.adb_send_command(["logcat", "-G", "16M"])
