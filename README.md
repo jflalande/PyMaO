@@ -33,10 +33,12 @@ where:
 `json_config_file`: The file that holds the definitions of the rows and columns to be processed
 
 For more information about the usge of PostProcessing.py, check the help with:
-  `python3 post_processing/PostProcessing.py -h`
+
+    python3 post_processing/PostProcessing.py -h
 
 Example of config file:
-see post_processing/example/drebin.json
+
+see `post_processing/examples/drebin.json`
 
     {
         "rows":{
