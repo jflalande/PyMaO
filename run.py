@@ -5,12 +5,8 @@ from Worker import doJob
 import time
 import logging
 import experiment
+import importlib
 
-# importing XPs
-from experiment.XPNative import XPNative
-from experiment.XPInstallLaunch import XPInstallLaunch
-from experiment.XPExampleModel import XPExampleModel
-from experiment.XPDetectDHT import XPDetectDHT
 
 # Adds a very verbose level of logs
 DEBUG_LEVELV_NUM = 9
@@ -27,6 +23,13 @@ logging.Logger.debugv = debugv
 log = logging.getLogger("orchestrator")
 
 def generateXP(s, *args, **kwargs):
+    # Importing module experiment.s
+    full_module_name = "experiment." + s
+
+    # The file gets executed upon import, as expected.
+    importlib.import_module(full_module_name)
+
+    # Generating object
     return getattr(getattr(experiment,s), s)(*args, **kwargs)
 
 # Tries to apply colors to logs
@@ -68,14 +71,19 @@ applyColorsToLogs()
 """
 PARAMETERS
 """
+# The experiment to run
+targetXP = "XPNative"
+
 NB_WORKERS = 4 # No more workers than devices if using devices !
+
+# If you need a device:
 DEVICES = ["CB512DXH1C", "CB512ENX66", "CB512FCYAS", "CB512FEL52","CB512DXGVS"]
 DEVICES = ["CB512DXGVS"]
 logSetup("normal")
 #logSetup("verbose")
 #logSetup("veryverbose")
 
-targetXP = "XPNative"
+
 
 
 
