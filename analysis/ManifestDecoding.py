@@ -26,6 +26,8 @@ class ManifestDecoding(Analysis):
 
         errcode, res = self.xp.exec_in_subprocess(command, cwd=True)
 
+
+
         # Single value capture: minSdkVersion, targetSdkVersion, package
         for line in res.split('\n'):
 
@@ -47,6 +49,8 @@ class ManifestDecoding(Analysis):
         self.updateJsonAnalyses(analysis_name, jsonanalyses, {"launchable": False})
         activity = None
         activities = []
+        # Number of activities
+        NofActivities = 0
         indent = 1000
         for line in res.split('\n'):
             # Detecting a new activity tag or other tag indented on the current activity
@@ -83,6 +87,9 @@ class ManifestDecoding(Analysis):
                 activity["main"] = True
                 self.updateJsonAnalyses(analysis_name, jsonanalyses, {"launchable": True})
 
+        # Updating JSON: Number of activities NumActivities
+        self.updateJsonAnalyses(analysis_name, jsonanalyses, {"NumActivities": NofActivities})
+
         # Pushing last activity
         if activity is not None:
             activities.append(activity)
@@ -103,5 +110,3 @@ class ManifestDecoding(Analysis):
 
         # This analysis can fail if aapt fails to analyze apk
         return errcode == 0
-
-
