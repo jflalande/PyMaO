@@ -27,32 +27,10 @@
 			"$..GetManifAndDexDates.manif_date >= 1356994800",
 			null
 		],
-		"N. of unzipped":[
-			"$..Unzip.status == \"done\"",
-			null
-		],
 		"Popular SDK Min Version":[
-			"$..ManifestDecoding.minSdkVersion:top:3",
-			null
-		],
-		"Least popular SDK Min Version":[
-			"$..ManifestDecoding.minSdkVersion:bottom:3",
+			"$..ManifestDecoding.minSdkVersion:top:5",
 			null
 		]
 	},
-	"histograms":{
-    "DEX_dates":[
-			"$..GetManifAndDexDates.dex_date",
-			"date"
-		],
-		"Manfinest_dates":[
-			"$..GetManifAndDexDates.manif_date",
-			"date"
-		],
-		"Size":[
-			"$..GetAPKSize.size",
-			"int"
-		]
-  },
-	"output_dir":"/home/tomas/orch/drebin"
+	"output_dir":"/home/tomas/orch"
 }

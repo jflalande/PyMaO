@@ -1,6 +1,6 @@
 {
 	"rows":{
-		"Drebin":"/home/tomas/orch/drebin"
+		"Drebin":"/home/tomas/orch/sub_drebin"
 	},
 	"columns":{
 		"dex_date < 2013":[
@@ -54,5 +54,5 @@
 			"int"
 		]
   },
-	"output_dir":"/home/tomas/orch/drebin"
+	"output_dir":"/home/tomas/orch/res_sub_drebin"
 }

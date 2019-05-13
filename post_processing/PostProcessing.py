@@ -1,8 +1,8 @@
 import os
 import time
-import logging
+import logging # Log info output
 import datetime
-import argparse
+import argparse # Program argument parser
 import json
 from jsonpath_ng import jsonpath, parse
 
@@ -55,7 +55,7 @@ see `post_processing/examples/drebin.json`
         "histograms":{
             "Data 1":[
         			"<JSONPath expression>",
-        			"<type>"             ---------------> This can be date only (for the moment)
+        			"<type>"             ---------------> This can be date, int, float, string
         		],
         		"Data 2":[
         			"<JSONPath expression>",
@@ -136,6 +136,7 @@ def logSetup(level):
         log.setLevel(logging.INFO)
         log.info("Debug is Normal.")
     else:
+        # else
         log.setLevel(logging.INFO)
         log.warning("Logging level \"{}\" not defined, setting \"normal\" instead"
                     .format(level))
@@ -196,7 +197,13 @@ def output_histogram(datasets,output_dir):
             plt.savefig(output_dir + "/histogram_"+ histogram_name + ".pdf")
             log.info("Histogram saved as histogram_"+ histogram_name + ".pdf")
 
-def output_to_files(datasets,jsonfile,xlsxfile,rawfile):
+def output_to_files(datasets,out_dir):
+    log.info("Processing finished, outputing files")
+
+    jsonfile = out_dir +  "/" + outputfilename + ".json"
+    xlsxfile = out_dir +  "/" + outputfilename + ".xlsx"
+    rawfile = out_dir +  "/" + outputfilename + "_raw.json"
+
     # Dictionary for the output JSON file
     dico = {}
     # Raw results of the histogram
@@ -222,11 +229,11 @@ def output_to_files(datasets,jsonfile,xlsxfile,rawfile):
     row_num += 1
     col_num = 1
 
+    # If the result JSON already exists, don't do anything
     if not os.path.isfile(jsonfile):
         for row_name in datasets:
             log.debug("Assigning row " + row_name)
 
-            row = datasets[row_name]
             dico[row_name] = {}
             raw[row_name] = {}
             ws.cell(row=row_num,column=col_num,value=row_name)
@@ -251,13 +258,16 @@ def output_to_files(datasets,jsonfile,xlsxfile,rawfile):
             ws.merge_cells(start_row=row_num,start_column=1,end_row=row_num+1,end_column=1)
             row_num += 2
             col_num = 1
-        # print(str(dico))
+            # print(str(dico))
             for histogram_name in row.histogram_collection:
                 # def output_histogram(data,output_dir):
                 data = row.histogram_collection[histogram_name]['data']
-                raw[histogram_name] = row.histogram_collection[histogram_name]
+                raw[row_name][histogram_name] = row.histogram_collection[histogram_name]
 
-        # log.debug('Creating file at ' + jsonfile)
+        # Create the output directory if it doesn't exists
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+
         with open(jsonfile, 'w') as out:
             json.dump(dico, out)
         log.info("File saved at " + jsonfile)
@@ -265,6 +275,7 @@ def output_to_files(datasets,jsonfile,xlsxfile,rawfile):
         with open(rawfile, 'w') as out:
             json.dump(raw, out)
         log.info("File saved at " + rawfile)
+
         # filename = "res.xlsx"
         wb.save(xlsxfile)
         log.info("File saved at " + xlsxfile)
@@ -274,8 +285,8 @@ def output_to_files(datasets,jsonfile,xlsxfile,rawfile):
 def topN(dico,N,poll_type):
     if poll_type == 'top':
         res = dict(Counter(dico).most_common(N))
-    elif poll_type == 'bottom':
-        res = dict(Counter(dico).most_common()[:N-1:1])
+    elif poll_type == 'bottom' or poll_type == 'bot':
+        res = dict(Counter(dico).most_common()[:-N-1:-1])
     return res
 
 ################################################################################
@@ -348,6 +359,7 @@ class Row:
         self.total += 1
 
         for column in self.columns:
+            log.debug('Processing data ' + str(self.total) )
             log.debug('parsing: ' + str(column.name))
             # Find the value of the JSONPath expression if it's not in the dictionary
             expression = column.jpath
@@ -362,9 +374,9 @@ class Row:
                     log.debugv('There is an instance of string for val: ' + str(val))
                     val = "\"" + val + "\""
                 if column.req_type == None:
-                    log.debug('changing ' + column.jpath + ' -> ' + str(val))
+                    log.debugv('changing ' + column.jpath + ' -> ' + str(val))
                     evaluator = column.req_parser
-                    log.debug('The request to evaluate is: ' + str(evaluator.tokenizer.expression))
+                    log.debugv('The request to evaluate is: ' + str(evaluator.tokenizer.expression))
                     res = evaluator.evaluate({expression:val})
                     if res:
                         column.total += 1
@@ -399,21 +411,20 @@ def postprocessing(myjsonconfig,verbose=None):
     # print('This verbosity is ' + str(verbose))
 
     logSetup(verbose)
-
     t_start = time.time()
-
     filename = myjsonconfig
 
     # Check if the JSON config file exists
     if not os.path.isfile(filename):
         log.warning("The file " + filename + " doesn't exist. Quitting")
     else:
-        with open(filename) as f:
-            myjson = json.load(f)
+        with open(filename) as config:
+            myjson = json.load(config)
 
+        log.info("Output dir: " + myjson['output_dir'])
         jsonfile = myjson['output_dir'] +  "/" + outputfilename + ".json"
-        xlsxfile = myjson['output_dir'] +  "/" + outputfilename + ".xlsx"
-        rawfile = myjson['output_dir'] +  "/" + outputfilename + "_raw.json"
+        # xlsxfile = myjson['output_dir'] +  "/" + outputfilename + ".xlsx"
+        # rawfile = myjson['output_dir'] +  "/" + outputfilename + "_raw.json"
 
         # Check of the result file already exists
         if os.path.isfile(jsonfile):
@@ -449,14 +460,17 @@ def postprocessing(myjsonconfig,verbose=None):
                     raise "Cannot open dir"
 
                 # for each file
+                numFiles = len(files)
                 for filename in files:
-                    log.debug("Processing " + filename + " JSON file")
+
+                    log.debug("Processing file number " + str(numFiles) + ": " + filename + " JSON file")
+                    numFiles -= 1
                     with open(mypath + "/" + filename) as f:
                         mwjson = json.load(f)
 
                     datasets[row].process(mwjson)
 
-            output_to_files(datasets,jsonfile,xlsxfile,rawfile)
+            output_to_files(datasets,myjson['output_dir'])
             output_histogram(datasets,myjson['output_dir'])
 
     t_end = time.time()
