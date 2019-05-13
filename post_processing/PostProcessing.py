@@ -165,23 +165,28 @@ def output_histogram(datasets,output_dir):
             # def output_histogram(data,output_dir):
             data = row.histogram_collection[histogram_name]['data']
 
-            mindate = dt.datetime.fromtimestamp(min(data))
-            maxdate = dt.datetime.fromtimestamp(max(data))
-            bindate = dt.datetime(year=mindate.year, month=mindate.month, day=1)
-            mybins = [bindate.timestamp()]
-            while bindate < maxdate:
-                if bindate.month == 12:
-                    bindate = dt.datetime(year=bindate.year + 1, month=1, day=1)
-                else:
-                    bindate = dt.datetime(year=bindate.year, month=bindate.month + 1, day=1)
-                mybins.append(bindate.timestamp())
-            mybins = mdates.epoch2num(mybins)
+            if row.histogram_collection[histogram_name]['type'] == 'date':
 
-            date_data = mdates.epoch2num(data)
+                mindate = dt.datetime.fromtimestamp(min(data))
+                maxdate = dt.datetime.fromtimestamp(max(data))
+                bindate = dt.datetime(year=mindate.year, month=mindate.month, day=1)
+                mybins = [bindate.timestamp()]
+                while bindate < maxdate:
+                    if bindate.month == 12:
+                        bindate = dt.datetime(year=bindate.year + 1, month=1, day=1)
+                    else:
+                        bindate = dt.datetime(year=bindate.year, month=bindate.month + 1, day=1)
+                    mybins.append(bindate.timestamp())
+                mybins = mdates.epoch2num(mybins)
+
+                plot_data = mdates.epoch2num(data)
+            else:
+                mybins=50
+                plot_data = data
 
             fig, ax = plt.subplots(1,1)
             fig, ax = plt.subplots(1,1, figsize=(200, 20), facecolor='white')
-            ax.hist(date_data, bins=mybins, ec='black')
+            ax.hist(plot_data, bins=mybins, ec='black')
             ax.xaxis.set_major_locator(mdates.MonthLocator())
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%m.%y'))
             fig.autofmt_xdate()
