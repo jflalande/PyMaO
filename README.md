@@ -83,7 +83,7 @@ It follows this grammar:
     Expression --> Terminal (>,<,>=,<=,==) Terminal
     Terminal --> Number or String or Variable
 
-To compare a variable to a string, they must be enclosed in <""> in the JSON file. For example:
+To compare a variable to a string, they must be enclosed in `""` in the JSON file. For example:
 
     $..Unzip.status == \"done\"
 
