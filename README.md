@@ -92,4 +92,5 @@ This expression compares if the variable `$..Unzip.status` is equal to the strin
 For our purposes, all the JSONPath expressions are variables.
 
 ### TODO:
+* [ ]  Handle non-dates histograms (little patch)
 * [ ]  Expand expression for multiple requests
