@@ -1,4 +1,5 @@
 import logging
+from sys import platform
 
 log = logging.getLogger("orchestrator")
 
@@ -33,7 +34,14 @@ class Analysis:
         raise NotImplementedError("Analysis not implemented")
 
     def checkTMPFS(self):
-        command = "mount | grep tmpfs | grep " + self.xp.TMPFS
+        log.debug("You are running on "+platform)
+        if platform == 'Linux' :
+            command = "mount | grep '^tmpfs' | grep " + self.xp.TMPFS
+        elif platform == 'darwin' :
+            command = "mount | grep '(hfs'" # + self.xp.TMPFS
+        else :
+            log.error ("Your platform seems to be unknown ...")
+            quit()
         log.debugv("Analysis: checking TMPFS with command " + command)
         errcode, res = self.xp.exec_in_subprocess(command)
         if res == "":
