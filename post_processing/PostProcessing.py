@@ -21,6 +21,9 @@ import numpy as np
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import matplotlib.ticker as ticker
+
+from math import floor, log as loga
 """
 Usage:
     python3 <this_file> <json_config>
@@ -166,8 +169,13 @@ def output_histogram(datasets,output_dir):
             # def output_histogram(data,output_dir):
             data = row.histogram_collection[histogram_name]['data']
 
-            if row.histogram_collection[histogram_name]['type'] == 'date':
+            log.debugv("The data of " + histogram_name + " is " + str(data))
 
+            hist_type = row.histogram_collection[histogram_name]['type']
+
+            if hist_type == 'date':
+                log.debug("Histogram " + histogram_name + " is type date")
+                # Processing the dates to get the maximun and minimum month-year
                 mindate = dt.datetime.fromtimestamp(min(data))
                 maxdate = dt.datetime.fromtimestamp(max(data))
                 bindate = dt.datetime(year=mindate.year, month=mindate.month, day=1)
@@ -181,16 +189,32 @@ def output_histogram(datasets,output_dir):
                 mybins = mdates.epoch2num(mybins)
 
                 plot_data = mdates.epoch2num(data)
-            else:
-                mybins=50
-                plot_data = data
 
-            fig, ax = plt.subplots(1,1)
-            fig, ax = plt.subplots(1,1, figsize=(200, 20), facecolor='white')
-            ax.hist(plot_data, bins=mybins, ec='black')
-            ax.xaxis.set_major_locator(mdates.MonthLocator())
-            ax.xaxis.set_major_formatter(mdates.DateFormatter('%m.%y'))
-            fig.autofmt_xdate()
+                fig, ax = plt.subplots(1,1, figsize=(200, 20), facecolor='white')
+                ax.hist(plot_data, bins=mybins, ec='black')
+                ax.xaxis.set_major_locator(mdates.MonthLocator())
+                ax.xaxis.set_major_formatter(mdates.DateFormatter('%m.%y'))
+                fig.autofmt_xdate()
+            elif hist_type == 'int':
+                log.debug("Histogram " + histogram_name + " is type int")
+                fig, ax = plt.subplots(1,1,figsize=(200, 20))
+
+                # Ajust bins
+                max_exp = int(floor(loga(max(data),10)))
+                binwidth = 10**(max_exp - 3)
+
+                ax.hist(data, bins=np.arange(min(data), max(data) + binwidth, binwidth), ec='black')
+
+                ax.set_xlim(left=0) # Start at zero
+                ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ','))) # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
+                ax.xaxis.set_major_locator(ticker.MultipleLocator(binwidth*10))
+                plt.xticks(rotation=45) # Rotate x ticks
+                plt.gcf().subplots_adjust(bottom=0.15) # Adjust the lables if they go pass the figure
+                plt.grid(linestyle="--") # Grid in the histogram
+            else:
+                fig, ax = plt.subplots(1,1)
+                ax.hist(data, bins='auto', ec='black')
+
 
             plt.savefig(output_dir + "/histogram_"+ histogram_name + ".png")
             log.info("Histogram saved as histogram_"+ histogram_name + ".png")
@@ -333,7 +357,6 @@ class Column:
             # print('getting poll')
             self.res_poll = topN(self.poll,self.num_poll,self.req_type)
 
-
 class Row:
     columns = []
     histogram_collection = {}
@@ -359,14 +382,15 @@ class Row:
         self.total += 1
 
         for column in self.columns:
-            log.debug('Processing data ' + str(self.total) )
-            log.debug('parsing: ' + str(column.name))
+            log.debugv('Processing data ' + str(self.total) )
+            log.debugv('parsing: ' + str(column.name))
             # Find the value of the JSONPath expression if it's not in the dictionary
             expression = column.jpath
             if expression not in self.var_dict.keys():
                 self.var_dict[expression] = parse(expression).find(json_file)
             log.debugv("This is the result of the parsing: " + str(self.var_dict[expression]))
             # if the length is 0, the value was not found in the JSON file
+            # Add the value if it exists
             if len(self.var_dict[expression]) != 0:
                 val = self.var_dict[expression][0].value
                 # Put some quotes to strings, so Jason can be happy
@@ -393,9 +417,13 @@ class Row:
             expression = histogram_dict['request']
             if expression not in self.var_dict.keys():
                 self.var_dict[expression] = parse(expression).find(json_file)
+            # Add the value if it exists
             if len(self.var_dict[expression]) != 0:
                 val = self.var_dict[expression][0].value
-                histogram_dict['data'].append(val)
+                if histogram_dict['type'] == 'int':
+                    histogram_dict['data'].append(int(val))
+                else:
+                    histogram_dict['data'].append(val)
 
         # Reinitialize the dictionary
         self.var_dict = {}
@@ -455,7 +483,7 @@ def postprocessing(myjsonconfig,verbose=None):
                 mypath = myjson['rows'][row]
 
                 try:
-                    files = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+                    files = [f for f in listdir(mypath) if isfile(join(mypath, f)) and f.endswith(".json")]
                 except:
                     raise "Cannot open dir"
 
