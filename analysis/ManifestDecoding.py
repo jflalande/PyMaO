@@ -78,6 +78,7 @@ class ManifestDecoding(Analysis):
             if m and len(m.group(1)) == indent + 2:
                 log.debugv("ManifestDecoding: name of activity detected.")
                 activity["name"] = m.group(2)
+                NofActivities += 1
 
             # Detecting the MAIN activity
             m = re.match("^(\s+)A: android:name\(\w+\)=\"(android\.intent\.action\.MAIN)\".*$", line)
