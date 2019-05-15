@@ -4,6 +4,11 @@ import os
 
 log = logging.getLogger("orchestrator")
 
+"""
+Built one dot file containing a CFG for each method in the apk
+This analysis reliies on ForceCFI  
+"""
+
 
 class BuildMethodsCFG(Analysis):
 

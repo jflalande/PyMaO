@@ -41,6 +41,7 @@ def doJob(queue, xp, worker_nb):
 
         # Setup of the working directory
         xp.setupWorkingDirectory()
+        log.debug("Working directory is "+os.path.abspath(os.curdir))
 
         status = {}
         for analysis, precondition in xp.analyses[::-1]:
