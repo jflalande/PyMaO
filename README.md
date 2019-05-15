@@ -83,7 +83,7 @@ It follows this grammar:
     Expression --> Terminal (>,<,>=,<=,==) Terminal
     Terminal --> Number or String or Variable
 
-To compare a variable to a string, they must be enclosed in <""> in the JSON file. For example:
+To compare a variable to a string, they must be enclosed in `""` in the JSON file. For example:
 
     $..Unzip.status == \"done\"
 
@@ -92,4 +92,7 @@ This expression compares if the variable `$..Unzip.status` is equal to the strin
 For our purposes, all the JSONPath expressions are variables.
 
 ### TODO:
+* [x]  Handle top and bottom surveys
+* [ ]  Handle non-dates histograms (little patch)
 * [ ]  Expand expression for multiple requests
+* [ ]  Add reference in histogram to defined columns

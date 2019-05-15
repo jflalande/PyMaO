@@ -35,7 +35,7 @@ class Analysis:
 
     def checkTMPFS(self):
         log.debug("You are running on "+platform)
-        if platform == 'Linux' :
+        if platform == 'linux' or platform == 'Linux':
             command = "mount | grep '^tmpfs' | grep " + self.xp.TMPFS
         elif platform == 'darwin' :
             command = "mount | grep '(hfs'" # + self.xp.TMPFS
