@@ -17,7 +17,7 @@ class BuildMethodsCFG(Analysis):
         # Have to become some parameters, not hardcoded
         jar_path = "/Users/vviettri/Documents/malware/malware-trigger-dev/ForceCFI/forcecfi.jar"
         output_dir = "/Users/vviettri/Documents/malware/malware-xp/output-xp-cfg_res"
-        graph_dir = "/Users/vviettri/Documents/malware/malware-xp/output-xp-cfgDot"
+        graph_dir = "/Users/vviettri/Documents/malware/malware-xp/output-xp-cfgDot"+ "/" + apkname
         #graph_dir = "./output-xp-cfgDot"
         heuristics_file = "/Users/vviettri/Documents/malware/malware-trigger-dev/SuspiciousHeuristics/heuristics/suspicious2.json"
         ### WARNING ###
