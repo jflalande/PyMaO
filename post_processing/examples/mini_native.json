@@ -1,0 +1,12 @@
+{
+	"rows":{
+		"Native Dataset":"/home/tomas/orch/mini_native"
+	},
+	"columns":{
+		"ARM":[
+			"$..Native.native_methods == \"True\"",
+			null
+		]
+	},
+	"output_dir":"/home/tomas/orch/res_mini_native"
+}

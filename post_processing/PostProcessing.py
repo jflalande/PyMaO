@@ -243,7 +243,7 @@ def output_to_files(datasets,out_dir):
     for row_name in datasets:
         row = datasets[row_name]
         ws.cell(row=row_num,column=2,value="Total")
-        col_num = 2
+        col_num = 3
         for column in row.columns:
             ws.cell(row=row_num,column=col_num,value=column.name)
             ws.merge_cells(start_row=row_num,start_column=col_num,end_row=row_num,end_column=col_num+1)
@@ -253,58 +253,67 @@ def output_to_files(datasets,out_dir):
     col_num = 1
 
     # If the result JSON already exists, don't do anything
-    if not os.path.isfile(jsonfile):
-        for row_name in datasets:
-            log.debug("Assigning row " + row_name)
+    # if not os.path.isfile(jsonfile):
+    for row_name in datasets:
+        log.debug("Assigning row " + row_name)
 
-            dico[row_name] = {}
-            raw[row_name] = {}
-            ws.cell(row=row_num,column=col_num,value=row_name)
-            col_num += 1
+        dico[row_name] = {}
+        raw[row_name] = {}
 
-            for column in row.columns:
-                log.debug("Assiging column " + column.name)
-                column.get_total()
-                if column.req_type == None:
-                    dico[row_name][column.name] = [column.total,column.pct_total,column.pct_depend]
-                    ws.cell(row=row_num,column=col_num,value=column.total)
-                    ws.cell(row=row_num+1,column=col_num,value=column.pct_total)
-                    ws.cell(row=row_num+1,column=col_num+1,value=column.pct_depend)
-                    # Grand total merge_cells
-                    ws.merge_cells(start_row=row_num,start_column=col_num,end_row=row_num,end_column=col_num+1)
-                else:
-                    dico[row_name][column.name] = column.res_poll
-                    ws.cell(row=row_num,column=col_num,value=str(column.res_poll).replace("{","").replace("}","").replace(",","\n"))
-                    ws.merge_cells(start_row=row_num,start_column=col_num,end_row=row_num+1,end_column=col_num+1)
-                col_num += 2
-            # Dataset name merge
-            ws.merge_cells(start_row=row_num,start_column=1,end_row=row_num+1,end_column=1)
-            row_num += 2
-            col_num = 1
-            # print(str(dico))
-            if 'histograms' in row.histogram_collection.keys():
-                for histogram_name in row.histogram_collection:
-                    # def output_histogram(data,output_dir):
-                    data = row.histogram_collection[histogram_name]['data']
-                    raw[row_name][histogram_name] = row.histogram_collection[histogram_name]
+        row = datasets[row_name]
 
-        # Create the output directory if it doesn't exists
-        if not os.path.exists(out_dir):
-            os.makedirs(out_dir)
+        # Assigning the name of the row
+        ws.cell(row=row_num,column=col_num,value=row_name)
+        col_num += 1
 
-        with open(jsonfile, 'w') as out:
-            json.dump(dico, out)
-        log.info("File saved at " + jsonfile)
+        # Assigning the total of the row
+        ws.cell(row=row_num,column=col_num,value=row.total)
+        ws.merge_cells(start_row=row_num,start_column=col_num,end_row=row_num+1,end_column=col_num)
+        col_num += 1
 
-        with open(rawfile, 'w') as out:
-            json.dump(raw, out)
-        log.info("File saved at " + rawfile)
+        for column in row.columns:
+            log.debug("Assiging column " + column.name)
+            column.get_total()
+            if column.req_type == None:
+                dico[row_name][column.name] = [column.total,column.pct_total,column.pct_depend]
+                ws.cell(row=row_num,column=col_num,value=column.total)
+                ws.cell(row=row_num+1,column=col_num,value=column.pct_total)
+                ws.cell(row=row_num+1,column=col_num+1,value=column.pct_depend)
+                # Grand total merge_cells
+                ws.merge_cells(start_row=row_num,start_column=col_num,end_row=row_num,end_column=col_num+1)
+            else:
+                dico[row_name][column.name] = column.res_poll
+                ws.cell(row=row_num,column=col_num,value=str(column.res_poll).replace("{","").replace("}","").replace(",","\n"))
+                ws.merge_cells(start_row=row_num,start_column=col_num,end_row=row_num+1,end_column=col_num+1)
+            col_num += 2
+        # Dataset name merge
+        ws.merge_cells(start_row=row_num,start_column=1,end_row=row_num+1,end_column=1)
+        row_num += 2
+        col_num = 1
+        # print(str(dico))
+        if 'histograms' in row.histogram_collection.keys():
+            for histogram_name in row.histogram_collection:
+                # def output_histogram(data,output_dir):
+                data = row.histogram_collection[histogram_name]['data']
+                raw[row_name][histogram_name] = row.histogram_collection[histogram_name]
 
-        # filename = "res.xlsx"
-        wb.save(xlsxfile)
-        log.info("File saved at " + xlsxfile)
-    else:
-        log.warning("file already written. finishing")
+    # Create the output directory if it doesn't exists
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    with open(jsonfile, 'w') as out:
+        json.dump(dico, out)
+    log.info("File saved at " + jsonfile)
+
+    with open(rawfile, 'w') as out:
+        json.dump(raw, out)
+    log.info("File saved at " + rawfile)
+
+    # filename = "res.xlsx"
+    wb.save(xlsxfile)
+    log.info("File saved at " + xlsxfile)
+    # else:
+    #     log.warning("file already written. finishing")
 
 def topN(dico,N,poll_type):
     if poll_type == 'top':
@@ -460,53 +469,54 @@ def postprocessing(myjsonconfig,verbose=None):
         # rawfile = myjson['output_dir'] +  "/" + outputfilename + "_raw.json"
 
         # Check of the result file already exists
-        if os.path.isfile(jsonfile):
-            log.warning("The output file already exist. Quitting")
+        # if os.path.isfile(jsonfile):
+        #     log.warning("The output file already exist. Quitting")
 
-        else:
-            # Initialize Row and Columns objects
-            datasets={} # An empty dataset (dictionary)
+        # else:
 
-            # for each row, because they are different datasets
-            for row in myjson['rows']:
+        # Initialize Row and Columns objects
+        datasets={} # An empty dataset (dictionary)
 
-                log.info('Processing ' + row)
+        # for each row, because they are different datasets
+        for row in myjson['rows']:
 
-                # create row object
-                datasets[row] = Row(row)
+            log.info('Processing ' + row)
 
-                # create columns
-                for column in myjson['columns']:
-                    log.debugv("the column is " + str(column))
-                    # create_column(self,name,req,depends=None):
-                    datasets[row].create_column(column, myjson['columns'][column][0], myjson['columns'][column][1])
+            # create row object
+            datasets[row] = Row(row)
 
-                # Create histogram
-                if 'histograms' in myjson.keys():
-                    for histogram in myjson['histograms']:
-                        datasets[row].create_histogram(histogram,myjson['histograms'][histogram][0],myjson['histograms'][histogram][1])
+            # create columns
+            for column in myjson['columns']:
+                log.debugv("the column is " + str(column))
+                # create_column(self,name,req,depends=None):
+                datasets[row].create_column(column, myjson['columns'][column][0], myjson['columns'][column][1])
 
-                mypath = myjson['rows'][row]
-
-                try:
-                    files = [f for f in listdir(mypath) if isfile(join(mypath, f)) and f.endswith(".json")]
-                except:
-                    raise "Cannot open dir"
-
-                # for each file
-                numFiles = len(files)
-                for filename in files:
-
-                    log.debug("Processing file number " + str(numFiles) + ": " + filename + " JSON file")
-                    numFiles -= 1
-                    with open(mypath + "/" + filename) as f:
-                        mwjson = json.load(f)
-
-                    datasets[row].process(mwjson)
-
-            output_to_files(datasets,myjson['output_dir'])
+            # Create histogram
             if 'histograms' in myjson.keys():
-                output_histogram(datasets,myjson['output_dir'])
+                for histogram in myjson['histograms']:
+                    datasets[row].create_histogram(histogram,myjson['histograms'][histogram][0],myjson['histograms'][histogram][1])
+
+            mypath = myjson['rows'][row]
+
+            try:
+                files = [f for f in listdir(mypath) if isfile(join(mypath, f)) and f.endswith(".json")]
+            except:
+                raise "Cannot open dir"
+
+            # for each file
+            numFiles = len(files)
+            for filename in files:
+
+                log.debug("Processing file number " + str(numFiles) + ": " + filename + " JSON file")
+                numFiles -= 1
+                with open(mypath + "/" + filename) as f:
+                    mwjson = json.load(f)
+
+                datasets[row].process(mwjson)
+
+        output_to_files(datasets,myjson['output_dir'])
+        if 'histograms' in myjson.keys():
+            output_histogram(datasets,myjson['output_dir'])
 
     t_end = time.time()
     log.info("TIME: " + str(round(t_end - t_start,1)) + " s")
