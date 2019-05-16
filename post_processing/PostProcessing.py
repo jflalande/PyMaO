@@ -164,7 +164,6 @@ def output_histogram(datasets,output_dir):
         log.debug("Assigning row " + row_name)
         row = datasets[row_name]
 
-        # If there is no histogram, it won't make any
         for histogram_name in row.histogram_collection:
             # def output_histogram(data,output_dir):
             data = row.histogram_collection[histogram_name]['data']
@@ -283,10 +282,11 @@ def output_to_files(datasets,out_dir):
             row_num += 2
             col_num = 1
             # print(str(dico))
-            for histogram_name in row.histogram_collection:
-                # def output_histogram(data,output_dir):
-                data = row.histogram_collection[histogram_name]['data']
-                raw[row_name][histogram_name] = row.histogram_collection[histogram_name]
+            if 'histograms' in row.histogram_collection.keys():
+                for histogram_name in row.histogram_collection:
+                    # def output_histogram(data,output_dir):
+                    data = row.histogram_collection[histogram_name]['data']
+                    raw[row_name][histogram_name] = row.histogram_collection[histogram_name]
 
         # Create the output directory if it doesn't exists
         if not os.path.exists(out_dir):
@@ -393,15 +393,20 @@ class Row:
             # Add the value if it exists
             if len(self.var_dict[expression]) != 0:
                 val = self.var_dict[expression][0].value
+                log.debugv("The value for " + str(expression) + " is: " + str(val))
                 # Put some quotes to strings, so Jason can be happy
                 if not isinstance(val,int) or isinstance(val,float):
                     log.debugv('There is an instance of string for val: ' + str(val))
                     val = "\"" + val + "\""
+                elif isinstance(val,bool):
+                    log.debugv('There is an instance of bool for val: ' + str(val))
+                    val = "\"" + str(val) + "\""
                 if column.req_type == None:
                     log.debugv('changing ' + column.jpath + ' -> ' + str(val))
                     evaluator = column.req_parser
                     log.debugv('The request to evaluate is: ' + str(evaluator.tokenizer.expression))
                     res = evaluator.evaluate({expression:val})
+                    log.debugv("The result was: " + str(res))
                     if res:
                         column.total += 1
                 else:
@@ -410,20 +415,20 @@ class Row:
                         column.poll[val] += 1
                     else:
                         column.poll[val] = 1
-
-        for histogram_name in self.histogram_collection:
-            histogram_dict = self.histogram_collection[histogram_name]
-            # Find the value of the JSONPath expression if it's not in the dictionary
-            expression = histogram_dict['request']
-            if expression not in self.var_dict.keys():
-                self.var_dict[expression] = parse(expression).find(json_file)
-            # Add the value if it exists
-            if len(self.var_dict[expression]) != 0:
-                val = self.var_dict[expression][0].value
-                if histogram_dict['type'] == 'int':
-                    histogram_dict['data'].append(int(val))
-                else:
-                    histogram_dict['data'].append(val)
+        if 'histograms' in self.histogram_collection.keys():
+            for histogram_name in self.histogram_collection:
+                histogram_dict = self.histogram_collection[histogram_name]
+                # Find the value of the JSONPath expression if it's not in the dictionary
+                expression = histogram_dict['request']
+                if expression not in self.var_dict.keys():
+                    self.var_dict[expression] = parse(expression).find(json_file)
+                # Add the value if it exists
+                if len(self.var_dict[expression]) != 0:
+                    val = self.var_dict[expression][0].value
+                    if histogram_dict['type'] == 'int':
+                        histogram_dict['data'].append(int(val))
+                    else:
+                        histogram_dict['data'].append(val)
 
         # Reinitialize the dictionary
         self.var_dict = {}
@@ -477,8 +482,9 @@ def postprocessing(myjsonconfig,verbose=None):
                     datasets[row].create_column(column, myjson['columns'][column][0], myjson['columns'][column][1])
 
                 # Create histogram
-                for histogram in myjson['histograms']:
-                    datasets[row].create_histogram(histogram,myjson['histograms'][histogram][0],myjson['histograms'][histogram][1])
+                if 'histograms' in myjson.keys():
+                    for histogram in myjson['histograms']:
+                        datasets[row].create_histogram(histogram,myjson['histograms'][histogram][0],myjson['histograms'][histogram][1])
 
                 mypath = myjson['rows'][row]
 
@@ -499,7 +505,8 @@ def postprocessing(myjsonconfig,verbose=None):
                     datasets[row].process(mwjson)
 
             output_to_files(datasets,myjson['output_dir'])
-            output_histogram(datasets,myjson['output_dir'])
+            if 'histograms' in myjson.keys():
+                output_histogram(datasets,myjson['output_dir'])
 
     t_end = time.time()
     log.info("TIME: " + str(round(t_end - t_start,1)) + " s")
