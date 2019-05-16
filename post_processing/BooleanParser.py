@@ -36,16 +36,16 @@ class Tokenizer:
 	def next(self):
 		self.i += 1
 		return self.tokens[self.i-1]
-	
+
 	def peek(self):
 		return self.tokens[self.i]
-	
+
 	def hasNext(self):
 		return self.i < len(self.tokens)
 
 	def nextTokenType(self):
 		return self.tokenTypes[self.i]
-	
+
 	def nextTokenTypeIsOperator(self):
 		t = self.tokenTypes[self.i]
 		return t == TokenType.GT or t == TokenType.GTE \
@@ -89,7 +89,7 @@ class Tokenizer:
 						number = float(t)
 						self.tokenTypes.append(TokenType.NUM)
 					except:
-						if re.search('^[a-zA-Z_\.\$\[\]]+$', t):
+						if re.search('^[a-zA-Z_\.\$\[\]0-9]+$', t):
 							self.tokenTypes.append(TokenType.VAR)
 						else:
 							self.tokenTypes.append(None)
@@ -148,7 +148,7 @@ class BooleanParser:
 			return condition
 		else:
 			raise Exception('Operator expected, but got ' + self.tokenizer.next())
-	
+
 	def parseTerminal(self):
 		if self.tokenizer.hasNext():
 			tokenType = self.tokenizer.nextTokenType()
@@ -162,19 +162,19 @@ class BooleanParser:
 				return n
 			else:
 				raise Exception('NUM, STR, or VAR expected, but got ' + self.tokenizer.next())
-		
+
 		else:
                     raise Exception('no next: NUM, STR, or VAR expected, but got ' + self.tokenizer.next())
-	
+
 	def evaluate(self, variable_dict):
 		return self.evaluateRecursive(self.root, variable_dict)
-	
+
 	def evaluateRecursive(self, treeNode, variable_dict):
 		if treeNode.tokenType == TokenType.NUM or treeNode.tokenType == TokenType.STR:
 			return treeNode.value
 		if treeNode.tokenType == TokenType.VAR:
 			return variable_dict.get(treeNode.value)
-		
+
 		left = self.evaluateRecursive(treeNode.left, variable_dict)
 		right = self.evaluateRecursive(treeNode.right, variable_dict)
 		if treeNode.tokenType == TokenType.GT:

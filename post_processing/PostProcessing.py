@@ -4,7 +4,7 @@ import logging # Log info output
 import datetime
 import argparse # Program argument parser
 import json
-from jsonpath_ng import jsonpath, parse
+# from jsonpath_ng import jsonpath, parse
 
 from os import listdir
 from os.path import isfile, join
@@ -164,61 +164,63 @@ def output_histogram(datasets,output_dir):
         log.debug("Assigning row " + row_name)
         row = datasets[row_name]
 
-        for histogram_name in row.histogram_collection:
-            # def output_histogram(data,output_dir):
-            data = row.histogram_collection[histogram_name]['data']
+        # Just to verify
+        if len(row.histogram_collection.keys()) != 0:
+            for histogram_name in row.histogram_collection:
+                # def output_histogram(data,output_dir):
+                data = row.histogram_collection[histogram_name]['data']
 
-            log.debugv("The data of " + histogram_name + " is " + str(data))
+                log.debugv("The data of " + histogram_name + " is " + str(data))
 
-            hist_type = row.histogram_collection[histogram_name]['type']
+                hist_type = row.histogram_collection[histogram_name]['type']
 
-            if hist_type == 'date':
-                log.debug("Histogram " + histogram_name + " is type date")
-                # Processing the dates to get the maximun and minimum month-year
-                mindate = dt.datetime.fromtimestamp(min(data))
-                maxdate = dt.datetime.fromtimestamp(max(data))
-                bindate = dt.datetime(year=mindate.year, month=mindate.month, day=1)
-                mybins = [bindate.timestamp()]
-                while bindate < maxdate:
-                    if bindate.month == 12:
-                        bindate = dt.datetime(year=bindate.year + 1, month=1, day=1)
-                    else:
-                        bindate = dt.datetime(year=bindate.year, month=bindate.month + 1, day=1)
-                    mybins.append(bindate.timestamp())
-                mybins = mdates.epoch2num(mybins)
+                if hist_type == 'date':
+                    log.debug("Histogram " + histogram_name + " is type date")
+                    # Processing the dates to get the maximun and minimum month-year
+                    mindate = dt.datetime.fromtimestamp(min(data))
+                    maxdate = dt.datetime.fromtimestamp(max(data))
+                    bindate = dt.datetime(year=mindate.year, month=mindate.month, day=1)
+                    mybins = [bindate.timestamp()]
+                    while bindate < maxdate:
+                        if bindate.month == 12:
+                            bindate = dt.datetime(year=bindate.year + 1, month=1, day=1)
+                        else:
+                            bindate = dt.datetime(year=bindate.year, month=bindate.month + 1, day=1)
+                        mybins.append(bindate.timestamp())
+                    mybins = mdates.epoch2num(mybins)
 
-                plot_data = mdates.epoch2num(data)
+                    plot_data = mdates.epoch2num(data)
 
-                fig, ax = plt.subplots(1,1, figsize=(200, 20), facecolor='white')
-                ax.hist(plot_data, bins=mybins, ec='black')
-                ax.xaxis.set_major_locator(mdates.MonthLocator())
-                ax.xaxis.set_major_formatter(mdates.DateFormatter('%m.%y'))
-                fig.autofmt_xdate()
-            elif hist_type == 'int':
-                log.debug("Histogram " + histogram_name + " is type int")
-                fig, ax = plt.subplots(1,1,figsize=(200, 20))
+                    fig, ax = plt.subplots(1,1, figsize=(200, 20), facecolor='white')
+                    ax.hist(plot_data, bins=mybins, ec='black')
+                    ax.xaxis.set_major_locator(mdates.MonthLocator())
+                    ax.xaxis.set_major_formatter(mdates.DateFormatter('%m.%y'))
+                    fig.autofmt_xdate()
+                elif hist_type == 'int':
+                    log.debug("Histogram " + histogram_name + " is type int")
+                    fig, ax = plt.subplots(1,1,figsize=(200, 20))
 
-                # Ajust bins
-                max_exp = int(floor(loga(max(data),10)))
-                binwidth = 10**(max_exp - 3)
+                    # Ajust bins
+                    max_exp = int(floor(loga(max(data),10)))
+                    binwidth = 10**(max_exp - 3)
 
-                ax.hist(data, bins=np.arange(min(data), max(data) + binwidth, binwidth), ec='black')
+                    ax.hist(data, bins=np.arange(min(data), max(data) + binwidth, binwidth), ec='black')
 
-                ax.set_xlim(left=0) # Start at zero
-                ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ','))) # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
-                ax.xaxis.set_major_locator(ticker.MultipleLocator(binwidth*10))
-                plt.xticks(rotation=45) # Rotate x ticks
-                plt.gcf().subplots_adjust(bottom=0.15) # Adjust the lables if they go pass the figure
-                plt.grid(linestyle="--") # Grid in the histogram
-            else:
-                fig, ax = plt.subplots(1,1)
-                ax.hist(data, bins='auto', ec='black')
+                    ax.set_xlim(left=0) # Start at zero
+                    ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ','))) # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
+                    ax.xaxis.set_major_locator(ticker.MultipleLocator(binwidth*10))
+                    plt.xticks(rotation=45) # Rotate x ticks
+                    plt.gcf().subplots_adjust(bottom=0.15) # Adjust the lables if they go pass the figure
+                    plt.grid(linestyle="--") # Grid in the histogram
+                else:
+                    fig, ax = plt.subplots(1,1)
+                    ax.hist(data, bins='auto', ec='black')
 
 
-            plt.savefig(output_dir + "/histogram_"+ histogram_name + ".png")
-            log.info("Histogram saved as histogram_"+ histogram_name + ".png")
-            plt.savefig(output_dir + "/histogram_"+ histogram_name + ".pdf")
-            log.info("Histogram saved as histogram_"+ histogram_name + ".pdf")
+                plt.savefig(output_dir + "/histogram_"+ histogram_name + ".png")
+                log.info("Histogram saved as histogram_"+ histogram_name + ".png")
+                plt.savefig(output_dir + "/histogram_"+ histogram_name + ".pdf")
+                log.info("Histogram saved as histogram_"+ histogram_name + ".pdf")
 
 def output_to_files(datasets,out_dir):
     log.info("Processing finished, outputing files")
@@ -395,13 +397,23 @@ class Row:
             log.debugv('parsing: ' + str(column.name))
             # Find the value of the JSONPath expression if it's not in the dictionary
             expression = column.jpath
+
             if expression not in self.var_dict.keys():
-                self.var_dict[expression] = parse(expression).find(json_file)
+                try:
+                    parse = expression.split('.')
+                    name = json_file['name']
+                    log.debugv('the parsed list is: ' + str(parse))
+                    log.debugv('My name is: ' + str(parse[2]))
+                    self.var_dict[expression] = json_file[name][parse[2]][parse[3]]
+                except Exception as e:
+                    self.var_dict[expression] = None
+                # self.var_dict[expression] = parse(expression).find(json_file)
             log.debugv("This is the result of the parsing: " + str(self.var_dict[expression]))
             # if the length is 0, the value was not found in the JSON file
             # Add the value if it exists
-            if len(self.var_dict[expression]) != 0:
-                val = self.var_dict[expression][0].value
+            if self.var_dict[expression] != None:
+                # val = self.var_dict[expression][0].value
+                val = self.var_dict[expression]
                 log.debugv("The value for " + str(expression) + " is: " + str(val))
                 # Put some quotes to strings, so Jason can be happy
                 if not isinstance(val,int) or isinstance(val,float):
@@ -424,20 +436,34 @@ class Row:
                         column.poll[val] += 1
                     else:
                         column.poll[val] = 1
-        if 'histograms' in self.histogram_collection.keys():
+
+        if (self.histogram_collection.keys()) != 0:
             for histogram_name in self.histogram_collection:
                 histogram_dict = self.histogram_collection[histogram_name]
+
                 # Find the value of the JSONPath expression if it's not in the dictionary
                 expression = histogram_dict['request']
+
                 if expression not in self.var_dict.keys():
-                    self.var_dict[expression] = parse(expression).find(json_file)
+                    try:
+                        parse = expression.split('.')
+                        name = json_file['name']
+                        log.debugv('the parsed list is: ' + str(parse))
+                        log.debugv('My name is: ' + str(parse[2]))
+                        self.var_dict[expression] = json_file[name][parse[2]][parse[3]]
+                    except Exception as e:
+                        self.var_dict[expression] = None
+                log.debugv("--- Histogram: This is the result of the parsing: " + str(self.var_dict[expression]))
                 # Add the value if it exists
-                if len(self.var_dict[expression]) != 0:
-                    val = self.var_dict[expression][0].value
+                if self.var_dict[expression] != None:
+                    val = self.var_dict[expression]
+                    log.debugv("The value for " + str(expression) + " is: " + str(val))
                     if histogram_dict['type'] == 'int':
                         histogram_dict['data'].append(int(val))
                     else:
                         histogram_dict['data'].append(val)
+        else:
+            log.debugv("No histograms, moving on")
 
         # Reinitialize the dictionary
         self.var_dict = {}
@@ -462,6 +488,8 @@ def postprocessing(myjsonconfig,verbose=None):
     else:
         with open(filename) as config:
             myjson = json.load(config)
+
+        log.debugv("This is the config file: " + str(myjson))
 
         log.info("Output dir: " + myjson['output_dir'])
         jsonfile = myjson['output_dir'] +  "/" + outputfilename + ".json"
@@ -491,10 +519,13 @@ def postprocessing(myjsonconfig,verbose=None):
                 # create_column(self,name,req,depends=None):
                 datasets[row].create_column(column, myjson['columns'][column][0], myjson['columns'][column][1])
 
-            # Create histogram
+            # Create histograms
             if 'histograms' in myjson.keys():
                 for histogram in myjson['histograms']:
+                    log.debugv("Adding " + histogram + " histogram")
                     datasets[row].create_histogram(histogram,myjson['histograms'][histogram][0],myjson['histograms'][histogram][1])
+            else:
+                log.debugv("There is no histogram in the config file, moving on")
 
             mypath = myjson['rows'][row]
 
@@ -505,6 +536,7 @@ def postprocessing(myjsonconfig,verbose=None):
 
             # for each file
             numFiles = len(files)
+            log.info("Processing " + str(numFiles) + " files")
             for filename in files:
 
                 log.debug("Processing file number " + str(numFiles) + ": " + filename + " JSON file")
@@ -512,9 +544,15 @@ def postprocessing(myjsonconfig,verbose=None):
                 with open(mypath + "/" + filename) as f:
                     mwjson = json.load(f)
 
+                mwjson['name'] = filename.split('.')[0]
+
                 datasets[row].process(mwjson)
 
         output_to_files(datasets,myjson['output_dir'])
+
+        t_end = time.time()
+        log.info("TIME: " + str(round(t_end - t_start,1)) + " s")
+
         if 'histograms' in myjson.keys():
             output_histogram(datasets,myjson['output_dir'])
 
