@@ -3,9 +3,25 @@
 		"Native Dataset":"/home/tomas/orch/mini_native"
 	},
 	"columns":{
-		"ARM":[
+		"Native methods":[
 			"$..Native.native_methods == \"True\"",
 			null
+		],
+		"EABI":[
+			"$..Native.armeabi == \"True\"",
+			null
+		],
+		"ARM64":[
+			"$..Native.arm64 == \"True\"",
+			null
+		],
+		"lib64_or_suspicious":[
+			"$..Native.lib64_or_suspicious == \"True\"",
+			null
+		],
+		"Launchable":[
+			"$..ManifestDecoding.launchable == \"True\"",
+			"lib64_or_suspicious"
 		]
 	},
 	"output_dir":"/home/tomas/orch/res_mini_native"
