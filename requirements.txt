@@ -1,3 +1,6 @@
 coloredlogs
 jsonpath_ng
 openpyxl
+numpy
+matplotlib
+tkinter
