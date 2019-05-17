@@ -54,13 +54,22 @@ class DHTCheck(Analysis):
 
 
         classnames = defaultdict(int)
+        libnames = defaultdict(int)
         for line in res.split("\n"):
             if "[DHT]" in line:
                 classname = line.split("[DHT]")[1].split()[0] # field is dropped
                 classnames[classname] += 1
+                splitted_line = line.split()
+                if len(splitted_line) == 2:
+                    if splitted_line[3][0] == '/':
+                        libnames[splitted_line[3]] += 1
+                elif len(splitted_line) == 3:
+                    libnames[splitted_line[3]] += 1
                 self.updateJsonAnalyses(analysis_name, jsonanalyses, {"DHT": True})
         if classnames:
             self.updateJsonAnalyses(analysis_name, jsonanalyses, {"DHTclassnames": dict(classnames)})
+        if libnames:
+            self.updateJsonAnalyses(analysis_name, jsonanalyses, {"DHTlibnames": dict(libnames)})
 
         # Dumping in a file for DEBUG purpose
         log.debug("Dumping in the file: " + self.xp.JSONBASE + apkname)
