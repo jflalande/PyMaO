@@ -1,0 +1,13 @@
+{
+	"rows":{
+		"Androzoo":"/home/jf/swap/jsons"
+	},
+	"columns":{
+		"Launchable":[
+			"$..LaunchAndSurvive.running == \"True\"",
+			null
+		]
+                 },
+	"output_dir":"/home/jf/swap"
+
+}
