@@ -1,5 +1,6 @@
 from analysis.Analysis import Analysis
 import logging
+import re
 import time
 from collections import defaultdict
 
@@ -55,21 +56,36 @@ class DHTCheck(Analysis):
 
         classnames = defaultdict(int)
         libnames = defaultdict(int)
+        classes_per_libs = defaultdict(lambda:defaultdict(int))
+        REGEX = "^.*\[DHT\]([^ ]*)( [^/][^ ]*|)( /[^ ]*|)$"
+        regex = re.compile(REGEX)
         for line in res.split("\n"):
-            if "[DHT]" in line:
-                classname = line.split("[DHT]")[1].split()[0] # field is dropped
-                classnames[classname] += 1
-                splitted_line = line.split()
-                if len(splitted_line) == 2:
-                    if splitted_line[3][0] == '/':
-                        libnames[splitted_line[3]] += 1
-                elif len(splitted_line) == 3:
-                    libnames[splitted_line[3]] += 1
+            m = regex.match(line)
+            if m: # this line contains DHT
                 self.updateJsonAnalyses(analysis_name, jsonanalyses, {"DHT": True})
+                
+                # Counting
+                #print("GROUPS:" + str(m.groups()))
+                classname = m.group(1)
+                fieldname = m.group(2)
+                libname = m.group(3)
+                if libname:
+                    libnames[libname] += 1
+                if classname:
+                    classnames[classname] += 1
+
+                if libname and classname:
+                    #print("libname: " + libname)
+                    #print("classname: " + classname)
+                    #print("update: =================> " + str(dict(classes_per_libs)))
+                    classes_per_libs[libname][classname] += 1
+
         if classnames:
             self.updateJsonAnalyses(analysis_name, jsonanalyses, {"DHTclassnames": dict(classnames)})
         if libnames:
             self.updateJsonAnalyses(analysis_name, jsonanalyses, {"DHTlibnames": dict(libnames)})
+        if classes_per_libs:
+            self.updateJsonAnalyses(analysis_name, jsonanalyses, {"DHTclassesperlibs": dict(classes_per_libs)})
 
         # Dumping in a file for DEBUG purpose
         log.debug("Dumping in the file: " + self.xp.JSONBASE + apkname)
