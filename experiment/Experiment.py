@@ -34,6 +34,8 @@ class Experiment:
     worker_nb = -1
     device_local_port = -1
 
+    SIMULATE_JSON_WRITE = False
+
     # For release
     SUBPROCESS_STDERR = os.devnull
     # For debugging
