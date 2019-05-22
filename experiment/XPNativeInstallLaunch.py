@@ -8,7 +8,7 @@ from analysis.AdbUninstall import AdbUninstall
 from analysis.LaunchAndSurvive import LaunchAndSurvive
 from analysis.SymlinkAPK import SymlinkAPK
 
-class XPNative(Experiment):
+class XPNativeInstallLaunch(Experiment):
 
     #APKBASE = "/media/jf/B006AF9A06AF5FD8/androzoo/samples"
     #JSONBASE = "/media/jf/B006AF9A06AF5FD8/orchestrator/XPNative/jsons"
