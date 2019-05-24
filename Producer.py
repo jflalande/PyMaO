@@ -41,8 +41,6 @@ def createJobs(queue, xp):
                 Statistics.incNbJobs()
 
 
-
-
 def redoAnalyses(packagename, json, xp):
     """
     json = {
