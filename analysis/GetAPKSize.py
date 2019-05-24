@@ -18,7 +18,9 @@ class GetAPKSize(Analysis):
 
         # file_path = self.xp.TMPFS + "/" + self.xp.tid  + "/" + apkname
 
-        command = "du -b \"" + self.xp.APKBASE + "/" + apkname + ".apk\""
+        # -b : print size in octets (kyloctets by default)
+        # -L : dereferenc the symbolic link, get the size of the reference
+        command = "du -bL \"" + self.xp.APKBASE + "/" + apkname + ".apk\""
 
         log.debug("The command is "+command)
 

@@ -9,7 +9,8 @@ log = logging.getLogger("orchestrator")
 def getRecursiveFilenames(basedir):
     for (dirpath, _, filenames) in os.walk(basedir):
         for filename in filenames:
-            yield os.path.join(dirpath,filenames)
+            log.debugv("This is filename " + filename)
+            yield os.path.join(dirpath,filename)
 
 def createJobs(queue, xp):
 
@@ -17,7 +18,7 @@ def createJobs(queue, xp):
     xp.cleanTMPFSDirectory()
 
     log.info("Producer: iterating over apk files in " + str(xp.APKBASE) + " - It can take some time...")
-    for filename in getRecursiveFilenames(base_dirxp.APKBASE):
+    for filename in getRecursiveFilenames(xp.APKBASE):
         if filename.endswith(".apk"):
             log.debugv("Producer: doing " + filename)
             packagename = getMalwareName(filename)
@@ -94,5 +95,3 @@ def readJson(name, xp):
     except JSONDecodeError:
         # File is empty or contains errors
         return {name: {}}
-
-

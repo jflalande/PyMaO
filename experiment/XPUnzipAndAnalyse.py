@@ -14,9 +14,9 @@ class XPUnzipAndAnalyse(Experiment):
     # APKBASE = HOME + "/gits/malware-goodware-small-dataset"
     # JSONBASE = HOME + "/orch/malware_json"
 
-    APKBASE = HOME + "/malware_datasets/drebin/malware/uncompressed"
+    APKBASE = HOME + "/malware_datasets/amd/liens"
     # APKBASE = HOME + "/malware_datasets/drebin/malware/sample"
-    JSONBASE = HOME + "/orch/drebin"
+    JSONBASE = HOME + "/orch/amd"
 
     TARGETSYMLINK =  HOME + "/orch/nativeAPK"
 
@@ -26,13 +26,13 @@ class XPUnzipAndAnalyse(Experiment):
         self.analyses = []
 
         # Run ManifestDecoding
-        self.analyses.append((ManifestDecoding(self),None))
+        # self.analyses.append((ManifestDecoding(self),None))
 
         # Run GetAPKSize
         self.analyses.append((GetAPKSize(self),None))
-        #
-        # # Run Unzip
-        self.analyses.append((Unzip(self), None))
-        #
-        # # Run GetManifAndDexDates
-        self.analyses.append((GetManifAndDexDates(self), [{"Unzip":{"status": "done"}}]))
+
+        # Run Unzip
+        # self.analyses.append((Unzip(self), None))
+
+        # Run GetManifAndDexDates
+        self.analyses.append((GetManifAndDexDates(self), None ))
