@@ -1,0 +1,26 @@
+{
+	"rows":{
+		"AMD":"/home/tomas/orch/amd"
+	},
+	"columns":{
+		"dex_date < 2013":[
+			"$..GetManifAndDexDates.dex_date < 1356994800",
+			null
+		]
+	},
+	"histograms":{
+		"DEX_dates":[
+			"$..GetManifAndDexDates.dex_date",
+			"date"
+		],
+		"Manfinest_dates":[
+			"$..GetManifAndDexDates.manif_date",
+			"date"
+		],
+		"Size":[
+			"$..GetAPKSize.size",
+			"int"
+		]
+  },
+	"output_dir":"/home/tomas/orch/res_amd"
+}

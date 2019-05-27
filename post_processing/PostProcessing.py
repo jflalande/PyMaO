@@ -405,6 +405,8 @@ class Row:
                     log.debugv('the parsed list is: ' + str(parse))
                     log.debugv('My name is: ' + str(parse[2]))
                     self.var_dict[expression] = json_file[name][parse[2]][parse[3]]
+                    if self.var_dict[expression] == "":
+                        self.var_dict[expression] = 0
                 except Exception as e:
                     self.var_dict[expression] = None
                 # self.var_dict[expression] = parse(expression).find(json_file)
@@ -451,9 +453,16 @@ class Row:
                         log.debugv('the parsed list is: ' + str(parse))
                         log.debugv('My name is: ' + str(parse[2]))
                         self.var_dict[expression] = json_file[name][parse[2]][parse[3]]
+                        if histogram_dict['type'] == 'date' and self.var_dict[expression] == "":
+                            log.debugv('This date "' + expression + '" is now 0')
+                            self.var_dict[expression] = 0
                     except Exception as e:
-                        self.var_dict[expression] = None
+                        if histogram_dict['type'] == 'data':
+                            self.var_dict[expression] = 0
+                        else:
+                            self.var_dict[expression] = None
                 log.debugv("--- Histogram: This is the result of the parsing: " + str(self.var_dict[expression]))
+
                 # Add the value if it exists
                 if self.var_dict[expression] != None:
                     val = self.var_dict[expression]
