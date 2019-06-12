@@ -171,10 +171,10 @@ def output_histograms(datasets,histograms_def,output_dir):
         joint_histogram = {}
         joint_histogram = { 'type':histograms_def[histogram_name][1], 'data':{} }
 
-        rows = []
+        # rows = []
 
         for row_name in datasets:
-            rows.append(row_name)
+
             # log.debug("Assigning row " + row_name)
             log.debugv("Assigning row " + row_name)
             row = datasets[row_name]
@@ -250,7 +250,7 @@ def output_histograms(datasets,histograms_def,output_dir):
 
             plt.figure().clear()
             plt.close(plt.figure())
-            print("Figure clear")
+            # print("Figure clear")
 
 
         # Draw joint histogram
@@ -261,19 +261,21 @@ def output_histograms(datasets,histograms_def,output_dir):
         mix_data = []
 
         for row_name in joint_histogram['data']:
-            log.debugv("Getting " + row_name)
+            log.debug("Getting " + row_name)
             label.append(row_name)
             row_data = joint_histogram['data'][row_name]
             # print(str(row_name) + " is of type " + str(type(row_data)))
             data.append(row_data)
             mix_data.extend(row_data)
 
-        log.debugv("dataset has " + str(len(data)) + " entries")
+        log.debug("dataset has " + str(len(data)) + " entries")
 
         for num in data:
             # print("num is " + str(num))
-            log.debugv("The size of num is " + str(len(num)))
+            log.debug("The size of num is " + str(len(num)))
 
+        s = "+"
+        joint = s.join(label)
 
         if hist_type == 'date':
             log.debug("Histogram " + histogram_name + " is type date")
@@ -298,25 +300,36 @@ def output_histograms(datasets,histograms_def,output_dir):
             fig, ax = plt.subplots(1,1, figsize=(200, 20), facecolor='white')
             # fig, ax = plt.subplots(1,1,facecolor='white')
             ax.hist(plot_data, bins=mybins, ec='black')
-            ax.set_title(histogram_name + " - " + row_name)
+            log.debug("This title is " + histogram_name + " - " + joint)
+            ax.set_title(histogram_name + " - " + joint)
             ax.xaxis.set_major_locator(mdates.MonthLocator())
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%m.%y'))
-            #fig.autofmt_xdate()
+            # fig.autofmt_xdate()
 
             # Changing the space between the ticks
 
             # plt.gca().margins(x=0)
-            plt.gcf().canvas.draw()
+            # plt.gcf().canvas.draw()
             tl = plt.gca().get_xticklabels()
-            maxsize = max([t.get_window_extent().width for t in tl])
+            # log.debug("tl = " + str(tl))
+            ticks_label = [t.get_window_extent().width for t in tl]
+            log.debug(str(ticks_label))
+            maxsize = max(ticks_label)
+
+            # If the ticks label list brings 0 in everyting
+            if maxsize == 0:
+                maxsize = 4
+            log.debug("maxsize = " + str(maxsize))
             m = 0.2 # inch margin
             N = len(mix_data)
+            log.debug("N = " + str(N))
+            log.debug("plt.gcf().dpi = " + str(plt.gcf().dpi))
             s = maxsize/plt.gcf().dpi*N+2*m
             margin = m/plt.gcf().get_size_inches()[0]
             #
             # print("plt.gcf().get_size_inches()[1] = " + str(plt.gcf().get_size_inches()[1]))
-            print("plt.gcf().get_size_inches() = " + str(plt.gcf().get_size_inches()))
-            print("s = " + str(s))
+            log.debug("plt.gcf().get_size_inches() = " + str(plt.gcf().get_size_inches()))
+            log.debug("s = " + str(s))
             plt.gcf().subplots_adjust(left=margin, right=1.-margin)
             # plt.gcf().set_size_inches(s, 10)
             plt.gcf().set_size_inches(s*0.25, plt.gcf().get_size_inches()[1])
@@ -325,7 +338,7 @@ def output_histograms(datasets,histograms_def,output_dir):
 
         elif hist_type == 'int':
             log.debug("Histogram " + histogram_name + " is type int")
-            fig, ax = plt.subplots(1,1,figsize=(200, 40))
+            fig, ax = plt.subplots(1,1,figsize=(200, 20))
             # fig, ax = plt.subplots(1,1)
             plt.style.use('seaborn-deep')
 
@@ -334,7 +347,8 @@ def output_histograms(datasets,histograms_def,output_dir):
 
             ax.hist(data, bins=np.arange(min(mix_data), max(mix_data) + binwidth, binwidth),label=label)
             ax.legend(loc='upper right')
-            ax.set_title(histogram_name)
+            log.debug("This title is " + histogram_name + " - " + joint)
+            ax.set_title(histogram_name + " - " + joint)
             ax.set_xlim(left=0) # Start at left zero
             ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ','))) # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
             ax.xaxis.set_major_locator(ticker.MultipleLocator(binwidth*10))
@@ -344,11 +358,11 @@ def output_histograms(datasets,histograms_def,output_dir):
         else:
             fig, ax = plt.subplots(1,1)
             ax.hist(data, bins='auto', ec='black')
-            ax.set_title(histogram_name + " - " + row_name)
+            log.debug("This title is " + histogram_name + " - " + joint)
+            ax.set_title(histogram_name + " - " + joint)
 
-        s = "+"
 
-        filename = histogram_name + "_" + s.join(rows)
+        filename = histogram_name + "_" + joint
         # plt.savefig(output_dir + "/histogram_"+ filename + ".png")
         # log.info("Histogram saved as histogram_"+ filename + ".png")
         plt.savefig(output_dir + "/histogram_"+ filename + ".pdf")
@@ -683,7 +697,7 @@ def postprocessing(myjsonconfig,verbose=0):
             log.info("Processing " + str(numFiles) + " files")
             for filename in files:
 
-                log.debug(row + "$ Processing file number " + str(numFiles) + ": " + filename + " JSON file")
+                log.debugv(row + "$ Processing file number " + str(numFiles) + ": " + filename + " JSON file")
                 numFiles -= 1
                 with open(mypath + "/" + filename) as f:
                     mwjson = json.load(f)
