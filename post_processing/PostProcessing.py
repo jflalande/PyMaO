@@ -4,7 +4,6 @@ import logging # Log info output
 import datetime
 import argparse # Program argument parser
 import json
-# from jsonpath_ng import jsonpath, parse
 
 from os import listdir
 from os.path import isfile, join
@@ -57,13 +56,13 @@ see `post_processing/examples/drebin.json`
         },
         "histograms":{
             "Data 1":[
-        			"<JSONPath expression>",
-        			"<type>"             ---------------> This can be date, int, float, string
-        		],
-        		"Data 2":[
-        			"<JSONPath expression>",
-        			"<type>"
-        		]
+    			"<JSONPath expression>",
+    			"<type>"             ---------------> This can be date, int, float, string
+    		],
+    		"Data 2":[
+    			"<JSONPath expression>",
+    			"<type>"
+    		]
         },
         "output_dir":"/path/to/your/output/dir"
     }
@@ -91,7 +90,7 @@ For our purposes, all the JSONPath expressions are variables.
 """
 
 # Name without extension
-outputfilename = "res"
+OUTPUT_FILENAME = "res"
 # Adds a very verbose level of logs
 DEBUG_LEVELV_NUM = 9
 logging.addLevelName(DEBUG_LEVELV_NUM, "DEBUGV")
@@ -135,7 +134,7 @@ def logSetup(level):
         log.setLevel(logging.DEBUG)
         log.info("Debug is Verbose.")
     # if no (-v) option
-    elif level == None:
+    elif level == 0:
         log.setLevel(logging.INFO)
         log.info("Debug is Normal.")
     else:
@@ -145,7 +144,6 @@ def logSetup(level):
                     .format(level))
 
 applyColorsToLogs()
-
 
 ################################################################################
 #                                                                              #
@@ -158,76 +156,211 @@ def epoch_to_date(epoch):
 
 os.stat_float_times(False)
 
-def output_histogram(datasets,output_dir):
+def output_histograms(datasets,histograms_def,output_dir):
 
-    for row_name in datasets:
-        log.debug("Assigning row " + row_name)
-        row = datasets[row_name]
+    # Pretty colors for the delight of the eye
+    plt.style.use('seaborn-deep')
 
-        # Just to verify
-        if len(row.histogram_collection.keys()) != 0:
-            for histogram_name in row.histogram_collection:
-                # def output_histogram(data,output_dir):
-                data = row.histogram_collection[histogram_name]['data']
+    # joint_histogram = {}
+    # for histogram in histograms_def:
+    #     joint_histogram[name] = {'type':histograms_def[1], 'data'=[]}
 
-                log.debugv("The data of " + histogram_name + " is " + str(data))
 
-                hist_type = row.histogram_collection[histogram_name]['type']
+    for histogram_name in histograms_def:
+        log.info("Processing histogram " + histogram_name)
+        joint_histogram = {}
+        joint_histogram = { 'type':histograms_def[histogram_name][1], 'data':{} }
 
-                if hist_type == 'date':
-                    log.debug("Histogram " + histogram_name + " is type date")
-                    # Processing the dates to get the maximun and minimum month-year
-                    mindate = dt.datetime.fromtimestamp(min(data))
-                    maxdate = dt.datetime.fromtimestamp(max(data))
-                    bindate = dt.datetime(year=mindate.year, month=mindate.month, day=1)
-                    mybins = [bindate.timestamp()]
-                    while bindate < maxdate:
-                        if bindate.month == 12:
-                            bindate = dt.datetime(year=bindate.year + 1, month=1, day=1)
-                        else:
-                            bindate = dt.datetime(year=bindate.year, month=bindate.month + 1, day=1)
-                        mybins.append(bindate.timestamp())
-                    mybins = mdates.epoch2num(mybins)
+        rows = []
 
-                    plot_data = mdates.epoch2num(data)
+        for row_name in datasets:
+            rows.append(row_name)
+            # log.debug("Assigning row " + row_name)
+            log.debugv("Assigning row " + row_name)
+            row = datasets[row_name]
 
-                    fig, ax = plt.subplots(1,1, figsize=(200, 20), facecolor='white')
-                    ax.hist(plot_data, bins=mybins, ec='black')
-                    ax.xaxis.set_major_locator(mdates.MonthLocator())
-                    ax.xaxis.set_major_formatter(mdates.DateFormatter('%m.%y'))
-                    fig.autofmt_xdate()
-                elif hist_type == 'int':
-                    log.debug("Histogram " + histogram_name + " is type int")
-                    fig, ax = plt.subplots(1,1,figsize=(200, 20))
+            # Print individual histograms
+            # Verify if there are histograms to output
+            # if len(row.histogram_collection.keys()) != 0:
+                # for histogram_name in row.histogram_collection:
+                # def output_histograms(data,output_dir):
+            data = row.histogram_collection[histogram_name]['data']
 
-                    # Ajust bins
-                    max_exp = int(floor(loga(max(data),10)))
-                    binwidth = 10**(max_exp - 3)
+            log.debugv("Data size is " + str(len(data)))
 
-                    ax.hist(data, bins=np.arange(min(data), max(data) + binwidth, binwidth), ec='black')
+            hist_type = row.histogram_collection[histogram_name]['type']
 
-                    ax.set_xlim(left=0) # Start at zero
-                    ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ','))) # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
-                    ax.xaxis.set_major_locator(ticker.MultipleLocator(binwidth*10))
-                    plt.xticks(rotation=45) # Rotate x ticks
-                    plt.gcf().subplots_adjust(bottom=0.15) # Adjust the lables if they go pass the figure
-                    plt.grid(linestyle="--") # Grid in the histogram
+            # Collect all the data from this row according to the name of
+            # the histogram
+            joint_histogram['data'][row_name] = data
+
+            log.debugv("The data of " + histogram_name + " is " + str(data))
+
+            if hist_type == 'date':
+                log.debug("Histogram " + histogram_name + " is type date")
+
+                # Processing the dates to get the maximun and minimum month-year
+                mindate = dt.datetime.fromtimestamp(min(data))
+                maxdate = dt.datetime.fromtimestamp(max(data))
+                bindate = dt.datetime(year=mindate.year, month=mindate.month, day=1)
+                mybins = [bindate.timestamp()]
+                while bindate < maxdate:
+                    if bindate.month == 12:
+                        bindate = dt.datetime(year=bindate.year + 1, month=1, day=1)
+                    else:
+                        bindate = dt.datetime(year=bindate.year, month=bindate.month + 1, day=1)
+                    mybins.append(bindate.timestamp())
+                mybins = mdates.epoch2num(mybins)
+
+                plot_data = mdates.epoch2num(data)
+
+                fig, ax = plt.subplots(1,1, figsize=(300, 40), facecolor='white')
+                # fig, ax = plt.subplots(1,1,facecolor='white')
+                ax.hist(plot_data, bins=mybins, ec='black')
+                ax.set_title(histogram_name + " - " + row_name)
+                ax.xaxis.set_major_locator(mdates.MonthLocator())
+                ax.xaxis.set_major_formatter(mdates.DateFormatter('%m.%y'))
+                fig.autofmt_xdate()
+            elif hist_type == 'int':
+                log.debug("Histogram " + histogram_name + " is type int")
+                fig, ax = plt.subplots(1,1,figsize=(200, 40))
+                # fig, ax = plt.subplots(1,1)
+                # Ajust bins
+                max_exp = int(floor(loga(max(data),10)))
+                binwidth = 10**(max_exp - 3)
+
+                ax.hist(data, bins=np.arange(min(data), max(data) + binwidth, binwidth), ec='black')
+                ax.set_title(histogram_name + " - " + row_name)
+                ax.set_xlim(left=0) # Start at left zero
+                ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ','))) # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
+                ax.xaxis.set_major_locator(ticker.MultipleLocator(binwidth*10))
+                plt.xticks(rotation=45) # Rotate x ticks
+                plt.gcf().subplots_adjust(bottom=0.15) # Adjust the lables if they go pass the figure
+                plt.grid(linestyle="--") # Grid in the histogram
+            else:
+                fig, ax = plt.subplots(1,1)
+                ax.hist(data, bins='auto', ec='black')
+                ax.set_title(histogram_name + " - " + row_name)
+
+            filename = histogram_name + "_" + row_name
+            # plt.savefig(output_dir + "/histogram_"+ filename + ".png")
+            # log.info("Histogram saved as histogram_"+ filename + ".png")
+            plt.savefig(output_dir + "/histogram_"+ filename + ".pdf")
+            log.info("Histogram saved as histogram_"+ filename + ".pdf")
+
+            plt.figure().clear()
+            plt.close(plt.figure())
+            print("Figure clear")
+
+
+        # Draw joint histogram
+
+        # ax.hist(dataset_list, bins, label=['x', 'y'])
+        label = []
+        data = []
+        mix_data = []
+
+        for row_name in joint_histogram['data']:
+            log.debugv("Getting " + row_name)
+            label.append(row_name)
+            row_data = joint_histogram['data'][row_name]
+            # print(str(row_name) + " is of type " + str(type(row_data)))
+            data.append(row_data)
+            mix_data.extend(row_data)
+
+        log.debugv("dataset has " + str(len(data)) + " entries")
+
+        for num in data:
+            # print("num is " + str(num))
+            log.debugv("The size of num is " + str(len(num)))
+
+
+        if hist_type == 'date':
+            log.debug("Histogram " + histogram_name + " is type date")
+            # Processing the dates to get the maximun and minimum month-year
+            mindate = dt.datetime.fromtimestamp(min(mix_data))
+            maxdate = dt.datetime.fromtimestamp(max(mix_data))
+            bindate = dt.datetime(year=mindate.year, month=mindate.month, day=1)
+            mybins = [bindate.timestamp()]
+            while bindate < maxdate:
+                if bindate.month == 12:
+                    bindate = dt.datetime(year=bindate.year + 1, month=1, day=1)
                 else:
-                    fig, ax = plt.subplots(1,1)
-                    ax.hist(data, bins='auto', ec='black')
+                    bindate = dt.datetime(year=bindate.year, month=bindate.month + 1, day=1)
+                mybins.append(bindate.timestamp())
+            mybins = mdates.epoch2num(mybins)
 
+            # plot_data = mdates.epoch2num(data)
+            plot_data = []
+            for list in data:
+                plot_data.append(mdates.epoch2num(list))
 
-                plt.savefig(output_dir + "/histogram_"+ histogram_name + ".png")
-                log.info("Histogram saved as histogram_"+ histogram_name + ".png")
-                plt.savefig(output_dir + "/histogram_"+ histogram_name + ".pdf")
-                log.info("Histogram saved as histogram_"+ histogram_name + ".pdf")
+            fig, ax = plt.subplots(1,1, figsize=(200, 20), facecolor='white')
+            # fig, ax = plt.subplots(1,1,facecolor='white')
+            ax.hist(plot_data, bins=mybins, ec='black')
+            ax.set_title(histogram_name + " - " + row_name)
+            ax.xaxis.set_major_locator(mdates.MonthLocator())
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%m.%y'))
+            #fig.autofmt_xdate()
+
+            # Changing the space between the ticks
+
+            # plt.gca().margins(x=0)
+            plt.gcf().canvas.draw()
+            tl = plt.gca().get_xticklabels()
+            maxsize = max([t.get_window_extent().width for t in tl])
+            m = 0.2 # inch margin
+            N = len(mix_data)
+            s = maxsize/plt.gcf().dpi*N+2*m
+            margin = m/plt.gcf().get_size_inches()[0]
+            #
+            # print("plt.gcf().get_size_inches()[1] = " + str(plt.gcf().get_size_inches()[1]))
+            print("plt.gcf().get_size_inches() = " + str(plt.gcf().get_size_inches()))
+            print("s = " + str(s))
+            plt.gcf().subplots_adjust(left=margin, right=1.-margin)
+            # plt.gcf().set_size_inches(s, 10)
+            plt.gcf().set_size_inches(s*0.25, plt.gcf().get_size_inches()[1])
+
+            fig.autofmt_xdate()
+
+        elif hist_type == 'int':
+            log.debug("Histogram " + histogram_name + " is type int")
+            fig, ax = plt.subplots(1,1,figsize=(200, 40))
+            # fig, ax = plt.subplots(1,1)
+            plt.style.use('seaborn-deep')
+
+            max_exp = int(floor(loga(max(mix_data),10)))
+            binwidth = 10**(max_exp - 3)
+
+            ax.hist(data, bins=np.arange(min(mix_data), max(mix_data) + binwidth, binwidth),label=label)
+            ax.legend(loc='upper right')
+            ax.set_title(histogram_name)
+            ax.set_xlim(left=0) # Start at left zero
+            ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ','))) # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
+            ax.xaxis.set_major_locator(ticker.MultipleLocator(binwidth*10))
+            plt.xticks(rotation=45) # Rotate x ticks
+            plt.gcf().subplots_adjust(bottom=0.15) # Adjust the lables if they go pass the figure
+            plt.grid(linestyle="--") # Grid in the histogram
+        else:
+            fig, ax = plt.subplots(1,1)
+            ax.hist(data, bins='auto', ec='black')
+            ax.set_title(histogram_name + " - " + row_name)
+
+        s = "+"
+
+        filename = histogram_name + "_" + s.join(rows)
+        # plt.savefig(output_dir + "/histogram_"+ filename + ".png")
+        # log.info("Histogram saved as histogram_"+ filename + ".png")
+        plt.savefig(output_dir + "/histogram_"+ filename + ".pdf")
+        log.info("Histogram saved as histogram_"+ filename + ".pdf")
+        plt.figure().clear()
 
 def output_to_files(datasets,out_dir):
     log.info("Processing finished, outputing files")
 
-    jsonfile = out_dir +  "/" + outputfilename + ".json"
-    xlsxfile = out_dir +  "/" + outputfilename + ".xlsx"
-    rawfile = out_dir +  "/" + outputfilename + "_raw.json"
+    jsonfile = out_dir +  "/" + OUTPUT_FILENAME + ".json"
+    xlsxfile = out_dir +  "/" + OUTPUT_FILENAME + ".xlsx"
+    rawfile = out_dir +  "/" + OUTPUT_FILENAME + "_raw.json"
 
     # Dictionary for the output JSON file
     dico = {}
@@ -295,7 +428,7 @@ def output_to_files(datasets,out_dir):
         # print(str(dico))
         if 'histograms' in row.histogram_collection.keys():
             for histogram_name in row.histogram_collection:
-                # def output_histogram(data,output_dir):
+                # def output_histograms(data,output_dir):
                 data = row.histogram_collection[histogram_name]['data']
                 raw[row_name][histogram_name] = row.histogram_collection[histogram_name]
 
@@ -369,13 +502,13 @@ class Column:
             self.res_poll = topN(self.poll,self.num_poll,self.req_type)
 
 class Row:
-    columns = []
-    histogram_collection = {}
-
+    var_dict = {}
     def __init__(self,name):
         self.name = name
         self.total = 0
-        self.var_dict = {}
+        # self.
+        self.columns = []
+        self.histogram_collection = {}
         # print("Row " + self.name + " created")
 
     def create_column(self,name,req,depend_name=None):
@@ -483,11 +616,12 @@ class Row:
 #                                                                              #
 ################################################################################
 
-def postprocessing(myjsonconfig,verbose=None):
+def postprocessing(myjsonconfig,verbose=0):
 
     # print('This verbosity is ' + str(verbose))
-
-    logSetup(verbose)
+    # quit()
+    #
+    # logSetup(verbose)
     t_start = time.time()
     filename = myjsonconfig
 
@@ -501,9 +635,9 @@ def postprocessing(myjsonconfig,verbose=None):
         log.debugv("This is the config file: " + str(myjson))
 
         log.info("Output dir: " + myjson['output_dir'])
-        jsonfile = myjson['output_dir'] +  "/" + outputfilename + ".json"
-        # xlsxfile = myjson['output_dir'] +  "/" + outputfilename + ".xlsx"
-        # rawfile = myjson['output_dir'] +  "/" + outputfilename + "_raw.json"
+        jsonfile = myjson['output_dir'] +  "/" + OUTPUT_FILENAME + ".json"
+        # xlsxfile = myjson['output_dir'] +  "/" + OUTPUT_FILENAME + ".xlsx"
+        # rawfile = myjson['output_dir'] +  "/" + OUTPUT_FILENAME + "_raw.json"
 
         # Check of the result file already exists
         # if os.path.isfile(jsonfile):
@@ -532,6 +666,7 @@ def postprocessing(myjsonconfig,verbose=None):
             if 'histograms' in myjson.keys():
                 for histogram in myjson['histograms']:
                     log.debugv("Adding " + histogram + " histogram")
+                    # Each row will contain the same values: name, request (JSONPath), and type
                     datasets[row].create_histogram(histogram,myjson['histograms'][histogram][0],myjson['histograms'][histogram][1])
             else:
                 log.debugv("There is no histogram in the config file, moving on")
@@ -548,25 +683,34 @@ def postprocessing(myjsonconfig,verbose=None):
             log.info("Processing " + str(numFiles) + " files")
             for filename in files:
 
-                log.debug("Processing file number " + str(numFiles) + ": " + filename + " JSON file")
+                log.debug(row + "$ Processing file number " + str(numFiles) + ": " + filename + " JSON file")
                 numFiles -= 1
                 with open(mypath + "/" + filename) as f:
                     mwjson = json.load(f)
 
                 mwjson['name'] = filename.split('.')[0]
-
                 datasets[row].process(mwjson)
+
+            if verbose >= 1:
+                for histo in myjson['histograms']:
+                    log.debug("Dataset " + row + " has " + str(len(datasets[row].histogram_collection[histo]['data'])) + " entries in " + histo)
 
         output_to_files(datasets,myjson['output_dir'])
 
         t_end = time.time()
-        log.info("TIME: " + str(round(t_end - t_start,1)) + " s")
+        log.info("PROCESS TIME: " + str(round(t_end - t_start,1)) + " s")
 
         if 'histograms' in myjson.keys():
-            output_histogram(datasets,myjson['output_dir'])
+            if verbose == 2:
+                for name in datasets:
+                    log.debugv("This dataset has evaludated " + str(datasets[name].total) + " entries")
+                    for histo in myjson['histograms']:
+                        log.debugv("Dataset " + datasets[name].name + " has " + str(len(datasets[name].histogram_collection[histo]['data'])) + " entries in " + histo)
+
+            output_histograms(datasets,myjson['histograms'],myjson['output_dir'])
 
     t_end = time.time()
-    log.info("TIME: " + str(round(t_end - t_start,1)) + " s")
+    log.info("TOTAL TIME: " + str(round(t_end - t_start,1)) + " s")
     quit()
 
 def main():
@@ -578,7 +722,16 @@ def main():
     # parser.add_argument('-H', metavar='Result JSON file', help='Output information to the standart output (-vv is very verbose)')
     args=parser.parse_args()
 
-    postprocessing(args.json_config_file,args.v)
+    if args.v != None:
+        verbosity = args.v
+    else:
+        verbosity = 0
+
+
+    logSetup(verbosity)
+    # log.info('This verbosity is ' + str(verbosity))
+    # quit()
+    postprocessing(args.json_config_file,verbosity)
 
 if __name__ == "__main__":
     main()

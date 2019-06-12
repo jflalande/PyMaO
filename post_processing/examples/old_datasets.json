@@ -1,0 +1,31 @@
+{
+	"rows":{
+		"Drebin":"/home/tomas/orch/drebin",
+		"AMD":"/home/tomas/orch/amd"
+	},
+	"columns":{
+		"Have a AndroidManifest File":[
+			"$..ManifestDecoding.status == \"done\"",
+			null
+		],
+		"Popular SDK Min Version":[
+			"$..ManifestDecoding.minSdkVersion:top:3",
+			null
+		],
+		"Least popular SDK Min Version":[
+			"$..ManifestDecoding.minSdkVersion:bottom:3",
+			null
+		]
+	},
+	"histograms":{
+		"DEX_dates":[
+			"$..GetManifAndDexDates.dex_date",
+			"date"
+		],
+		"Size":[
+			"$..GetAPKSize.size",
+			"int"
+		]
+  },
+	"output_dir":"/home/tomas/orch/res_old_datasets03"
+}

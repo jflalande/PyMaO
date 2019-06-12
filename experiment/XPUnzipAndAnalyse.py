@@ -25,14 +25,14 @@ class XPUnzipAndAnalyse(Experiment):
     def __init__(self, deviceserial=None):
         self.analyses = []
 
-        # Run ManifestDecoding
-        # self.analyses.append((ManifestDecoding(self),None))
-
         # Run GetAPKSize
         self.analyses.append((GetAPKSize(self),None))
 
+        # Run GetManifAndDexDates
+        self.analyses.append((GetManifAndDexDates(self), None))
+
+        # Run ManifestDecoding
+        self.analyses.append((ManifestDecoding(self), None))
+
         # Run Unzip
         # self.analyses.append((Unzip(self), None))
-
-        # Run GetManifAndDexDates
-        self.analyses.append((GetManifAndDexDates(self), None ))
