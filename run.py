@@ -6,7 +6,8 @@ import time
 import logging
 import experiment
 import importlib
-
+import argparse
+import configparser
 
 """
 PARAMETERS
@@ -27,6 +28,13 @@ DEVICES = ["CB512DXH1C", "CB512ENX66", "CB512FCYAS", "CB512FEL52","CB512DXGVS"]
 DEBUG_LEVELV_NUM = 9
 logging.addLevelName(DEBUG_LEVELV_NUM, "DEBUGV")
 
+def setup_args():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("config", type=str,
+                        help="config file")
+
+    return parser.parse_args()
 
 def debugv(self, message, *args, **kws):
     # Yes, logger takes its '*args' as 'args'.
@@ -89,7 +97,12 @@ logSetup("normal")
 #logSetup("verbose")
 #logSetup("veryverbose")
 
+# Reading args
+setup_args()
 
+# Config reading
+configfile = ""
+config = configparser.ConfigParser(configfile)
 
 
 workers=[]
