@@ -12,11 +12,11 @@ from analysis.SymlinkAPK import SymlinkAPK
 class XPDetectDHT(Experiment):
 
     APKBASE = "/home/jf/swap/malwaredebug"
-    JSONBASE = "/home/jf/swap/DHT/jsons"
+    JSONBASE = "/home/jf/swap/malwaredebug"
     SIMULATE_JSON_WRITE = False
     SDKHOME = "/home/jf/Android/Sdk"
 
-    TARGETSYMLINK = "/home/jf/swap/DHT/apk"
+    TARGETSYMLINK = "/home/jf/swap/nativeAPKDHT"
 
     ''' By defautl, an XP does not use a drvice '''
     def usesADevice(self):

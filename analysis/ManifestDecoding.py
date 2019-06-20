@@ -19,10 +19,10 @@ class ManifestDecoding(Analysis):
         super().__init__(xp_)
         self.checkRunnableAndroidVersion = checkRunnableAndroidVersion
 
-    def analysis(self, analysis, analysis_name, apkname, jsonanalyses):
+    def analysis(self, analysis, analysis_name, basename, jsonanalyses):
         log.debug("Running ManifestDecoding analysis.")
 
-        command = "aapt d xmltree '" + self.xp.APKBASE + "/" + apkname + ".apk' AndroidManifest.xml"
+        command = "aapt d xmltree '" + jsonanalyses["filename"] + "' AndroidManifest.xml"
 
         errcode, res = self.xp.exec_in_subprocess(command, cwd=True)
 

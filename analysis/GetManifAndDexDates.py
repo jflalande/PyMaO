@@ -25,7 +25,7 @@ def date2epoch(my_time):
 
 class GetManifAndDexDates(Analysis):
 
-    def analysis(self, analysis, analysis_name, apkname, jsonanalyses):
+    def analysis(self, analysis, analysis_name, basename, jsonanalyses):
         log.debug("Running GetManifAndDexDates analysis.")
 
         # unzip_path = self.xp.TMPFS + "/" + self.xp.tid  + "/" + apkname
@@ -33,13 +33,13 @@ class GetManifAndDexDates(Analysis):
         os.stat_float_times(False)
         # manif_date = os.path.getmtime(unzip_path + "/AndroidManifest.xml")
 
-        command = "unzip -l \"" + self.xp.APKBASE + "/" + apkname + ".apk\" 2> /dev/null " #| grep -E 'AndroidManifest.xml' | head -n 1 | awk '{print $2\" \"$3}' | tr -d '\n\r'"
+        command = "unzip -l \"" + jsonanalyses["filename"] + ".apk\" 2> /dev/null " #| grep -E 'AndroidManifest.xml' | head -n 1 | awk '{print $2\" \"$3}' | tr -d '\n\r'"
 
         errcode, res = self.xp.exec_in_subprocess(command, cwd=True)
 
         if errcode != 0:
             if not res:
-                log.error("unzip command failed for " + apkname)
+                log.error("unzip command failed for " + jsonanalyses["filename"])
                 return 0
             else:
                 log.warning("unzip returned " + str(errcode))
@@ -57,12 +57,12 @@ class GetManifAndDexDates(Analysis):
 
         self.updateJsonAnalyses(analysis_name, jsonanalyses, {"manif_date": manif_date})
 
-        command = "unzip -l \"" + self.xp.APKBASE + "/" + apkname + ".apk\" 2> /dev/null " # | grep -E 'classes.dex' | head -n 1 | awk '{print $2\" \"$3}' | tr -d '\n\r'"
+        command = "unzip -l \"" + jsonanalyses["filename"] + ".apk\" 2> /dev/null " # | grep -E 'classes.dex' | head -n 1 | awk '{print $2\" \"$3}' | tr -d '\n\r'"
         errcode, res = self.xp.exec_in_subprocess(command, cwd=True)
 
         if errcode != 0:
             if not res:
-                log.error("unzip command failed for " + apkname)
+                log.error("unzip command failed for " + jsonanalyses["filename"])
                 return 0
             else:
                 log.warning("unzip returned " + str(errcode))

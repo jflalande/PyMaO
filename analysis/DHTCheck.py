@@ -10,7 +10,7 @@ log = logging.getLogger("orchestrator")
 
 class DHTCheck(Analysis):
 
-    def analysis(self, analysis, analysis_name, apkname, jsonanalyses):
+    def analysis(self, analysis, analysis_name, basename, jsonanalyses):
         log.debug("Running analysis Launch and test if app survives.")
 
         # Wake up and unlock device
@@ -88,8 +88,8 @@ class DHTCheck(Analysis):
             self.updateJsonAnalyses(analysis_name, jsonanalyses, {"DHTclassesperlibs": dict(classes_per_libs)})
 
         # Dumping in a file for DEBUG purpose
-        log.debug("Dumping in the file: " + self.xp.JSONBASE + apkname)
-        with  open(self.xp.JSONBASE + "/" + apkname + ".log" , "w" ) as f:
+        log.debug("Dumping in the file: " + self.xp.JSONBASE + basename + ".log")
+        with  open(self.xp.JSONBASE + "/" + basename + ".log" , "w" ) as f:
             f.write(res)
 
         return True

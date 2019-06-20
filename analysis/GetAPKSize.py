@@ -13,14 +13,14 @@ Errors are captured.
 
 class GetAPKSize(Analysis):
 
-    def analysis(self, analysis, analysis_name, apkname, jsonanalyses):
+    def analysis(self, analysis, analysis_name, basename, jsonanalyses):
         log.debug("Running GetAPKSize analysis.")
 
         # file_path = self.xp.TMPFS + "/" + self.xp.tid  + "/" + apkname
 
         # -b : print size in octets (kyloctets by default)
         # -L : dereferenc the symbolic link, get the size of the reference
-        command = "du -bL \"" + self.xp.APKBASE + "/" + apkname + ".apk\""
+        command = "du -bL \"" + jsonanalyses["filename"]
 
         log.debug("The command is "+command)
 

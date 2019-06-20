@@ -18,7 +18,7 @@ NB_WORKERS = 4 # No more workers than devices if using devices !
 
 # If you need devices:
 DEVICES = ["CB512DXH1C", "CB512ENX66", "CB512FCYAS", "CB512FEL52","CB512DXGVS"]
-# DEVICES = ["CB512DXGVS"]
+#DEVICES = ["CB512ENX66"]
 
 # =============================================================================
 

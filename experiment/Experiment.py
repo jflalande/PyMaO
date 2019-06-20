@@ -47,8 +47,8 @@ class Experiment:
     # sudo mount -t tmpfs -o size=512M tmpfs /home/jf/swap/tmpfs/
     #
     # Define this variable, without trailing slash:
-    #TMPFS="/home/jf/Téléchargements/tmpfs"
-    TMPFS = "/Volumes/RAMDisk/tmpfs"
+    TMPFS="/home/jf/Téléchargements/tmpfs"
+    #TMPFS = "/Volumes/RAMDisk/tmpfs"
     #note for mac user : you need first to create a ram disk (of size 1G) with the following command
     # diskutil erasevolume HFS+ "RAMDisk" `hdiutil attach -nomount ram://2097152`
 

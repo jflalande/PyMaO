@@ -17,16 +17,16 @@ class Analysis:
     def dependencies(self):
         return []
 
-    def run(self, analysis, analysis_name, apkname, jsonanalyses):
+    def run(self, analysis, analysis_name, basename, jsonanalyses):
         self.checkTMPFS()
-        ret =  self.analysis(analysis, analysis_name, apkname, jsonanalyses)
+        ret =  self.analysis(analysis, analysis_name, basename, jsonanalyses)
 
         # Update status of this analysis
         if ret:
             self.updateJsonAnalyses(analysis_name, jsonanalyses,{"status": "done"})
         else:
             self.updateJsonAnalyses(analysis_name, jsonanalyses, {"status": "failed"})
-            log.warning("Analysis " + analysis_name + " failed (" + apkname + ")")
+            log.warning("Analysis " + analysis_name + " failed (" + basename + ")")
 
         return ret
 

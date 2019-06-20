@@ -8,7 +8,7 @@ log = logging.getLogger("orchestrator")
 
 class LaunchAndSurvive(Analysis):
 
-    def analysis(self, analysis, analysis_name, apkname, jsonanalyses):
+    def analysis(self, analysis, analysis_name, basename, jsonanalyses):
         log.debug("Running analysis Launch and test if app survives.")
 
         # Wake up and unlock device

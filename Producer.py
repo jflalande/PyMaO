@@ -21,14 +21,18 @@ def createJobs(queue, xp):
     for filename in getRecursiveFilenames(xp.APKBASE):
         if filename.endswith(".apk"):
             log.debugv("Producer: doing " + filename)
-            packagename = getMalwareName(filename)
-            log.debugv("Producer: packagename " + packagename)
+            basename = getMalwareName(filename)
+            log.debugv("Producer: basename " + basename)
 
-            json = readJson(packagename, xp)
+            # Reading the JSON backup for this malware from the disk
+            json = readJson(basename, xp)
+            json[basename]["filename"] = filename # Storing filename
+            # At this stage, the JSON file is:
+            # { hashcode: { "filename" : "/var/here/hashcode.apk" }}
             log.debugv("Producer: json " + str(json))
 
             # Determine if one of the analysis should be done for this apk
-            analysisToDo = redoAnalyses(packagename, json, xp)
+            analysisToDo = redoAnalyses(basename, json, xp)
             log.debugv("Redo analysis: " + str(analysisToDo))
 
             # Debug

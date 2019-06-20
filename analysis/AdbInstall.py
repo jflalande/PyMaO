@@ -7,10 +7,10 @@ log = logging.getLogger("orchestrator")
 
 class AdbInstall(Analysis):
 
-    def analysis(self, analysis, analysis_name, apkname, jsonanalyses):
+    def analysis(self, analysis, analysis_name, basename, jsonanalyses):
         log.debug("Running analysis Install using Adb. Grant all permissions.")
 
-        exitcode, res = self.xp.adb_send_command(["install", "-t", "-g", "-r", self.xp.APKBASE + "/" + apkname + ".apk" ])
+        exitcode, res = self.xp.adb_send_command(["install", "-t", "-g", "-r", jsonanalyses["filename"] ])
 
         for line in res.split('\n'):
             if "Success" in line:

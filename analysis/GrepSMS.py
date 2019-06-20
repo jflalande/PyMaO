@@ -11,7 +11,7 @@ class GrepSMS(Analysis):
     def dependencies(self):
         return ["Apktool"]
 
-    def analysis(self, analysis, analysis_name, apkname, jsonanalyses):
+    def analysis(self, analysis, analysis_name, basename, jsonanalyses):
         log.debug("Running GrepSMS analysis.")
 
         command = "grep -Er \"\.*SMS.* \" ."
