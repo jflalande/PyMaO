@@ -2,7 +2,7 @@
 ## Installation process
 
 ```
-pip3 install < requirements.txt
+pip3 install -r requirements.txt
 sudo apt install openjdk-8-jre-headless
 sudo apt install apktool
 sudo apt install python3-tk
