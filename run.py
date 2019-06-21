@@ -94,15 +94,29 @@ logSetup(confparser['general']['debug'])
 # For parameters of the running XP:
 NB_WORKERS = int(confparser['general']['nb_workers'])
 DEVICES = confparser['general']['devices']
-targetXP = confparser['xp']['name']
+
 
 # Displaying for the user
 log.debugv("ARGS: " + str(args))
 log.info("Reading config file: " + args["config"])
+log.info("General parameters")
+log.info("==================")
 log.info(" - nb_workers: " + str(NB_WORKERS))
 log.info(" - devices: " + str(DEVICES))
-log.info(" - xp: " + str(targetXP))
+
 # ==================================================
+log.info("XP parameters")
+log.info("=============")
+targetXP = confparser['xp']['name']
+log.info(" - xp: " + str(targetXP))
+apkbase = confparser['xp']['apkbase']
+log.info(" - apkbase: " + str(apkbase))
+jsonbase = confparser['xp']['jsonbase']
+log.info(" - jsonbase: " + str(jsonbase))
+simulate_json_write = confparser['xp']['simulate_json_write']
+log.info(" - simulate_json_write: " + str(simulate_json_write))
+targetsymlink = confparser['xp']['targetsymlink']
+log.info(" - targetsymlink: " + str(targetsymlink))
 
 workers=[]
 t_start = time.time()
