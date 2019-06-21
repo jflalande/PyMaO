@@ -9,20 +9,6 @@ import importlib
 import argparse
 import configparser
 
-"""
-PARAMETERS
-"""
-# The experiment to run
-targetXP = "XPNative"
-
-NB_WORKERS = 4 # No more workers than devices if using devices !
-
-# If you need devices:
-DEVICES = ["CB512DXH1C", "CB512ENX66", "CB512FCYAS", "CB512FEL52","CB512DXGVS"]
-#DEVICES = ["CB512ENX66"]
-
-# =============================================================================
-
 
 # Adds a very verbose level of logs
 DEBUG_LEVELV_NUM = 9
@@ -89,21 +75,34 @@ def logSetup(level):
         log.warning("Logging level \"{}\" not defined, setting \"normal\" instead"
                     .format(level))
 
+# For debugging purpose:
 applyColorsToLogs()
 
-# For debugging purpose:
-########################
-logSetup("normal")
-#logSetup("verbose")
-#logSetup("veryverbose")
 
 # Reading args
-setup_args()
+args = vars(setup_args())
 
 # Config reading
-configfile = ""
-config = configparser.ConfigParser(configfile)
+confparser = configparser.ConfigParser()
 
+config_file = open(args["config"], "r")
+confparser.read_file(config_file)
+
+# For debugging purpose:
+logSetup(confparser['general']['debug'])
+
+# For parameters of the running XP:
+NB_WORKERS = int(confparser['general']['nb_workers'])
+DEVICES = confparser['general']['devices']
+targetXP = confparser['xp']['name']
+
+# Displaying for the user
+log.debugv("ARGS: " + str(args))
+log.info("Reading config file: " + args["config"])
+log.info(" - nb_workers: " + str(NB_WORKERS))
+log.info(" - devices: " + str(DEVICES))
+log.info(" - xp: " + str(targetXP))
+# ==================================================
 
 workers=[]
 t_start = time.time()
