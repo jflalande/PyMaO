@@ -72,7 +72,13 @@ class Experiment:
     def cleanTMPFSDirectory(self):
         log.info("Cleaning TMPFS")
         for the_file in os.listdir(self.tmpfs):
-            shutil.rmtree(self.tmpfs + "/" + the_file)
+            # Cannot use shutil because some APK have too many folders
+            # shutil.rmtree(self.tmpfs + "/" + the_file)
+            command = "rm -Rf " + self.tmpfs + "/" + the_file
+            errcode, res = self.exec_in_subprocess(command, shell=True)
+            if errcode != 0:
+                log.error("Error deleting files in TMPFS: " + command)
+                quit()
 
     '''
     This is an attempt to unifiy all subprocess commands
