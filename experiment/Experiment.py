@@ -38,26 +38,18 @@ class Experiment:
     #SUBPROCESS_STDERR = os.stdout
 
 
-    # To perform before launching the XP:
-    # sudo mount -t tmpfs -o size=512M tmpfs /home/jf/swap/tmpfs/
-    #
-    # Define this variable, without trailing slash:
-    TMPFS="/home/jf/Téléchargements/tmpfs"
-    #TMPFS = "/Volumes/RAMDisk/tmpfs"
-    #note for mac user : you need first to create a ram disk (of size 1G) with the following command
-    # diskutil erasevolume HFS+ "RAMDisk" `hdiutil attach -nomount ram://2097152`
-
     analyses = []
     # Unique identifier of the thread working on this XP
     tid = "NONE"
     working_directory = "NONE"
 
-    def __init__(self, targetXP, apkbase, jsonbase, targetsymlink, deviceserial=None):
+    def __init__(self, targetXP, apkbase, jsonbase, targetsymlink, tmpfs, deviceserial=None):
         self.targetXP = targetXP
         self.apkbase = apkbase
         self.jsonbase = jsonbase
         self.targetsymlink = targetsymlink
         self.deviceserial = deviceserial
+        self.tmpfs = tmpfs
 
         self.analyses = []
 
@@ -66,21 +58,21 @@ class Experiment:
         return False
 
     def setupWorkingDirectory(self):
-        log.debugv("Creating working directory " + self.TMPFS + "/" + self.tid)
+        log.debugv("Creating working directory " + self.tmpfs + "/" + self.tid)
         try:
-            os.mkdir(self.TMPFS + "/" + self.tid)
-            self.working_directory = self.TMPFS + "/" + self.tid
+            os.mkdir(self.tmpfs + "/" + self.tid)
+            self.working_directory = self.tmpfs + "/" + self.tid
         except:
-            raise Exception("Error creating directory " + self.TMPFS + "/" + self.tid)
+            raise Exception("Error creating directory " + self.tmpfs + "/" + self.tid)
 
     def cleanWorkingDirectory(self):
         log.debugv("Cleaning TMPFS for pid " + self.tid)
-        shutil.rmtree(self.TMPFS + "/" + self.tid)
+        shutil.rmtree(self.tmpfs + "/" + self.tid)
 
     def cleanTMPFSDirectory(self):
         log.info("Cleaning TMPFS")
-        for the_file in os.listdir(self.TMPFS):
-            shutil.rmtree(self.TMPFS + "/" + the_file)
+        for the_file in os.listdir(self.tmpfs):
+            shutil.rmtree(self.tmpfs + "/" + the_file)
 
     '''
     This is an attempt to unifiy all subprocess commands

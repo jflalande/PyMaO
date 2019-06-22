@@ -95,7 +95,7 @@ logSetup(confparser['general']['debug'])
 # For parameters of the running XP:
 NB_WORKERS = int(confparser['general']['nb_workers'])
 DEVICES = confparser['general']['devices']
-
+TMPFS = confparser['general']['tmpfs']
 
 # Displaying for the user
 log.debugv("ARGS: " + str(args))
@@ -104,6 +104,7 @@ log.info("General parameters")
 log.info("==================")
 log.info(" - nb_workers: " + str(NB_WORKERS))
 log.info(" - devices: " + str(DEVICES))
+log.info(" - tmpfs: " + str(TMPFS))
 
 # ==================================================
 log.info("XP parameters")
@@ -117,17 +118,18 @@ log.info(" - jsonbase: " + str(jsonbase))
 targetsymlink = confparser['xp']['targetsymlink']
 log.info(" - targetsymlink: " + str(targetsymlink))
 
+
 workers=[]
 t_start = time.time()
 
 malware_queue = Queue()
-xpModel = generateXP(targetXP, apkbase, jsonbase, targetsymlink)
+xpModel = generateXP(targetXP, apkbase, jsonbase, targetsymlink, TMPFS)
 xpUsesADevice = xpModel.usesADevice()
 if len(DEVICES) < NB_WORKERS and xpUsesADevice:
     log.error("No more workers than number of devices !")
     quit()
 
-xp = generateXP(targetXP, apkbase, jsonbase, targetsymlink)
+xp = generateXP(targetXP, apkbase, jsonbase, targetsymlink, TMPFS)
 xp.appendAnalysis()
 producer = Thread(target=createJobs, args=[malware_queue, xp])
 producer.start()
@@ -141,7 +143,7 @@ for i in range(NB_WORKERS):
     if xpUsesADevice:
         deviceserial = DEVICES[i]
 
-    xp = generateXP(targetXP, apkbase, jsonbase, targetsymlink, deviceserial)
+    xp = generateXP(targetXP, apkbase, jsonbase, targetsymlink, TMPFS, deviceserial)
     xp.appendAnalysis()
     worker = Thread(target=doJob, args=[malware_queue, xp, i+1])
     worker.start()

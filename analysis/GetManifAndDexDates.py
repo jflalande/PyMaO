@@ -28,7 +28,7 @@ class GetManifAndDexDates(Analysis):
     def analysis(self, analysis, analysis_name, basename, jsonanalyses):
         log.debug("Running GetManifAndDexDates analysis.")
 
-        # unzip_path = self.xp.TMPFS + "/" + self.xp.tid  + "/" + apkname
+        # unzip_path = self.xp.tmpfs + "/" + self.xp.tid  + "/" + apkname
 
         os.stat_float_times(False)
         # manif_date = os.path.getmtime(unzip_path + "/AndroidManifest.xml")

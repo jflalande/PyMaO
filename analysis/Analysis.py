@@ -36,9 +36,9 @@ class Analysis:
     def checkTMPFS(self):
         log.debug("You are running on "+platform)
         if platform == 'linux' or platform == 'Linux':
-            command = "mount | grep '^tmpfs' | grep " + self.xp.TMPFS
+            command = "mount | grep '^tmpfs' | grep " + self.xp.tmpfs
         elif platform == 'darwin' :
-            command = "mount | grep '(hfs'" # + self.xp.TMPFS
+            command = "mount | grep '(hfs'"
         else :
             log.error ("Your platform seems to be unknown ...")
             quit()
@@ -46,7 +46,7 @@ class Analysis:
         errcode, res = self.xp.exec_in_subprocess(command)
         if res == "":
             log.error("No tmpfs mount detected.")
-            log.error("Suggestion: sudo mount -t tmpfs -o size=1G tmpfs " + self.xp.TMPFS)
+            log.error("Suggestion: sudo mount -t tmpfs -o size=1G tmpfs " + self.xp.tmpfs)
             quit()
 
     def updateJsonAnalyses(self, analysis_name, jsonanalyses, newdata):

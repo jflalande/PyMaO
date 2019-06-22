@@ -16,7 +16,7 @@ class GetAPKSize(Analysis):
     def analysis(self, analysis, analysis_name, basename, jsonanalyses):
         log.debug("Running GetAPKSize analysis.")
 
-        # file_path = self.xp.TMPFS + "/" + self.xp.tid  + "/" + apkname
+        # file_path = self.xp.tmpfs + "/" + self.xp.tid  + "/" + apkname
 
         # -b : print size in octets (kyloctets by default)
         # -L : dereferenc the symbolic link, get the size of the reference
