@@ -38,6 +38,6 @@ class XPDetectDHT(Experiment):
                                {"AdbInstall" : {"install": True }}]))
 
         # Copying the APK that uses Direct Heap Touch
-        self.analyses.append((SymlinkAPK(self, targetDirectory=self.targetsymlink),
+        self.analyses.append((SymlinkAPK(self),
                               [{"DHTCheck" : {"DHT": True}}]))
 

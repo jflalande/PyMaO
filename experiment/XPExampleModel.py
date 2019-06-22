@@ -41,5 +41,5 @@ class XPExampleModel(Experiment):
         # Make a symbolic link to APK that have some criteria
         # in this example, it makes a symbolic link if the install is a success
         # myout-apk/XXX.apk --------> myinpt-apk/XXX.apk
-        #self.analyses.append((SymlinkAPK(self, targetDirectory=self.targetsymlink),
+        #self.analyses.append((SymlinkAPK(self),
         #                  [{"AdbInstall" : {"install": True }}]))

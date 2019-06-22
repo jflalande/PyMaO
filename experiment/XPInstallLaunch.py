@@ -38,6 +38,6 @@ class XPInstallLaunch(Experiment):
                                {"AdbInstall" : {"install": True }}]))
 
         # Copying the APK that are Native and with API > 24 to a specific folder
-        self.analyses.append((SymlinkAPK(self, targetDirectory=self.targetsymlink),
+        self.analyses.append((SymlinkAPK(self),
                               [{"LaunchAndSurvive" : {"running": True}}]))
 
