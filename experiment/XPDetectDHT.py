@@ -11,20 +11,13 @@ from analysis.SymlinkAPK import SymlinkAPK
 # uninstall
 class XPDetectDHT(Experiment):
 
-    APKBASE = "/home/jf/swap/malwaredebug"
-    JSONBASE = "/home/jf/swap/malwaredebug"
-    SIMULATE_JSON_WRITE = False
     SDKHOME = "/home/jf/Android/Sdk"
-
-    TARGETSYMLINK = "/home/jf/swap/nativeAPKDHT"
 
     ''' By defautl, an XP does not use a drvice '''
     def usesADevice(self):
         return True
 
-    def __init__(self, deviceserial=None):
-        self.deviceserial = deviceserial
-        self.analyses = []
+    def appendAnalysis(self):
 
         # Decode the manifest and checks that the minSdkVersion is 24
         # For apps that have native methods
@@ -45,6 +38,6 @@ class XPDetectDHT(Experiment):
                                {"AdbInstall" : {"install": True }}]))
 
         # Copying the APK that uses Direct Heap Touch
-        self.analyses.append((SymlinkAPK(self, targetDirectory=self.TARGETSYMLINK),
+        self.analyses.append((SymlinkAPK(self, targetDirectory=self.targetsymlink),
                               [{"DHTCheck" : {"DHT": True}}]))
 

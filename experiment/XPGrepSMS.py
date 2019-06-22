@@ -12,23 +12,21 @@ import os
 
 class XPGrepSMS(Experiment):
 
+    # NOT USED ANYMORE: PUT THESE IN A CONFIG FILE ! cf config/default.ini
+
     # Your home dir
-    HOME = os.path.expanduser('~') # Names can changes
+    #HOME = os.path.expanduser('~') # Names can changes
 
     # The dataset folder: where all your apk are
-    APKBASE = "/Users/vviettri/Documents/malware/malware-trigger-dev/Demos"# HOME + "/myinput"
+    #APKBASE = "/Users/vviettri/Documents/malware/malware-trigger-dev/Demos"# HOME + "/myinput"
 
     # The output folder where all the results will be recorded (json files)
-    JSONBASE = "/Users/vviettri/Documents/malware/malware-xp/output-xp" #HOME + "/myout-jsons"
+    #JSONBASE = "/Users/vviettri/Documents/malware/malware-xp/output-xp" #HOME + "/myout-jsons"
 
     # Used for making a symbolic link in a new folder to the APK that are selected by your experiment
-    TARGETSYMLINK =  HOME + "/myout-apk"
+    #TARGETSYMLINK =  HOME + "/myout-apk"
 
-    SIMULATE_JSON_WRITE = False
-
-    def __init__(self, deviceserial=None):
-        self.deviceserial = deviceserial
-        self.analyses = []
+    def appendAnalysis(self):
 
         #Run Apktool
         self.analyses.append((Apktool(self), None))

@@ -11,9 +11,11 @@ log = logging.getLogger("orchestrator")
 class SymlinkAPK(Analysis):
 
     # Sending a specific parameter: the version of Android we want to check against this APK
-    def __init__(self, xp_, targetDirectory="/tmp"):
+    def __init__(self, xp_, targetDirectory=None):
         super().__init__(xp_)
-        self.targetDirectory = targetDirectory
+        # By default, use the parameter targetsymlink that comes from the config file
+        if targetDirectory == None:
+            self.targetDirectory = xp_.targetsymlink
 
     def analysis(self, analysis, analysis_name, basename, jsonanalyses):
         log.debug("Symlink APK.")

@@ -96,13 +96,10 @@ def doJob(queue, xp, worker_nb):
 
 """Rewrites the JSON file for an apk"""
 def writeJson(name, xp, jsondata):
-    jsonfilename = os.path.join(xp.JSONBASE, name + ".json")
+    jsonfilename = os.path.join(xp.jsonbase, name + ".json")
 
-    if not xp.SIMULATE_JSON_WRITE:
-        with open(jsonfilename, 'w') as json_file:
-            json.dump(jsondata, json_file, indent=4)
-    else:
-        log.debug("Worker: JSON SIMULATION Writing in " + str(jsonfilename) + ': ' + str(jsondata))
+    with open(jsonfilename, 'w') as json_file:
+        json.dump(jsondata, json_file, indent=4)
 
 
 def evaluatePreConditions(analysis_name, jsonanalyses, precondition):

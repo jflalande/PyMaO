@@ -27,14 +27,9 @@ This class implements all common codes of an experiment.
 """
 class Experiment:
 
-    APKBASE = ""
-    JSONBASE = ""
     SDKHOME = ""
-    deviceserial = None
     worker_nb = -1
     device_local_port = -1
-
-    SIMULATE_JSON_WRITE = False
 
     # For release
     SUBPROCESS_STDERR = os.devnull
@@ -56,6 +51,15 @@ class Experiment:
     # Unique identifier of the thread working on this XP
     tid = "NONE"
     working_directory = "NONE"
+
+    def __init__(self, targetXP, apkbase, jsonbase, targetsymlink, deviceserial=None):
+        self.targetXP = targetXP
+        self.apkbase = apkbase
+        self.jsonbase = jsonbase
+        self.targetsymlink = targetsymlink
+        self.deviceserial = deviceserial
+
+        self.analyses = []
 
     ''' By defautl, an XP does not use a device '''
     def usesADevice(self):

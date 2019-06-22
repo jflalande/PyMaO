@@ -9,21 +9,20 @@ import os
 
 class XPUnzipAndAnalyse(Experiment):
 
-    HOME = os.path.expanduser('~') # Names can changes
+    # NOT USED ANYMORE: PUT THESE IN A CONFIG FILE ! cf config/default.ini
+
+    #HOME = os.path.expanduser('~') # Names can changes
 
     # APKBASE = HOME + "/gits/malware-goodware-small-dataset"
     # JSONBASE = HOME + "/orch/malware_json"
 
-    APKBASE = HOME + "/malware_datasets/amd/liens"
+    #APKBASE = HOME + "/malware_datasets/amd/liens"
     # APKBASE = HOME + "/malware_datasets/drebin/malware/sample"
-    JSONBASE = HOME + "/orch/amd"
+    #JSONBASE = HOME + "/orch/amd"
 
-    TARGETSYMLINK =  HOME + "/orch/nativeAPK"
+    #TARGETSYMLINK =  HOME + "/orch/nativeAPK"
 
-    SIMULATE_JSON_WRITE = False
-
-    def __init__(self, deviceserial=None):
-        self.analyses = []
+    def appendAnalysis(self):
 
         # Run GetAPKSize
         self.analyses.append((GetAPKSize(self),None))

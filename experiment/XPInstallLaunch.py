@@ -11,20 +11,13 @@ from analysis.SymlinkAPK import SymlinkAPK
 # uninstall
 class XPInstallLaunch(Experiment):
 
-    APKBASE = "/home/jf/swap/malware"
-    JSONBASE = "/home/jf/swap/nativeAPK"
-    SIMULATE_JSON_WRITE = False
     SDKHOME = "/home/jf/Android/Sdk"
-
-    TARGETSYMLINK = "/home/jf/swap/runningAPK"
 
     ''' By defautl, an XP does not use a drvice '''
     def usesADevice(self):
         return True
 
-    def __init__(self, deviceserial=None):
-        self.deviceserial = deviceserial
-        self.analyses = []
+    def appendAnalysis(self):
 
         # Decode the manifest and checks that the minSdkVersion is 24
         # For apps that have native methods
@@ -45,6 +38,6 @@ class XPInstallLaunch(Experiment):
                                {"AdbInstall" : {"install": True }}]))
 
         # Copying the APK that are Native and with API > 24 to a specific folder
-        self.analyses.append((SymlinkAPK(self, targetDirectory=self.TARGETSYMLINK),
+        self.analyses.append((SymlinkAPK(self, targetDirectory=self.targetsymlink),
                               [{"LaunchAndSurvive" : {"running": True}}]))
 

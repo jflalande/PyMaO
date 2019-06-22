@@ -7,6 +7,7 @@ from json import JSONDecodeError
 log = logging.getLogger("orchestrator")
 
 def getRecursiveFilenames(basedir):
+    log.debugv("Walking folder " + str(basedir))
     for (dirpath, _, filenames) in os.walk(basedir):
         for filename in filenames:
             log.debugv("This is filename " + filename)
@@ -17,8 +18,8 @@ def createJobs(queue, xp):
     # Cleaning TMPFS
     xp.cleanTMPFSDirectory()
 
-    log.info("Producer: iterating over apk files in " + str(xp.APKBASE) + " - It can take some time...")
-    for filename in getRecursiveFilenames(xp.APKBASE):
+    log.info("Producer: iterating over apk files in " + str(xp.apkbase) + " - It can take some time...")
+    for filename in getRecursiveFilenames(xp.apkbase):
         if filename.endswith(".apk"):
             log.debugv("Producer: doing " + filename)
             basename = getMalwareName(filename)
@@ -85,7 +86,7 @@ def getMalwareName(filename):
     return os.path.splitext(os.path.basename(filename))[0]
 
 def readJson(name, xp):
-    jsonfilename = os.path.join(xp.JSONBASE, name + ".json")
+    jsonfilename = os.path.join(xp.jsonbase, name + ".json")
     log.debugv("Producer: will read JSON " + str(jsonfilename))
 
     try:

@@ -39,7 +39,8 @@ def generateXP(s, *args, **kwargs):
     importlib.import_module(full_module_name)
 
     # Generating object
-    return getattr(getattr(experiment,s), s)(*args, **kwargs)
+    # We pass again the name of the XP as a first parameter s + other parameters
+    return getattr(getattr(experiment,s), s)(s, *args, **kwargs)
 
 # Tries to apply colors to logs
 def applyColorsToLogs():
@@ -107,14 +108,12 @@ log.info(" - devices: " + str(DEVICES))
 # ==================================================
 log.info("XP parameters")
 log.info("=============")
-targetXP = confparser['xp']['name']
+targetXP = confparser['xp']['targetXP']
 log.info(" - xp: " + str(targetXP))
 apkbase = confparser['xp']['apkbase']
 log.info(" - apkbase: " + str(apkbase))
 jsonbase = confparser['xp']['jsonbase']
 log.info(" - jsonbase: " + str(jsonbase))
-simulate_json_write = confparser['xp']['simulate_json_write']
-log.info(" - simulate_json_write: " + str(simulate_json_write))
 targetsymlink = confparser['xp']['targetsymlink']
 log.info(" - targetsymlink: " + str(targetsymlink))
 
@@ -122,13 +121,15 @@ workers=[]
 t_start = time.time()
 
 malware_queue = Queue()
-xpModel = generateXP(targetXP)
+xpModel = generateXP(targetXP, apkbase, jsonbase, targetsymlink)
 xpUsesADevice = xpModel.usesADevice()
 if len(DEVICES) < NB_WORKERS and xpUsesADevice:
     log.error("No more workers than number of devices !")
     quit()
 
-producer = Thread(target=createJobs, args=[malware_queue, generateXP(targetXP)])
+xp = generateXP(targetXP, apkbase, jsonbase, targetsymlink)
+xp.appendAnalysis()
+producer = Thread(target=createJobs, args=[malware_queue, xp])
 producer.start()
 
 # Waiting the producer to work first (helps for debugging purpose)
@@ -140,7 +141,9 @@ for i in range(NB_WORKERS):
     if xpUsesADevice:
         deviceserial = DEVICES[i]
 
-    worker = Thread(target=doJob, args=[malware_queue, generateXP(targetXP, deviceserial), i+1])
+    xp = generateXP(targetXP, apkbase, jsonbase, targetsymlink, deviceserial)
+    xp.appendAnalysis()
+    worker = Thread(target=doJob, args=[malware_queue, xp, i+1])
     worker.start()
     workers.append(worker)
 

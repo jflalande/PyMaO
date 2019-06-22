@@ -10,21 +10,11 @@ from analysis.SymlinkAPK import SymlinkAPK
 
 class XPNativeInstallLaunch(Experiment):
 
-    #APKBASE = "/media/jf/B006AF9A06AF5FD8/androzoo/samples"
-    #JSONBASE = "/media/jf/B006AF9A06AF5FD8/orchestrator/XPNative/jsons"
-    #TARGETSYMLINK = "/media/jf/B006AF9A06AF5FD8/orchestrator/XPNative/apk"
-
-    APKBASE = "/home/jf/swap/malwaredebug"
-    JSONBASE = "/home/jf/swap/malwaredebug"
-    TARGETSYMLINK = "/home/jf/swap/nativeAPK"
-
-
-    ''' By defautl, an XP does not use a drvice '''
+    ''' This XP uses a device '''
     def usesADevice(self):
         return True
 
-    def __init__(self, deviceserial=None):
-        self.analyses = []
+    def appendAnalysis(self):
 
         # Run Apktool
         self.analyses.append((Apktool(self), None))
@@ -52,7 +42,7 @@ class XPNativeInstallLaunch(Experiment):
                                {"AdbInstall" : {"install": True }}]))
 
         # Copying the APK that are Native and with API > 24 to a specific folder
-        self.analyses.append((SymlinkAPK(self, targetDirectory=self.TARGETSYMLINK),
+        self.analyses.append((SymlinkAPK(self, targetDirectory=self.targetsymlink),
                               [{"LaunchAndSurvive" : {"running": True}}]))
 
 
