@@ -2,7 +2,7 @@ import os
 import json
 import logging
 import threading
-from experiment.Statistics import Statistics
+from utils.Statistics import Statistics
 
 log = logging.getLogger("orchestrator")
 

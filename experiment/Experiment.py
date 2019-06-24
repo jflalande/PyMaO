@@ -4,23 +4,11 @@ import subprocess
 import os
 import shutil
 import time
-import threading
-from enum import Enum
+from utils.DeviceStatus import DeviceStatus
+from utils.Statistics import Statistics
 
 log = logging.getLogger("orchestrator")
 
-""" Helps to encode the device status """
-class DeviceStatus(Enum):
-
-    OFFLINE = 0
-    ONLINE = 1
-    PACKAGE = 2
-    BOOTCOMPLETED = 3
-
-    def __bool__(self):
-        return self.value == DeviceStatus.BOOTCOMPLETED.value
-
-a = DeviceStatus.OFFLINE
 
 """
 This class implements all common codes of an experiment.
@@ -215,6 +203,7 @@ class Experiment:
         if not device_detected:
             return DeviceStatus.OFFLINE
 
+        Statistics.publishDeviceStatus(self.deviceserial, DeviceStatus.ONLINE)
 
         log.debug("Checking package service " + str(self.deviceserial))
         detected_package = False
@@ -254,7 +243,7 @@ class Experiment:
 
         # Keeping device ALIVE by pinging
         self.keep_device_ALIVE_he_is_ALIVE()
-        return DeviceStatus.BOOTCOMPLETED
+        return DeviceStatus.READY
 
     def keep_device_ALIVE_he_is_ALIVE(self):
         # Updating watchdog
@@ -263,11 +252,16 @@ class Experiment:
 
     def check_device_online_or_wait_reboot(self):
 
+        # Check device health
         device_status = self.check_device_online()
+        Statistics.publishDeviceStatus(self.deviceserial, device_status)
+
+        # If the status is ok, exiting
         if device_status:
             return
 
         log.warning(self.me() + "Device " + self.deviceserial + " seems UNSTABLE !")
+        Statistics.publishDeviceStatus(self.deviceserial, DeviceStatus.WTF)
         print('\a') # BEEP
 
         if device_status == DeviceStatus.ONLINE or device_status == DeviceStatus.PACKAGE:
@@ -286,7 +280,8 @@ class Experiment:
 
         while True:
             device_status = self.check_device_online()
-            if device_status == DeviceStatus.BOOTCOMPLETED:
+            Statistics.publishDeviceStatus(self.deviceserial, device_status)
+            if device_status == DeviceStatus.READY:
                 break
             log.warning(self.me() + "Waiting device INDEFINITELY...")
             if device_status == DeviceStatus.ONLINE or device_status == DeviceStatus.PACKAGE:

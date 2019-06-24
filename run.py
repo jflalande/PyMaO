@@ -1,18 +1,19 @@
 from queue import Queue
 from threading import Thread
-from Producer import createJobs
-from Worker import doJob
+from workers.Producer import createJobs
+from workers.Worker import doJob
+from workers.StatisticsWorker import StatisticsWorker
 import time
 import logging
 import experiment
 import importlib
 import argparse
 import configparser
-
-
-# Adds a very verbose level of logs
-DEBUG_LEVELV_NUM = 9
-logging.addLevelName(DEBUG_LEVELV_NUM, "DEBUGV")
+import curses
+from utils.CursesHandler import CursesHandler
+import signal
+import sys
+import ast
 
 def setup_args():
     parser = argparse.ArgumentParser()
@@ -21,15 +22,6 @@ def setup_args():
                         help="config file")
 
     return parser.parse_args()
-
-def debugv(self, message, *args, **kws):
-    # Yes, logger takes its '*args' as 'args'.
-    if self.isEnabledFor(DEBUG_LEVELV_NUM):
-        self._log(DEBUG_LEVELV_NUM, message, args, **kws)
-
-
-logging.Logger.debugv = debugv
-log = logging.getLogger("orchestrator")
 
 def generateXP(s, *args, **kwargs):
     # Importing module experiment.s
@@ -42,24 +34,16 @@ def generateXP(s, *args, **kwargs):
     # We pass again the name of the XP as a first parameter s + other parameters
     return getattr(getattr(experiment,s), s)(s, *args, **kwargs)
 
-# Tries to apply colors to logs
-def applyColorsToLogs():
-    try:
-        import coloredlogs
+def debugv(self, message, *args, **kws):
+    # Yes, logger takes its '*args' as 'args'.
+    if self.isEnabledFor(DEBUG_LEVELV_NUM):
+        self._log(DEBUG_LEVELV_NUM, message, args, **kws)
 
-        style = coloredlogs.DEFAULT_LEVEL_STYLES
-        style['debugv'] = {'color': 'magenta'}
-        coloredlogs.install(
-            show_hostname=False, show_name=True,
-            logger=log,
-            level=DEBUG_LEVELV_NUM,
-            fmt='%(asctime)s [%(levelname)8s] %(message)s'
-            # Default format:
-            # fmt='%(asctime)s %(hostname)s %(name)s[%(process)d] %(levelname)s
-            #  %(message)s'
-        )
-    except ImportError:
-        log.error("Can't import coloredlogs, logs may not appear correctly.")
+# Adds a very verbose level of logs
+DEBUG_LEVELV_NUM = 9
+logging.addLevelName(DEBUG_LEVELV_NUM, "DEBUGV")
+logging.Logger.debugv = debugv
+log = logging.getLogger("orchestrator")
 
 def logSetup(level):
     if level == "veryverbose":
@@ -76,89 +60,168 @@ def logSetup(level):
         log.warning("Logging level \"{}\" not defined, setting \"normal\" instead"
                     .format(level))
 
+def restoreConsole():
+    curses.nocbreak(); stdscr.keypad(0); curses.echo()
+    curses.endwin()
+
+# Signal handler for Control+C
+# will restore console
+def signal_handler(sig, frame):
+    restoreConsole()
+    print('You pressed Ctrl+C!')
+    sys.exit(0)
+
+# Overrinding Ctrl+C
+signal.signal(signal.SIGINT, signal_handler)
+
 # For debugging purpose:
-applyColorsToLogs()
+#applyColorsToLogs()
+#logging.basicConfig(format='%(asctime)s [%(levelname)8s] %(message)s')
 
+try:
+    stdscr = curses.initscr()
+    curses.noecho()
+    curses.cbreak() # No enter needed
 
-# Reading args
-args = vars(setup_args())
+    curses.start_color()
+    curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
+    curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
+    curses.init_pair(3, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+    curses.init_pair(4, curses.COLOR_RED, curses.COLOR_BLACK)
 
-# Config reading
-confparser = configparser.ConfigParser()
+    stdscr.keypad(True) # Special key
 
-config_file = open(args["config"], "r")
-confparser.read_file(config_file)
+    screen = curses.initscr()
+    #screen.nodelay(1) # if used, will cause getch() to not wait.
+    maxy, maxx = screen.getmaxyx()
+    height = maxy - 2
+    width = maxx - 2
+    rightcol=30
+    log_width=width-rightcol
 
-# For debugging purpose:
-logSetup(confparser['general']['debug'])
+    screen.border('|', '|', '-', '-', '+', '+', '+', '+')
+    win_logs = curses.newwin(height, log_width, 1, 1)
+    #win_logs.border('|', '|', '-', '-', '+', '+', '+', '+')
 
-# For parameters of the running XP:
-NB_WORKERS = int(confparser['general']['nb_workers'])
-DEVICES = confparser['general']['devices']
-TMPFS = confparser['general']['tmpfs']
+    win_right = curses.newwin(height, rightcol, 1, log_width+1)
+    win_right.border('|', '|', '-', '-', '+', '+', '+', '+')
+    win_right.scrollok(True)
 
-# Displaying for the user
-log.debugv("ARGS: " + str(args))
-log.info("Reading config file: " + args["config"])
-log.info("General parameters")
-log.info("==================")
-log.info(" - nb_workers: " + str(NB_WORKERS))
-log.info(" - devices: " + str(DEVICES))
-log.info(" - tmpfs: " + str(TMPFS))
+    curses.setsyx(-1, -1)
+    screen.addstr(0, 20, "Malware XP orchestrator", curses.color_pair(4))
+    # Refresh: order is important
+    screen.refresh()
+    win_logs.refresh()
+    win_right.refresh()
+    win_logs.scrollok(True)
 
-# ==================================================
-log.info("XP parameters")
-log.info("=============")
-targetXP = confparser['xp']['targetXP']
-log.info(" - xp: " + str(targetXP))
-apkbase = confparser['xp']['apkbase']
-log.info(" - apkbase: " + str(apkbase))
-jsonbase = confparser['xp']['jsonbase']
-log.info(" - jsonbase: " + str(jsonbase))
-targetsymlink = confparser['xp']['targetsymlink']
-log.info(" - targetsymlink: " + str(targetsymlink))
+    # Add an handler for the log object for redirecting messages to win
+    mh = CursesHandler(win_logs)
+    #mh.setFormatter('%(asctime)s [%(levelname)8s] %(message)s')
+    log.addHandler(mh)
 
+    # Reading args
+    args = vars(setup_args())
 
-workers=[]
-t_start = time.time()
+    # Config reading
+    confparser = configparser.ConfigParser()
 
-malware_queue = Queue()
-xpModel = generateXP(targetXP, apkbase, jsonbase, targetsymlink, TMPFS)
-xpUsesADevice = xpModel.usesADevice()
-if len(DEVICES) < NB_WORKERS and xpUsesADevice:
-    log.error("No more workers than number of devices !")
-    quit()
+    config_file = open(args["config"], "r")
+    confparser.read_file(config_file)
 
-xp = generateXP(targetXP, apkbase, jsonbase, targetsymlink, TMPFS)
-xp.appendAnalysis()
-producer = Thread(target=createJobs, args=[malware_queue, xp])
-producer.start()
+    # For debugging purpose:
+    logSetup(confparser['general']['debug'])
 
-# Waiting the producer to work first (helps for debugging purpose)
-time.sleep(1)
+    # For parameters of the running XP:
+    NB_WORKERS = int(confparser['general']['nb_workers'])
+    DEVICES = ast.literal_eval(confparser['general']['devices'])
+    TMPFS = confparser['general']['tmpfs']
 
-# Creating workers
-for i in range(NB_WORKERS):
-    deviceserial = None
-    if xpUsesADevice:
-        deviceserial = DEVICES[i]
+    # Displaying for the user
+    log.debugv("ARGS: " + str(args))
+    log.info("Reading config file: " + args["config"])
+    log.info("General parameters")
+    log.info("==================")
+    log.info(" - nb_workers: " + str(NB_WORKERS))
+    log.info(" - devices: " + str(DEVICES))
+    log.info(" - tmpfs: " + str(TMPFS))
 
-    xp = generateXP(targetXP, apkbase, jsonbase, targetsymlink, TMPFS, deviceserial)
+    # ==================================================
+    log.info("XP parameters")
+    log.info("=============")
+    targetXP = confparser['xp']['targetXP']
+    log.info(" - xp: " + str(targetXP))
+    apkbase = confparser['xp']['apkbase']
+    log.info(" - apkbase: " + str(apkbase))
+    jsonbase = confparser['xp']['jsonbase']
+    log.info(" - jsonbase: " + str(jsonbase))
+    targetsymlink = confparser['xp']['targetsymlink']
+    log.info(" - targetsymlink: " + str(targetsymlink))
+
+    # Starts a thread for stats
+    stat_worker = StatisticsWorker(win_right, DEVICES)
+    stat_worker.start()
+
+    workers=[]
+    t_start = time.time()
+
+    malware_queue = Queue()
+    xpModel = generateXP(targetXP, apkbase, jsonbase, targetsymlink, TMPFS)
+    xpUsesADevice = xpModel.usesADevice()
+    if len(DEVICES) < NB_WORKERS and xpUsesADevice:
+        log.error("No more workers than number of devices !")
+        quit()
+
+    xp = generateXP(targetXP, apkbase, jsonbase, targetsymlink, TMPFS)
     xp.appendAnalysis()
-    worker = Thread(target=doJob, args=[malware_queue, xp, i+1])
-    worker.start()
-    workers.append(worker)
+    producer = Thread(target=createJobs, args=[malware_queue, xp])
+    producer.start()
 
-# Waiting the producer to finish
-producer.join()
+    # Waiting the producer to work first (helps for debugging purpose)
+    time.sleep(1)
 
-# Adding a fake job in the queue that will be consumed by workers
-for i in range(NB_WORKERS):
-    malware_queue.put("--END--")
+    # Creating workers
+    for i in range(NB_WORKERS):
+        deviceserial = None
+        if xpUsesADevice:
+            deviceserial = DEVICES[i]
 
-# Waiting all workers
-for worker in workers:
-    worker.join()
+        xp = generateXP(targetXP, apkbase, jsonbase, targetsymlink, TMPFS, deviceserial)
+        xp.appendAnalysis()
+        worker = Thread(target=doJob, args=[malware_queue, xp, i+1])
+        worker.start()
+        workers.append(worker)
 
-t_end = time.time()
-log.info("TIME: " + str(round(t_end - t_start,1)) + " s")
+    # Waiting the producer to finish
+    producer.join()
+
+    # Adding a fake job in the queue that will be consumed by workers
+    for i in range(NB_WORKERS):
+        malware_queue.put("--END--")
+
+    # Waiting all workers
+    for worker in workers:
+        worker.join()
+
+    stat_worker.end = True
+
+    t_end = time.time()
+    log.info("TIME: " + str(round(t_end - t_start,1)) + " s")
+    log.info("Press q for terminating.")
+
+    #log.warning("This is a warning")
+    #log.error("This is an error")
+
+    while True:
+        c = screen.getch()
+        if c == 113:
+           break
+
+        #log.info("Pressed: " + str(c))
+
+    restoreConsole()
+
+except RuntimeError as e:
+    restoreConsole()
+    print("ERROR")
+    print(e)

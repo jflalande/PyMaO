@@ -1,7 +1,7 @@
 import os
 import json
 import logging
-from experiment.Statistics import Statistics
+from utils.Statistics import Statistics
 from json import JSONDecodeError
 
 log = logging.getLogger("orchestrator")
