@@ -1,4 +1,7 @@
 import threading
+import copy
+import time
+import datetime
 from utils.DeviceStatus import DeviceStatus
 
 class Statistics():
@@ -7,6 +10,8 @@ class Statistics():
     totaljobs = 0
     lock = threading.Lock()
     device_status = {}
+    xp_result = {}
+    t_start = 0
 
     @staticmethod
     def incNbJobs():
@@ -60,3 +65,29 @@ class Statistics():
             status = DeviceStatus.OFFLINE
         Statistics.lock.release()
         return status
+
+    @staticmethod
+    def recordXPResult(analysis_name, jsonanalysis):
+        Statistics.lock.acquire()
+        status = jsonanalysis[analysis_name]["status"]
+        if analysis_name not in Statistics.xp_result:
+            Statistics.xp_result[analysis_name] = {"done": 0, "precond_false": 0, "failed": 0, "total": 0}
+        Statistics.xp_result[analysis_name][status] = Statistics.xp_result[analysis_name][status] + 1
+        Statistics.xp_result[analysis_name]["total"] = Statistics.xp_result[analysis_name]["total"] + 1
+        Statistics.lock.release()
+
+    @staticmethod
+    def getXPResult():
+        Statistics.lock.acquire()
+        xp_result = copy.copy(Statistics.xp_result)
+        Statistics.lock.release()
+        return xp_result
+
+    @staticmethod
+    def initTime():
+        Statistics.t_start = time.time()
+
+    @staticmethod
+    def getTime():
+        duration =  datetime.timedelta(seconds=time.time() - Statistics.t_start)
+        return str(duration).split(".")[0]

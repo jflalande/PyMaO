@@ -1,5 +1,6 @@
 import logging
 import curses
+from utils.Colors import Colors
 
 class CursesHandler(logging.Handler):
     def __init__(self, screen):
@@ -10,19 +11,19 @@ class CursesHandler(logging.Handler):
             LVL = ""
 
             if record.levelno == 20:
-                col = 1
+                col = Colors.WHITE
                 LVL = "INFO   "
             elif record.levelno >= 9 and record.levelno <= 10:
-                col = 2
+                col = Colors.YELLOW
                 LVL = "DEBUG  "
             elif record.levelno == 30:
-                col = 3
+                col = Colors.CYAN
                 LVL = "WARNING"
             else:
-                col = 4
+                col = Colors.RED
                 LVL = " ERROR "
-            #msg = str(record.levelno) + " | " + msg
-            msg = LVL + " | " + msg
-            screen = self.screen
-            screen.addstr(msg + "\n",  curses.color_pair(col))
-            screen.refresh()
+
+            self.screen.addstr(LVL, curses.color_pair(col))
+            self.screen.addstr(" | ", curses.color_pair(Colors.WHITE))
+            self.screen.addstr(msg + "\n",  curses.color_pair(col))
+            self.screen.refresh()

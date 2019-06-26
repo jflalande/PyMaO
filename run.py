@@ -1,5 +1,7 @@
 from queue import Queue
 from threading import Thread
+
+from utils.Statistics import Statistics
 from workers.Producer import createJobs
 from workers.Worker import doJob
 from workers.StatisticsWorker import StatisticsWorker
@@ -82,12 +84,14 @@ try:
     stdscr = curses.initscr()
     curses.noecho()
     curses.cbreak() # No enter needed
+    curses.curs_set(False)
 
     curses.start_color()
     curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
     curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
     curses.init_pair(3, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-    curses.init_pair(4, curses.COLOR_RED, curses.COLOR_BLACK)
+    curses.init_pair(4, curses.COLOR_CYAN, curses.COLOR_BLACK)
+    curses.init_pair(5, curses.COLOR_RED, curses.COLOR_BLACK)
 
     stdscr.keypad(True) # Special key
 
@@ -163,8 +167,8 @@ try:
     stat_worker.start()
 
     workers=[]
-    t_start = time.time()
 
+    Statistics.initTime()
     malware_queue = Queue()
     xpModel = generateXP(targetXP, apkbase, jsonbase, targetsymlink, TMPFS)
     xpUsesADevice = xpModel.usesADevice()
@@ -206,7 +210,8 @@ try:
     stat_worker.end = True
 
     t_end = time.time()
-    log.info("TIME: " + str(round(t_end - t_start,1)) + " s")
+    runtime = Statistics.getTime()
+    log.info("TIME: " + runtime )
     log.info("Press q for terminating.")
 
     #log.warning("This is a warning")

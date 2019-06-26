@@ -20,19 +20,23 @@ def doJob(queue, xp, worker_nb):
     setupHasBeenDone = False
 
     while True:
-        jsondata = queue.get()
-        Statistics.decNbJobs()
 
         # Preparing the device the first time and arming watchdog
         if not setupHasBeenDone:
             xp.setupDeviceUsingAdb()
             setupHasBeenDone = True
 
+        # Getting a job to perform
+        jsondata = queue.get()
+
         # End of jobs
         if jsondata == "--END--":
             if xp.usesADevice():
                 xp.cleanDeviceUsingAdb()
             break;
+
+        # This is a real job - we decrease the number of jobs instatistics
+        Statistics.decNbJobs()
 
         apkname = next(iter(jsondata))
         jsonanalyses = jsondata[apkname]
@@ -85,8 +89,13 @@ def doJob(queue, xp, worker_nb):
                         apkname) + ".apk ====")
                     analysis.run(analysis, analysis_name, apkname, jsonanalyses)
 
+            # Updating statistics
+            Statistics.recordXPResult(analysis_name, jsonanalyses)
+
         # Clean of the working directory
         xp.cleanWorkingDirectory()
+
+
 
         # Erasing .json file
         writeJson(apkname, xp, jsondata)
