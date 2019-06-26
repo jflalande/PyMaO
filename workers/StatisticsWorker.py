@@ -67,7 +67,7 @@ class StatisticsWorker(Thread):
             y = y + 1
             self.print_right(y, 2, 20, Colors.WHITE, "----------")
             y = y + 1
-            self.print_right(y, 2, 0, Colors.WHITE, "DONE ")
+            self.print_right(y, 2, 0, Colors.GREEN, "DONE ")
             self.print_right(y, 7, 0, Colors.YELLOW, "PREC ")
             self.print_right(y, 12, 0, Colors.RED, "FAIL ")
             self.print_right(y, 17, 0, Colors.WHITE, "TOTAL ")
@@ -77,7 +77,7 @@ class StatisticsWorker(Thread):
             for analysis in xp_result:
                 self.print_right(y, 2, 0, Colors.WHITE, analysis + ": ")
                 y = y + 1
-                l = self.print_right(y, 2, 0, Colors.WHITE, str(xp_result[analysis]["done"]))
+                l = self.print_right(y, 2, 0, Colors.GREEN, str(xp_result[analysis]["done"]))
                 l = l + self.print_right(y, 2 + l, 0, Colors.WHITE, " / ")
                 l = l + self.print_right(y, 2 + l, 0, Colors.YELLOW, str(xp_result[analysis]["precond_false"]))
                 l = l + self.print_right(y, 2 + l, 0, Colors.WHITE, " / ")
