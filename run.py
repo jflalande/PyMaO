@@ -161,6 +161,8 @@ try:
     log.info(" - jsonbase: " + str(jsonbase))
     targetsymlink = confparser['xp']['targetsymlink']
     log.info(" - targetsymlink: " + str(targetsymlink))
+    simulate_json_write = confparser['xp']['simulate_json_write']
+    log.info(" - simulate json write: " + str(simulate_json_write))
 
     # Starts a thread for stats
     stat_worker = StatisticsWorker(win_right, DEVICES)
@@ -170,13 +172,13 @@ try:
 
     Statistics.initTime()
     malware_queue = Queue()
-    xpModel = generateXP(targetXP, apkbase, jsonbase, targetsymlink, TMPFS)
+    xpModel = generateXP(targetXP, apkbase, jsonbase, targetsymlink, simulate_json_write, TMPFS)
     xpUsesADevice = xpModel.usesADevice()
     if len(DEVICES) < NB_WORKERS and xpUsesADevice:
         log.error("No more workers than number of devices !")
         quit()
 
-    xp = generateXP(targetXP, apkbase, jsonbase, targetsymlink, TMPFS)
+    xp = generateXP(targetXP, apkbase, jsonbase, targetsymlink, simulate_json_write, TMPFS)
     xp.appendAnalysis()
     producer = Thread(target=createJobs, args=[malware_queue, xp])
     producer.start()
@@ -190,7 +192,7 @@ try:
         if xpUsesADevice:
             deviceserial = DEVICES[i]
 
-        xp = generateXP(targetXP, apkbase, jsonbase, targetsymlink, TMPFS, deviceserial)
+        xp = generateXP(targetXP, apkbase, jsonbase, targetsymlink, simulate_json_write, TMPFS, deviceserial)
         xp.appendAnalysis()
         worker = Thread(target=doJob, args=[malware_queue, xp, i+1])
         worker.start()

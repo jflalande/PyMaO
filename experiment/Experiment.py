@@ -31,13 +31,15 @@ class Experiment:
     tid = "NONE"
     working_directory = "NONE"
 
-    def __init__(self, targetXP, apkbase, jsonbase, targetsymlink, tmpfs, deviceserial=None):
+    def __init__(self, targetXP, apkbase, jsonbase, targetsymlink, simulate_json_write, tmpfs, deviceserial=None):
         self.targetXP = targetXP
         self.apkbase = apkbase
         self.jsonbase = jsonbase
         self.targetsymlink = targetsymlink
         self.deviceserial = deviceserial
+        self.simulate_json_write = simulate_json_write
         self.tmpfs = tmpfs
+
 
         self.analyses = []
 

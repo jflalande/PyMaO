@@ -107,8 +107,11 @@ def doJob(queue, xp, worker_nb):
 def writeJson(name, xp, jsondata):
     jsonfilename = os.path.join(xp.jsonbase, name + ".json")
 
-    with open(jsonfilename, 'w') as json_file:
-        json.dump(jsondata, json_file, indent=4)
+    if not xp.simulate_json_write:
+        with open(jsonfilename, 'w') as json_file:
+            json.dump(jsondata, json_file, indent=4)
+    else:
+        log.warning("Worker: JSON SIMULATION Writing in " + str(jsonfilename) + ': ' + str(jsondata))
 
 
 def evaluatePreConditions(analysis_name, jsonanalyses, precondition):
