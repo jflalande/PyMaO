@@ -19,11 +19,11 @@ class Analysis:
 
     def run(self, analysis, analysis_name, basename, jsonanalyses):
         self.checkTMPFS()
-        ret =  self.analysis(analysis, analysis_name, basename, jsonanalyses)
+        ret = self.analysis(analysis, analysis_name, basename, jsonanalyses)
 
         # Update status of this analysis
         if ret:
-            self.updateJsonAnalyses(analysis_name, jsonanalyses,{"status": "done"})
+            self.updateJsonAnalyses(analysis_name, jsonanalyses, {"status": "done"})
         else:
             self.updateJsonAnalyses(analysis_name, jsonanalyses, {"status": "failed"})
             log.warning("Analysis " + analysis_name + " failed (" + basename + ")")

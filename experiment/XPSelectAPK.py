@@ -11,8 +11,8 @@ class XPSelectAPK(Experiment):
         self.analyses.append((SelectAPK(self), None))
 
         # Copying the APK that were selected
-        self.analyses.append((SymlinkAPK(self),
-                              [{"SelectAPK": {"selected": True}}]))
+        # self.analyses.append((SymlinkAPK(self),
+                              # [{"SelectAPK": {"selected": True}}]))
 
 
 

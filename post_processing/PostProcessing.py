@@ -105,6 +105,7 @@ def debugv(self, message, *args, **kws):
 logging.Logger.debugv = debugv
 log = logging.getLogger("post-processing")
 
+
 # Tries to apply colors to logs
 def applyColorsToLogs():
     try:
@@ -123,6 +124,7 @@ def applyColorsToLogs():
         )
     except ImportError:
         log.error("Can't import coloredlogs, logs may not appear correctly.")
+
 
 def logSetup(level):
     # if -vv option as program argument
