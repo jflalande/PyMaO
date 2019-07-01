@@ -36,6 +36,11 @@ class Androguard(Analysis):
 
         self.updateJsonAnalyses(analysis_name, jsonanalyses, {"target_api": target_sdk})
 
+        min_sdk = a.get_min_sdk_version()
+        log.debug("Minimum API: " + str(min_sdk))
+
+        self.updateJsonAnalyses(analysis_name, jsonanalyses, {"min_api": min_sdk})
+
         classes = list(dx.get_classes())
 
         log.debug("Number of classes found: " + str(len(classes)))
@@ -68,6 +73,35 @@ class Androguard(Analysis):
         self.updateJsonAnalyses(analysis_name, jsonanalyses, {"classes": classes_name})
         self.updateJsonAnalyses(analysis_name, jsonanalyses, {"methods": methods_name})
         self.updateJsonAnalyses(analysis_name, jsonanalyses, {"api_methods": api_methods_name})
+
+        # Intents
+
+        intent_filters = {'activities': {}, 'services': {}, 'receivers': {}}
+
+        # From activities
+
+        for activity in a.get_activities():
+            intents = a.get_intent_filters('activity', activity)
+            if len(intents):
+                intent_filters['activities'][activity] = intents
+
+        # From services
+
+        for service in a.get_services():
+            intents = a.get_intent_filters('service', service)
+            if len(intents):
+                intent_filters['services'][service] = intents
+
+        # From receivers
+
+        for receiver in a.get_receivers():
+            intents = a.get_intent_filters('receiver', receiver)
+            if len(intents):
+                intent_filters['receivers'][receiver] = intents
+
+        self.updateJsonAnalyses(analysis_name, jsonanalyses, {"intent_filters": intent_filters})
+
+        # a.get_intent_filters('activity',act0)
 
         # def take_apk(apk):
             # take apk to a list
