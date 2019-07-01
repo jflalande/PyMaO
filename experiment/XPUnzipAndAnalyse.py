@@ -25,7 +25,7 @@ class XPUnzipAndAnalyse(Experiment):
     def appendAnalysis(self):
 
         # Run GetAPKSize
-        self.analyses.append((GetAPKSize(self),None))
+        self.analyses.append((GetAPKSize(self), None))
 
         # Run GetManifAndDexDates
         self.analyses.append((GetManifAndDexDates(self), None))

@@ -33,7 +33,7 @@ class GetManifAndDexDates(Analysis):
         os.stat_float_times(False)
         # manif_date = os.path.getmtime(unzip_path + "/AndroidManifest.xml")
 
-        command = "unzip -l \"" + jsonanalyses["filename"] + ".apk\" 2> /dev/null " #| grep -E 'AndroidManifest.xml' | head -n 1 | awk '{print $2\" \"$3}' | tr -d '\n\r'"
+        command = "unzip -l \"" + jsonanalyses["filename"] + "\" 2> /dev/null " #| grep -E 'AndroidManifest.xml' | head -n 1 | awk '{print $2\" \"$3}' | tr -d '\n\r'"
 
         errcode, res = self.xp.exec_in_subprocess(command, cwd=True)
 
@@ -57,7 +57,7 @@ class GetManifAndDexDates(Analysis):
 
         self.updateJsonAnalyses(analysis_name, jsonanalyses, {"manif_date": manif_date})
 
-        command = "unzip -l \"" + jsonanalyses["filename"] + ".apk\" 2> /dev/null " # | grep -E 'classes.dex' | head -n 1 | awk '{print $2\" \"$3}' | tr -d '\n\r'"
+        command = "unzip -l \"" + jsonanalyses["filename"] + "\" 2> /dev/null " # | grep -E 'classes.dex' | head -n 1 | awk '{print $2\" \"$3}' | tr -d '\n\r'"
         errcode, res = self.xp.exec_in_subprocess(command, cwd=True)
 
         if errcode != 0:

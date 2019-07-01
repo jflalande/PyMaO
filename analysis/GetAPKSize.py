@@ -20,13 +20,13 @@ class GetAPKSize(Analysis):
 
         # -b : print size in octets (kyloctets by default)
         # -L : dereferenc the symbolic link, get the size of the reference
-        command = "du -bL \"" + jsonanalyses["filename"]
+        command = "du -bL \"" + jsonanalyses["filename"] + "\""
 
-        log.debug("The command is "+command)
+        log.debugv("The command is "+command)
 
         errcode, res = self.xp.exec_in_subprocess(command, cwd=True)
 
-        log.debug("Got: " + str(res))
+        log.debugv("Got: " + str(res))
 
         size = res.strip().split()[0]
 
@@ -34,4 +34,4 @@ class GetAPKSize(Analysis):
 
         self.updateJsonAnalyses(analysis_name, jsonanalyses, {"size": size})
 
-        return 1
+        return errcode == 0
