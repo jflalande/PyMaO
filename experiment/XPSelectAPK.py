@@ -17,7 +17,7 @@ class XPSelectAPK(Experiment):
         self.analyses.append((GetManifAndDexDates(self), [{"GetAPKSize": {"status": "done"}}]))
 
         # Run Androguard (API level)
-        self.analyses.append((Androguard(self), [{"GetManifAndDexDates": {"status": "done"}}]))
+        self.analyses.append((Androguard(self), [{"GetAPKSize": {"status": "done"}}]))
 
         # Run SelectAPK
         # self.analyses.append((SelectAPK(self), [{"Androguard": {"status": "done"}}]))
