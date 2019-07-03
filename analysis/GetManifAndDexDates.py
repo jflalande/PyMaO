@@ -44,13 +44,22 @@ class GetManifAndDexDates(Analysis):
             else:
                 log.warning("unzip returned " + str(errcode))
         else:
-            log.debug("unzip manifest succesful: got \'" + str(res) + "\'")
+            log.debug("unzip manifest successful: got \'" + str(res) + "\'")
 
         date = grep_date_unzip(res,"AndroidManifest.xml")
         
         if date:
-            manif_date = date2epoch(date)
-            log.debug("The manifest modification time is " + epoch2date(manif_date) )
+            try:
+                manif_date = date2epoch(date)
+            except Exception as e:
+                excp_name = str(type(e).__name__)
+                excp_module = str(e.__module__)
+                my_e = str(excp_module + "." + excp_name + ": " + str(e))
+                self.updateJsonAnalyses(analysis_name, jsonanalyses, {"analyzed": False})
+                self.updateJsonAnalyses(analysis_name, jsonanalyses, {"error": my_e})
+                log.warning("Couldn't get the date from the APK: " + my_e)
+                return True
+            log.debug("The manifest modification time is " + epoch2date(manif_date))
         else:
             log.debug("The APK file doesn't contain a AndroidManifest.xml file")
             manif_date = ""
@@ -69,11 +78,20 @@ class GetManifAndDexDates(Analysis):
         else:
             log.debug("unzip dex succesful: got '" + str(res) + "'")
 
-        date = grep_date_unzip(res,"classes.dex")
+        date = grep_date_unzip(res, "classes.dex")
 
         if date:
-            dex_date = date2epoch(date)
-            log.debug("The classes.dex modification time is " + epoch2date(dex_date) )
+            try:
+                dex_date = date2epoch(date)
+            except Exception as e:
+                excp_name = str(type(e).__name__)
+                excp_module = str(e.__module__)
+                my_e = str(excp_module + "." + excp_name + ": " + str(e))
+                self.updateJsonAnalyses(analysis_name, jsonanalyses, {"analyzed": False})
+                self.updateJsonAnalyses(analysis_name, jsonanalyses, {"error": my_e})
+                log.warning("Couldn't get the date from the APK: " + my_e)
+                return True
+            log.debug("The classes.dex modification time is " + epoch2date(dex_date))
         else:
             log.debug("The APK file doesn't contain any classes.dex file")
             dex_date = ""
