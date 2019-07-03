@@ -51,10 +51,10 @@ class GetManifAndDexDates(Analysis):
         if date:
             try:
                 manif_date = date2epoch(date)
-            except Exception as e:
+            except ValueError as e:
                 excp_name = str(type(e).__name__)
-                excp_module = str(e.__module__)
-                my_e = str(excp_module + "." + excp_name + ": " + str(e))
+                # excp_module = str(e.__module__)
+                my_e = str(excp_name + ": " + str(e))
                 self.updateJsonAnalyses(analysis_name, jsonanalyses, {"analyzed": False})
                 self.updateJsonAnalyses(analysis_name, jsonanalyses, {"error": my_e})
                 log.warning("Couldn't get the date from the APK: " + my_e)
@@ -83,10 +83,11 @@ class GetManifAndDexDates(Analysis):
         if date:
             try:
                 dex_date = date2epoch(date)
-            except Exception as e:
+            except ValueError as e:
                 excp_name = str(type(e).__name__)
-                excp_module = str(e.__module__)
-                my_e = str(excp_module + "." + excp_name + ": " + str(e))
+                # excp_module = str(e.__module__)
+                # my_e = str(excp_module + "." + excp_name + ": " + str(e))
+                my_e = str(excp_name + ": " + str(e))
                 self.updateJsonAnalyses(analysis_name, jsonanalyses, {"analyzed": False})
                 self.updateJsonAnalyses(analysis_name, jsonanalyses, {"error": my_e})
                 log.warning("Couldn't get the date from the APK: " + my_e)
