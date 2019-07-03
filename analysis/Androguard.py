@@ -14,7 +14,6 @@ import re
 log = logging.getLogger("orchestrator")
 
 
-
 class Androguard(Analysis):
 
     testStaticVariable = 0
@@ -39,7 +38,8 @@ class Androguard(Analysis):
             'activity': {},
             'activity-alias': {},
             'service': {},
-            'receiver': {}
+            'receiver': {},
+            'provider': {}
         }
 
         # Upper bound for the dataset
@@ -144,8 +144,11 @@ class Androguard(Analysis):
 
         except Exception as e:
             excp_name = str(type(e).__name__)
-            excp_module = str(e.__module__)
-            my_e = str(excp_module + "." + excp_name + ": " + str(e))
+            if hasattr(e, '__module__'):
+                excp_module = str(e.__module__)
+                my_e = str(excp_module + "." + excp_name + ": " + str(e))
+            else:
+                my_e = str(excp_name + ": " + str(e))
             self.updateJsonAnalyses(analysis_name, jsonanalyses, {"analyzed": False})
             self.updateJsonAnalyses(analysis_name, jsonanalyses, {"error": my_e})
             log.warning("Couldn't decode with Androguard: " + my_e)
