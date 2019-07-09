@@ -21,6 +21,7 @@ import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.ticker as ticker
+import guess_distribution as gd
 
 from math import floor, log as loga
 """
@@ -153,10 +154,12 @@ applyColorsToLogs()
 #                                                                              #
 ################################################################################
 
+
 def epoch_to_date(epoch):
     return datetime.datetime.fromtimestamp(epoch).strftime('%Y-%m-%d %H:%M:%S')
 
 os.stat_float_times(False)
+
 
 def output_histograms(datasets,histograms_def,output_dir):
 
@@ -169,7 +172,7 @@ def output_histograms(datasets,histograms_def,output_dir):
 
     for histogram_name in histograms_def:
         log.info("Processing histogram " + histogram_name)
-        joint_histogram = {}
+        # joint_histogram = {}
         joint_histogram = { 'type':histograms_def[histogram_name][1], 'data':{} }
 
         # rows = []
@@ -215,7 +218,7 @@ def output_histograms(datasets,histograms_def,output_dir):
 
                 plot_data = mdates.epoch2num(data)
 
-                fig, ax = plt.subplots(1,1, figsize=(300, 40), facecolor='white')
+                fig, ax = plt.subplots(1, 1, figsize=(300, 40), facecolor='white')
                 # fig, ax = plt.subplots(1,1,facecolor='white')
                 ax.hist(plot_data, bins=mybins, ec='black')
                 ax.set_title(histogram_name + " - " + row_name)
@@ -229,10 +232,14 @@ def output_histograms(datasets,histograms_def,output_dir):
                 # Ajust bins
                 max_exp = int(floor(loga(max(data),10)))
                 binwidth = 10**(max_exp - 3)
+                bins = np.arange(min(data), max(data) + binwidth, binwidth),
 
-                ax.hist(data, bins=np.arange(min(data), max(data) + binwidth, binwidth), ec='black')
+                ax.hist(data, bins=bins, ec='black')
+                guessed_dist, params = gd.best_fit_distribution(data)
+
+                # ax.plot(data, )
                 ax.set_title(histogram_name + " - " + row_name)
-                ax.set_xlim(left=0) # Start at left zero
+                ax.set_xlim(left=0)  # Start at left zero
                 ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ','))) # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
                 ax.xaxis.set_major_locator(ticker.MultipleLocator(binwidth*10))
                 plt.xticks(rotation=45) # Rotate x ticks
