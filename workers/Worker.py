@@ -105,9 +105,9 @@ def doJob(queue, xp, worker_nb):
 
 """Rewrites the JSON file for an apk"""
 def writeJson(name, xp, jsondata):
-    jsonfilename = os.path.join(xp.jsonbase, name + ".json")
+    jsonfilename = os.path.join(xp.config.jsonbase, name + ".json")
 
-    if xp.simulate_json_write.lower() == "false":
+    if xp.config.simulate_json_write.lower() == "false":
         with open(jsonfilename, 'w') as json_file:
             json.dump(jsondata, json_file, indent=4)
     else:

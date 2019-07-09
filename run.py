@@ -5,12 +5,12 @@ from utils.Statistics import Statistics
 from workers.Producer import createJobs
 from workers.Worker import doJob
 from workers.StatisticsWorker import StatisticsWorker
+from utils.Config import Config
 import time
 import logging
 import experiment
 import importlib
 import argparse
-import configparser
 import curses
 from utils.CursesHandler import CursesHandler
 import signal
@@ -25,7 +25,7 @@ def setup_args():
 
     return parser.parse_args()
 
-def generateXP(s, *args, **kwargs):
+def generateXP(s, config, deviceserial=None):
     # Importing module experiment.s
     full_module_name = "experiment." + s
 
@@ -34,7 +34,7 @@ def generateXP(s, *args, **kwargs):
 
     # Generating object
     # We pass again the name of the XP as a first parameter s + other parameters
-    return getattr(getattr(experiment,s), s)(s, *args, **kwargs)
+    return getattr(getattr(experiment,s), s)(config, deviceserial=deviceserial)
 
 def debugv(self, message, *args, **kws):
     # Yes, logger takes its '*args' as 'args'.
@@ -127,58 +127,46 @@ try:
     # Reading args
     args = vars(setup_args())
 
-    # Config reading
-    confparser = configparser.ConfigParser()
-
-    config_file = open(args["config"], "r")
-    confparser.read_file(config_file)
+    # Config
+    config = Config(args["config"])
 
     # For debugging purpose:
-    logSetup(confparser['general']['debug'])
-
-    # For parameters of the running XP:
-    NB_WORKERS = int(confparser['general']['nb_workers'])
-    DEVICES = ast.literal_eval(confparser['general']['devices'])
-    TMPFS = confparser['general']['tmpfs']
+    logSetup(config.debug)
 
     # Displaying for the user
     log.debugv("ARGS: " + str(args))
     log.info("Reading config file: " + args["config"])
     log.info("General parameters")
     log.info("==================")
-    log.info(" - nb_workers: " + str(NB_WORKERS))
-    log.info(" - devices: " + str(DEVICES))
-    log.info(" - tmpfs: " + str(TMPFS))
+    log.info(" - nb_workers: " + str(config.nb_workers))
+    log.info(" - devices: " + str(config.devices))
+    log.info(" - tmpfs: " + str(config.tmpfs))
+    log.info(" - sdkhome: " + str(config.sdkhome))
 
     # ==================================================
     log.info("XP parameters")
     log.info("=============")
-    targetXP = confparser['xp']['targetXP']
-    log.info(" - xp: " + str(targetXP))
-    apkbase = confparser['xp']['apkbase']
-    log.info(" - apkbase: " + str(apkbase))
-    jsonbase = confparser['xp']['jsonbase']
-    log.info(" - jsonbase: " + str(jsonbase))
-    targetsymlink = confparser['xp']['targetsymlink']
-    log.info(" - targetsymlink: " + str(targetsymlink))
-    simulate_json_write = confparser['xp']['simulate_json_write']
-    log.info(" - simulate json write: " + str(simulate_json_write))
+    log.info(" - xp: " + str(config.targetXP))
+    log.info(" - apkbase: " + str(config.apkbase))
+    log.info(" - jsonbase: " + str(config.jsonbase))
+    log.info(" - targetsymlink: " + str(config.targetsymlink))
+    log.info(" - simulate json write: " + str(config.simulate_json_write))
 
     # Starts a thread for stats
-    stat_worker = StatisticsWorker(win_right, DEVICES)
+    stat_worker = StatisticsWorker(win_right, config.devices)
     stat_worker.start()
 
     workers=[]
 
     Statistics.initTime()
     malware_queue = Queue()
-    xpModel = generateXP(targetXP, apkbase, jsonbase, targetsymlink, simulate_json_write, TMPFS)
+    xpModel = generateXP(config.targetXP, config)
     xpUsesADevice = xpModel.usesADevice()
-    if len(DEVICES) < NB_WORKERS and xpUsesADevice:
+    if len(config.devices) < config.nb_workers and xpUsesADevice:
         log.error("No more workers than number of devices !")
         quit()
 
-    xp = generateXP(targetXP, apkbase, jsonbase, targetsymlink, simulate_json_write, TMPFS)
+    xp = generateXP(config.targetXP, config)
     xp.appendAnalysis()
     producer = Thread(target=createJobs, args=[malware_queue, xp])
     producer.start()
@@ -187,12 +175,12 @@ try:
     time.sleep(1)
 
     # Creating workers
-    for i in range(NB_WORKERS):
+    for i in range(config.nb_workers):
         deviceserial = None
         if xpUsesADevice:
-            deviceserial = DEVICES[i]
+            deviceserial = config.devices[i]
 
-        xp = generateXP(targetXP, apkbase, jsonbase, targetsymlink, simulate_json_write, TMPFS, deviceserial)
+        xp = generateXP(config.targetXP, config, deviceserial=deviceserial)
         xp.appendAnalysis()
         worker = Thread(target=doJob, args=[malware_queue, xp, i+1])
         worker.start()
@@ -202,7 +190,7 @@ try:
     producer.join()
 
     # Adding a fake job in the queue that will be consumed by workers
-    for i in range(NB_WORKERS):
+    for i in range(config.nb_workers):
         malware_queue.put("--END--")
 
     # Waiting all workers
