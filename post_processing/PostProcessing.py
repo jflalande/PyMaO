@@ -22,6 +22,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.ticker as ticker
 import guess_distribution as gd
+import scipy.stats as st
 
 from math import floor, log as loga
 """
@@ -237,7 +238,14 @@ def output_histograms(datasets,histograms_def,output_dir):
                 ax.hist(data, bins=bins, ec='black')
                 guessed_dist, params = gd.best_fit_distribution(data)
 
-                # ax.plot(data, )
+                arg = params[:-2]
+                loc = params[-2]
+                scale = params[-1]
+
+                # my_dist = st.gennorm(loc=loc, scale=scale, *arg)
+                my_dist = guessed_dist(loc=loc, scale=scale, *arg)
+
+                ax.plot(data, my_dist.pdf(data, *arg), 'r-')
                 ax.set_title(histogram_name + " - " + row_name)
                 ax.set_xlim(left=0)  # Start at left zero
                 ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ','))) # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
@@ -397,11 +405,11 @@ def output_to_files(datasets,out_dir):
     # Create names for columns in workbook
     for row_name in datasets:
         row = datasets[row_name]
-        ws.cell(row=row_num,column=2,value="Total")
+        ws.cell(row=row_num, column=2, value="Total")
         col_num = 3
         for column in row.columns:
-            ws.cell(row=row_num,column=col_num,value=column.name)
-            ws.merge_cells(start_row=row_num,start_column=col_num,end_row=row_num,end_column=col_num+1)
+            ws.cell(row=row_num, column=col_num, value=column.name)
+            ws.merge_cells(start_row=row_num, start_column=col_num, end_row=row_num, end_column=col_num+1)
             col_num += 2
 
     row_num += 1
@@ -470,6 +478,7 @@ def output_to_files(datasets,out_dir):
     # else:
     #     log.warning("file already written. finishing")
 
+
 def topN(dico,N,poll_type):
     if poll_type == 'top':
         res = dict(Counter(dico).most_common(N))
@@ -482,6 +491,7 @@ def topN(dico,N,poll_type):
 #                          Row and column definition                           #
 #                                                                              #
 ################################################################################
+
 
 class Column:
     def __init__(self,name,parent_row,req,depend=None):
