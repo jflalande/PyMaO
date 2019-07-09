@@ -31,15 +31,9 @@ class Experiment:
     tid = "NONE"
     working_directory = "NONE"
 
-    def __init__(self, targetXP, apkbase, jsonbase, targetsymlink, simulate_json_write, tmpfs, deviceserial=None):
-        self.targetXP = targetXP
-        self.apkbase = apkbase
-        self.jsonbase = jsonbase
-        self.targetsymlink = targetsymlink
+    def __init__(self, config, deviceserial=None):
+        self.config = config
         self.deviceserial = deviceserial
-        self.simulate_json_write = simulate_json_write
-        self.tmpfs = tmpfs
-
 
         self.analyses = []
 
@@ -48,23 +42,23 @@ class Experiment:
         return False
 
     def setupWorkingDirectory(self):
-        log.debugv("Creating working directory " + self.tmpfs + "/" + self.tid)
+        log.debugv("Creating working directory " + self.config.tmpfs + "/" + self.tid)
         try:
-            os.mkdir(self.tmpfs + "/" + self.tid)
-            self.working_directory = self.tmpfs + "/" + self.tid
+            os.mkdir(self.config.tmpfs + "/" + self.tid)
+            self.working_directory = self.config.tmpfs + "/" + self.tid
         except:
-            raise Exception("Error creating directory " + self.tmpfs + "/" + self.tid)
+            raise Exception("Error creating directory " + self.config.tmpfs + "/" + self.tid)
 
     def cleanWorkingDirectory(self):
         log.debugv("Cleaning TMPFS for pid " + self.tid)
-        shutil.rmtree(self.tmpfs + "/" + self.tid)
+        #shutil.rmtree(self.config.tmpfs + "/" + self.tid)
 
     def cleanTMPFSDirectory(self):
         log.info("Cleaning TMPFS")
-        for the_file in os.listdir(self.tmpfs):
+        for the_file in os.listdir(self.config.tmpfs):
             # Cannot use shutil because some APK have too many folders
             # shutil.rmtree(self.tmpfs + "/" + the_file)
-            command = "rm -Rf " + self.tmpfs + "/" + the_file
+            command = "rm -Rf " + self.config.tmpfs + "/" + the_file
             errcode, res = self.exec_in_subprocess(command, shell=True)
             if errcode != 0:
                 log.error("Error deleting files in TMPFS: " + command)
@@ -129,7 +123,7 @@ class Experiment:
     """
     def adb_send_command(self, command, donotcaptureoutput=False):
         """ Send a command to this device (by default through ADB). """
-        tool_command = [self.SDKHOME + "/platform-tools/adb", "-s", self.deviceserial] + command
+        tool_command = [self.config.sdkhome + "/platform-tools/adb", "-s", self.deviceserial] + command
         log.debug("Sending command: " + str(tool_command))
         exitcode, out = self.exec_in_subprocess(tool_command, donotcaptureoutput=donotcaptureoutput, shell=False)
         return exitcode, out

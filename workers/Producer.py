@@ -18,8 +18,8 @@ def createJobs(queue, xp):
     # Cleaning TMPFS
     xp.cleanTMPFSDirectory()
 
-    log.info("Producer: iterating over apk files in " + str(xp.apkbase) + " - It can take some time...")
-    for filename in getRecursiveFilenames(xp.apkbase):
+    log.info("Producer: iterating over apk files in " + str(xp.config.apkbase) + " - It can take some time...")
+    for filename in getRecursiveFilenames(xp.config.apkbase):
         if filename.endswith(".apk"):
             log.debugv("Producer: doing " + filename)
             basename = getMalwareName(filename)
@@ -86,7 +86,7 @@ def getMalwareName(filename):
     return os.path.splitext(os.path.basename(filename))[0]
 
 def readJson(name, xp):
-    jsonfilename = os.path.join(xp.jsonbase, name + ".json")
+    jsonfilename = os.path.join(xp.config.jsonbase, name + ".json")
     log.debugv("Producer: will read JSON " + str(jsonfilename))
 
     try:
