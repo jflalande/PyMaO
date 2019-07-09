@@ -55,7 +55,7 @@ class BuildMethodsCFG(Analysis):
         command=command_chdir+" ;  "+command_java
 
 
-        errcode, res = self.xp.exec_in_subprocess(command, cwd=True)
+        errcode, res = self.xp.exec_in_subprocess(command, cwd=True, logOutputs=True)
 
 
         cfg = pgv.AGraph(output_dir + "/call-graph.dot")

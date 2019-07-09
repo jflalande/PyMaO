@@ -51,7 +51,7 @@ class Experiment:
 
     def cleanWorkingDirectory(self):
         log.debugv("Cleaning TMPFS for pid " + self.tid)
-        #shutil.rmtree(self.config.tmpfs + "/" + self.tid)
+        shutil.rmtree(self.config.tmpfs + "/" + self.tid)
 
     def cleanTMPFSDirectory(self):
         log.info("Cleaning TMPFS")
@@ -72,7 +72,7 @@ class Experiment:
     For commands that manipulates the output, the output should not be captured. For this purpose the
     donotcpatureoutput arguments helps to achieve this.
     '''
-    def exec_in_subprocess(self, cmd, donotcaptureoutput=False, cwd=None, shell=True):
+    def exec_in_subprocess(self, cmd, donotcaptureoutput=False, cwd=None, shell=True, logOutputs=False):
 
         log.debugv('Subprocess: ' + str(cmd))
         if cwd:
@@ -109,6 +109,9 @@ class Experiment:
 
         log.debugv("Result of subprocess:")
         log.debugv("Out: " + out)
+        if logOutputs:
+            with open(self.working_directory + "/log", "w") as logf:
+                logf.write(out)
         log.debugv("Exit code: " + str(exitcode))
         return exitcode, out
 
