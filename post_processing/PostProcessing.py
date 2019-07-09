@@ -17,11 +17,11 @@ from openpyxl import Workbook   # For outputing results in xlsx (Excel format)
 import datetime as dt
 
 import numpy as np
-import matplotlib.mlab as mlab
+# import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.ticker as ticker
-import guess_distribution as gd
+# import guess_distribution as gd
 import scipy.stats as st
 
 from math import floor, log as loga
@@ -189,8 +189,9 @@ def output_histograms(datasets,histograms_def,output_dir):
             # Print individual histograms
             # Verify if there are histograms to output
             # if len(row.histogram_collection.keys()) != 0:
-                # for histogram_name in row.histogram_collection:
-                # def output_histograms(data,output_dir):
+            #     for histogram_name in row.histogram_collection:
+            #     def output_histograms(data,output_dir):
+
             data = row.histogram_collection[histogram_name]['data']
 
             log.debugv("Data size is " + str(len(data)))
@@ -230,25 +231,52 @@ def output_histograms(datasets,histograms_def,output_dir):
                 ax.xaxis.set_major_formatter(mdates.DateFormatter('%m.%y'))
                 fig.autofmt_xdate()
             elif hist_type == 'int':
-                log.debug("Histogram " + histogram_name + " is type int")
+                log.debug("Histogram " + histogram_name + " for " + row_name + " is type int")
+                log.info("Histogram " + histogram_name + " for " + row_name + " is type int")
                 fig, ax = plt.subplots(1, 1, figsize=(200, 40))
                 # fig, ax = plt.subplots(1,1)
                 # Ajust bins
                 max_exp = int(floor(loga(max(data), 10)))
                 binwidth = 10**(max_exp - 3)
-                bins = np.arange(min(data), max(data) + binwidth, binwidth),
+                bins = np.arange(min(data), max(data) + binwidth, binwidth)
 
-                ax.hist(data, bins=bins, ec='black')
-                guessed_dist, params = gd.best_fit_distribution(data)
+                # ax.hist(data, bins=bins, ec='black')
+
+                # guessed_dist, params = gd.best_fit_distribution(data)
+
+                guessed_dist = st.gennorm
+                # my_params = (0.3324494702448755, 1808293.0000002861, 71602.6687589449)
+                params = guessed_dist.fit(data)
+
+                # log.info(my_params == params)
+                # log.info("my_params: " + str(my_params))
+                log.info("params:    " + str(params))
 
                 arg = params[:-2]
+                # loc: the mean of the distribution
                 loc = params[-2]
+                # scale: the standard deviation of the distribution
                 scale = params[-1]
 
-                # my_dist = st.gennorm(loc=loc, scale=scale, *arg)
-                my_dist = guessed_dist(loc=loc, scale=scale, *arg)
+                my_rv = guessed_dist(*arg, loc=loc, scale=scale)
 
-                ax.plot(data, my_dist.pdf(data, *arg), 'r-')
+                # ax.hist(data, bins=bins, ec='black')
+
+                # Option 1 (doesn't work)
+                x = np.linspace(0, 5000)
+                ax.plot(x, my_rv.pdf(x), 'r-', lw=2)
+
+                # Option 2 ("scale" is not ajusted)
+                # x = np.linspace(guessed_dist.ppf(0.01, *arg), guessed_dist.ppf(0.99, *arg), 5000)
+                # # x = guessed_dist.rvs(*arg, 5000)
+                # ax.plot(x, guessed_dist.pdf(x, *arg), 'r-', lw=5)
+
+                # ax.plot(data, my_dist.pdf(data), 'r-', lw=5)
+                # ax.plot(data, guessed_dist.pdf(data, *arg, loc=loc, scale=scale), 'r-', lw=5)
+                # ax.plot(data, my_dist.pdf(data), 'r-', lw=5)
+
+                # ax.plot(data, guessed_dist.pdf(data, *arg), 'g-', lw=5)
+
                 ax.set_title(histogram_name + " - " + row_name)
                 ax.set_xlim(left=0)  # Start at left zero
                 ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ',')))  # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
@@ -273,119 +301,120 @@ def output_histograms(datasets,histograms_def,output_dir):
             # print("Figure clear")
 
         # Draw joint histogram
+        if len(datasets) > 1:
 
-        # ax.hist(dataset_list, bins, label=['x', 'y'])
-        label = []
-        data = []
-        mix_data = []
+            # ax.hist(dataset_list, bins, label=['x', 'y'])
+            label = []
+            data = []
+            mix_data = []
 
-        for row_name in joint_histogram['data']:
-            log.debug("Getting " + row_name)
-            label.append(row_name)
-            row_data = joint_histogram['data'][row_name]
-            # print(str(row_name) + " is of type " + str(type(row_data)))
-            data.append(row_data)
-            mix_data.extend(row_data)
+            for row_name in joint_histogram['data']:
+                log.debug("Getting " + row_name)
+                label.append(row_name)
+                row_data = joint_histogram['data'][row_name]
+                # print(str(row_name) + " is of type " + str(type(row_data)))
+                data.append(row_data)
+                mix_data.extend(row_data)
 
-        log.debug("dataset has " + str(len(data)) + " entries")
+            log.debug("dataset has " + str(len(data)) + " entries")
 
-        for num in data:
-            # print("num is " + str(num))
-            log.debug("The size of num is " + str(len(num)))
+            for num in data:
+                # print("num is " + str(num))
+                log.debug("The size of num is " + str(len(num)))
 
-        s = "+"
-        joint = s.join(label)
+            s = "+"
+            joint = s.join(label)
 
-        if hist_type == 'date':
-            log.debug("Histogram " + histogram_name + " is type date")
-            # Processing the dates to get the maximun and minimum month-year
-            mindate = dt.datetime.fromtimestamp(min(mix_data))
-            maxdate = dt.datetime.fromtimestamp(max(mix_data))
-            bindate = dt.datetime(year=mindate.year, month=mindate.month, day=1)
-            mybins = [bindate.timestamp()]
-            while bindate < maxdate:
-                if bindate.month == 12:
-                    bindate = dt.datetime(year=bindate.year + 1, month=1, day=1)
-                else:
-                    bindate = dt.datetime(year=bindate.year, month=bindate.month + 1, day=1)
-                mybins.append(bindate.timestamp())
-            mybins = mdates.epoch2num(mybins)
+            if hist_type == 'date':
+                log.debug("Histogram " + histogram_name + " is type date")
+                # Processing the dates to get the maximun and minimum month-year
+                mindate = dt.datetime.fromtimestamp(min(mix_data))
+                maxdate = dt.datetime.fromtimestamp(max(mix_data))
+                bindate = dt.datetime(year=mindate.year, month=mindate.month, day=1)
+                mybins = [bindate.timestamp()]
+                while bindate < maxdate:
+                    if bindate.month == 12:
+                        bindate = dt.datetime(year=bindate.year + 1, month=1, day=1)
+                    else:
+                        bindate = dt.datetime(year=bindate.year, month=bindate.month + 1, day=1)
+                    mybins.append(bindate.timestamp())
+                mybins = mdates.epoch2num(mybins)
 
-            # plot_data = mdates.epoch2num(data)
-            plot_data = []
-            for list in data:
-                plot_data.append(mdates.epoch2num(list))
+                # plot_data = mdates.epoch2num(data)
+                plot_data = []
+                for list in data:
+                    plot_data.append(mdates.epoch2num(list))
 
-            fig, ax = plt.subplots(1,1, figsize=(200, 20), facecolor='white')
-            # fig, ax = plt.subplots(1,1,facecolor='white')
-            ax.hist(plot_data, bins=mybins, ec='black')
-            log.debug("This title is " + histogram_name + " - " + joint)
-            ax.set_title(histogram_name + " - " + joint)
-            ax.xaxis.set_major_locator(mdates.MonthLocator())
-            ax.xaxis.set_major_formatter(mdates.DateFormatter('%m.%y'))
-            # fig.autofmt_xdate()
+                fig, ax = plt.subplots(1,1, figsize=(200, 20), facecolor='white')
+                # fig, ax = plt.subplots(1,1,facecolor='white')
+                ax.hist(plot_data, bins=mybins, ec='black')
+                log.debug("This title is " + histogram_name + " - " + joint)
+                ax.set_title(histogram_name + " - " + joint)
+                ax.xaxis.set_major_locator(mdates.MonthLocator())
+                ax.xaxis.set_major_formatter(mdates.DateFormatter('%m.%y'))
+                # fig.autofmt_xdate()
 
-            # Changing the space between the ticks
+                # Changing the space between the ticks
 
-            # plt.gca().margins(x=0)
-            # plt.gcf().canvas.draw()
-            tl = plt.gca().get_xticklabels()
-            # log.debug("tl = " + str(tl))
-            ticks_label = [t.get_window_extent().width for t in tl]
-            log.debug(str(ticks_label))
-            maxsize = max(ticks_label)
+                # plt.gca().margins(x=0)
+                # plt.gcf().canvas.draw()
+                tl = plt.gca().get_xticklabels()
+                # log.debug("tl = " + str(tl))
+                ticks_label = [t.get_window_extent().width for t in tl]
+                log.debug(str(ticks_label))
+                maxsize = max(ticks_label)
 
-            # If the ticks label list brings 0 in everyting
-            if maxsize == 0:
-                maxsize = 4
-            log.debug("maxsize = " + str(maxsize))
-            m = 0.2 # inch margin
-            N = len(mix_data)
-            log.debug("N = " + str(N))
-            log.debug("plt.gcf().dpi = " + str(plt.gcf().dpi))
-            s = maxsize/plt.gcf().dpi*N+2*m
-            margin = m/plt.gcf().get_size_inches()[0]
-            #
-            # print("plt.gcf().get_size_inches()[1] = " + str(plt.gcf().get_size_inches()[1]))
-            log.debug("plt.gcf().get_size_inches() = " + str(plt.gcf().get_size_inches()))
-            log.debug("s = " + str(s))
-            plt.gcf().subplots_adjust(left=margin, right=1.-margin)
-            # plt.gcf().set_size_inches(s, 10)
-            plt.gcf().set_size_inches(s*0.25, plt.gcf().get_size_inches()[1])
+                # If the ticks label list brings 0 in everyting
+                if maxsize == 0:
+                    maxsize = 4
+                log.debug("maxsize = " + str(maxsize))
+                m = 0.2 # inch margin
+                N = len(mix_data)
+                log.debug("N = " + str(N))
+                log.debug("plt.gcf().dpi = " + str(plt.gcf().dpi))
+                s = maxsize/plt.gcf().dpi*N+2*m
+                margin = m/plt.gcf().get_size_inches()[0]
+                #
+                # print("plt.gcf().get_size_inches()[1] = " + str(plt.gcf().get_size_inches()[1]))
+                log.debug("plt.gcf().get_size_inches() = " + str(plt.gcf().get_size_inches()))
+                log.debug("s = " + str(s))
+                plt.gcf().subplots_adjust(left=margin, right=1.-margin)
+                # plt.gcf().set_size_inches(s, 10)
+                plt.gcf().set_size_inches(s*0.25, plt.gcf().get_size_inches()[1])
 
-            fig.autofmt_xdate()
+                fig.autofmt_xdate()
 
-        elif hist_type == 'int':
-            log.debug("Histogram " + histogram_name + " is type int")
-            fig, ax = plt.subplots(1, 1, figsize=(200, 20))
-            # fig, ax = plt.subplots(1,1)
-            plt.style.use('seaborn-deep')
+            elif hist_type == 'int':
+                log.debug("Histogram " + histogram_name + " is type int")
+                fig, ax = plt.subplots(1, 1, figsize=(200, 20))
+                # fig, ax = plt.subplots(1,1)
+                plt.style.use('seaborn-deep')
 
-            max_exp = int(floor(loga(max(mix_data),10)))
-            binwidth = 10**(max_exp - 3)
+                max_exp = int(floor(loga(max(mix_data),10)))
+                binwidth = 10**(max_exp - 3)
 
-            ax.hist(data, bins=np.arange(min(mix_data), max(mix_data) + binwidth, binwidth),label=label)
-            ax.legend(loc='upper right')
-            log.debug("This title is " + histogram_name + " - " + joint)
-            ax.set_title(histogram_name + " - " + joint)
-            ax.set_xlim(left=0) # Start at left zero
-            ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ','))) # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
-            ax.xaxis.set_major_locator(ticker.MultipleLocator(binwidth*10))
-            plt.xticks(rotation=45) # Rotate x ticks
-            plt.gcf().subplots_adjust(bottom=0.15) # Adjust the lables if they go pass the figure
-            plt.grid(linestyle="--") # Grid in the histogram
-        else:
-            fig, ax = plt.subplots(1,1)
-            ax.hist(data, bins='auto', ec='black')
-            log.debug("This title is " + histogram_name + " - " + joint)
-            ax.set_title(histogram_name + " - " + joint)
+                ax.hist(data, bins=np.arange(min(mix_data), max(mix_data) + binwidth, binwidth),label=label)
+                ax.legend(loc='upper right')
+                log.debug("This title is " + histogram_name + " - " + joint)
+                ax.set_title(histogram_name + " - " + joint)
+                ax.set_xlim(left=0) # Start at left zero
+                ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ','))) # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
+                ax.xaxis.set_major_locator(ticker.MultipleLocator(binwidth*10))
+                plt.xticks(rotation=45) # Rotate x ticks
+                plt.gcf().subplots_adjust(bottom=0.15) # Adjust the lables if they go pass the figure
+                plt.grid(linestyle="--") # Grid in the histogram
+            else:
+                fig, ax = plt.subplots(1,1)
+                ax.hist(data, bins='auto', ec='black')
+                log.debug("This title is " + histogram_name + " - " + joint)
+                ax.set_title(histogram_name + " - " + joint)
 
-        filename = histogram_name + "_" + joint
-        # plt.savefig(output_dir + "/histogram_"+ filename + ".png")
-        # log.info("Histogram saved as histogram_"+ filename + ".png")
-        plt.savefig(output_dir + "/histogram_"+ filename + ".pdf")
-        log.info("Histogram saved as histogram_"+ filename + ".pdf")
-        plt.figure().clear()
+            filename = histogram_name + "_" + joint
+            # plt.savefig(output_dir + "/histogram_"+ filename + ".png")
+            # log.info("Histogram saved as histogram_"+ filename + ".png")
+            plt.savefig(output_dir + "/joint_histogram_"+ filename + ".pdf")
+            log.info("Histogram saved as histogram_"+ filename + ".pdf")
+            plt.figure().clear()
 
 
 def output_to_files(datasets,out_dir):
@@ -485,7 +514,6 @@ def output_to_files(datasets,out_dir):
     log.info("File saved at " + xlsxfile)
     # else:
     #     log.warning("file already written. finishing")
-
 
 
 def topN(dico, N, poll_type):

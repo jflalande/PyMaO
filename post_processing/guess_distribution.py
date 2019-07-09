@@ -426,17 +426,20 @@ if __name__ == '__main__':
     data2 = androzoo2data(args.androzoo_file, ',')
     log.info("Androzoo file data processed")
 
-    params = (0.352741247536232, 1752521.9999999618, 163469.98334998888)
-    arg = params[:-2]
-    loc = params[-2]
-    scale = params[-1]
+    # params = (0.352741247536232, 1752521.9999999618, 163469.98334998888)
+    # arg = params[:-2]
+    # loc = params[-2]
+    # scale = params[-1]
 
-    my_dist = st.gennorm(loc=loc, scale=scale, *arg)
-    res_data = create_list_by_dist(data, data2, my_dist)
+    # my_dist = st.gennorm(loc=loc, scale=scale, *arg)
+    # res_data = create_list_by_dist(data, data2, my_dist)
+
+    res_data = create_list_by_dist(data, data2)
 
     print("res_data size: " + str(len(res_data)))
 
-    with open('res.txt', 'w') as f:
+    # TODO: Replace filename with date
+    with open('res3.txt', 'w') as f:
         for item in res_data:
             f.write("{},{:d}\n".format(item['name'], item['value']))
 
