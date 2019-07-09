@@ -22,6 +22,9 @@ def setup_args():
 
     parser.add_argument("config", type=str,
                         help="config file")
+    parser.add_argument('-v',
+                        help='Output information to the standart output (-vv is very verbose)',
+                        action="count")
 
     return parser.parse_args()
 
@@ -128,7 +131,7 @@ try:
     args = vars(setup_args())
 
     # Config
-    config = Config(args["config"])
+    config = Config(args["config"], args["v"])
 
     # For debugging purpose:
     logSetup(config.debug)

@@ -14,12 +14,17 @@ class Config:
     simulate_json_write = False
     triggerdroid_path = None
 
-    def __init__(self, config_filename):
+    def __init__(self, config_filename, verbose):
         confparser = configparser.ConfigParser()
         config_file = open(config_filename, "r")
         confparser.read_file(config_file)
 
         self.debug = confparser['general']['debug']
+        if verbose is not None:
+            if verbose == 1:
+                self.debug = "verbose"
+            else:
+                self.debug = "veryverbose"
 
         self.nb_workers = int(confparser['general']['nb_workers'])
         self.devices = ast.literal_eval(confparser['general']['devices'])
