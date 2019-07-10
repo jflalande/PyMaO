@@ -132,6 +132,9 @@ try:
     # Reading args
     args = vars(setup_args())
 
+    # Temporary, just for logging conf parsing.
+    log.setLevel(DEBUG_LEVELV_NUM)
+
     # Config
     config = Config(args)
 
