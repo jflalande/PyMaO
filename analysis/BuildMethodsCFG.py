@@ -31,7 +31,7 @@ class BuildMethodsCFG(Analysis):
         jar_path = self.xp.config.triggerdroid_path
 
         output_dir = self.xp.working_directory
-        heuristics_file = "/home/pwilke/Work/CS/malware/AME/TriggerDroid/res/suspicious3.json"
+        heuristics_file = "/home/pwilke/Work/CS/malware/AME/TriggerDroid/res/suspicious5.json"
         ### WARNING ###
 
         apk = jsonanalyses["filename"]
