@@ -14,7 +14,11 @@ class Config:
     simulate_json_write = False
     triggerdroid_path = None
 
-    def __init__(self, config_filename, verbose):
+    def __init__(self, args):
+        config_filename = args["config"]
+        verbose = args["v"]
+        simulate = args["simulate_json_write"]
+
         confparser = configparser.ConfigParser()
         config_file = open(config_filename, "r")
         confparser.read_file(config_file)
@@ -36,7 +40,7 @@ class Config:
         self.apkbase = confparser['xp']['apkbase']
         self.jsonbase = confparser['xp']['jsonbase']
         self.targetsymlink = confparser['xp']['targetsymlink']
-        self.simulate_json_write = confparser['xp']['simulate_json_write']
+        self.simulate_json_write = simulate or confparser['xp']['simulate_json_write'].lower == "true"
 
         self.triggerdroid_path = confparser['analyses']['triggerDroidPath']
 

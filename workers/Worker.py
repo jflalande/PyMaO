@@ -107,7 +107,7 @@ def doJob(queue, xp, worker_nb):
 def writeJson(name, xp, jsondata):
     jsonfilename = os.path.join(xp.config.jsonbase, name + ".json")
 
-    if xp.config.simulate_json_write.lower() == "false":
+    if not xp.config.simulate_json_write:
         with open(jsonfilename, 'w') as json_file:
             json.dump(jsondata, json_file, indent=4)
     else:
