@@ -3,7 +3,7 @@ import os
 
 # from scipy.stats import alpha, betaprime, wald, lognorm
 import scipy.stats as st
-from skgof import ks_test, cvm_test, ad_test
+# from skgof import ks_test, cvm_test, ad_test
 import logging
 import argparse
 import numpy as np
@@ -22,7 +22,7 @@ import math
 
 import warnings
 # import numpy as np
-import pandas as pd
+# import pandas as pd
 # import scipy.stats as st
 # import statsmodels as sm
 import matplotlib
@@ -142,7 +142,8 @@ def androzoo2data(az_list_path, separator):
     for line in az_list:
         d = {
             'name': line[0],
-            'value': int(line[1])
+            'size': int(line[1]),
+            'year': line[2]
              }
         data.append(d)
 
@@ -206,8 +207,9 @@ def best_fit_distribution(data, bins=None, ax=None):
                 # if axis pass in add to plot
                 try:
                     if ax:
-                        pd.Series(pdf, x).plot(ax=ax)
-                    # end
+                        # pd.Series(pdf, x).plot(ax=ax)
+                        print("Here I should add the PDF curbe to the plot")
+                # end
                 except Exception:
                     pass
 
@@ -298,9 +300,9 @@ def dist_generator(dist, n):
     yield from dist.rvs(n)
 
 
-def create_list_by_dist(data, data2, dist=None):
+def create_list_by_dist(data, androzoo, dist=None):
     # data = from jsons
-    # data2 = from androzoo_file
+    # androzoo = from androzoo_file
 
     data_values = [x['value'] for x in data]
 
@@ -324,7 +326,7 @@ def create_list_by_dist(data, data2, dist=None):
     else:
         guessed_dist = dist
 
-    n = len(data2)
+    n = len(androzoo)
 
     log.debug("Creating a similar distribution with " + str(n) + " values")
     # try:
@@ -336,8 +338,15 @@ def create_list_by_dist(data, data2, dist=None):
 
     new_data = []
 
-    # elements that where not taken into account, they will be reused when data2 is exhausted
-    # data3 = []
+    years = {
+        '2015': 0,
+        '2016': 0,
+        '2017': 0,
+        '2018': 0,
+    }
+
+    # elements that where not taken into account, they will be reused when androzoo is exhausted
+    # relist_androzoo = []
 
     # n = len(GWlist)
     # for num in range(n):
@@ -350,51 +359,65 @@ def create_list_by_dist(data, data2, dist=None):
         # for element in GWlist:
 
     # rand_from_guesses = next(guessed_values)
+
     rand_from_guesses = 0
+
     while rand_from_guesses <= 0:
         rand_from_guesses = guessed_dist.rvs()
+
     while len(new_data) < 5000:
-        data3 = []
+        relist_androzoo = []
         # rand_from_guesses = next(guessed_values)
         log.debug("Processing GW num: " + str(len(new_data)))
         log.debug("Guessed value: " + str(rand_from_guesses))
         # index = -1
-        for index, element in enumerate(data2):
+        for index, element in enumerate(androzoo):
             # rand_from_guesses = next(guessed_values)
             # if element is similar to dist_elem:
             # TODO: parametrize the porcentage
             # if element in new_data:
             #     log.debug("This element is already in new_data, continue")
-            #     _, *data2 = data2
-            #     log.debug("data2 now has " + str(len(data2)) + " elements")
+            #     _, *androzoo = androzoo
+            #     log.debug("androzoo now has " + str(len(androzoo)) + " elements")
             #     continue
 
-            if element['value'] < rand_from_guesses*1.05 and element['value'] > rand_from_guesses*0.95:
+            if element['size'] < rand_from_guesses*1.05 and element['size'] > rand_from_guesses*0.95:
                 # Put in dist_GWlist
                 log.debug(str(index) + " element " + str(element) + " added")
                 if len(new_data) < 5000:
-                    new_data.append(element)
+                    try:
+                        if years[element['year']] < 5000/4:
+                            years[element['year']] += 1
+                            new_data.append(element)
+                            rand_from_guesses = 0
+                            while rand_from_guesses <= 0:
+                                rand_from_guesses = guessed_dist.rvs()
+                    except KeyError:
+                        continue
                 else:
                     break
                 # rand_from_guesses = next(guessed_values)
-                rand_from_guesses = 0
-                while rand_from_guesses <= 0:
-                    rand_from_guesses = guessed_dist.rvs()
-                # _, *data2 = data2
+                # _, *androzoo = androzoo
             else:
                 # log.debug(str(index) + " This element doesn't follow, saving it")
-                data3.append(element)
+                relist_androzoo.append(element)
                 # Pop element from GWlist
-                # my_index = data2.index(element)
-                # data2.pop(my_index)
+                # my_index = androzoo.index(element)
+                # androzoo.pop(my_index)
                 # (?) Pop element from dist
             # if len(new_data) >= 5000:
             #     break
-        log.debug("data2 exhausted, chainging")
+        log.debug("androzoo exhausted, changing")
+        log.debug("Processing GW num: " + str(len(new_data)))
         rand_from_guesses = 0
         while rand_from_guesses <= 0:
             rand_from_guesses = guessed_dist.rvs()
-        data2 = data3
+
+        if androzoo.sort() != relist_androzoo.sort():
+            androzoo = relist_androzoo
+        else:
+            log.info("No other apks to try, exiting")
+            break
 
     return new_data
 
@@ -418,12 +441,12 @@ if __name__ == '__main__':
     # guess_my_distribution(args.jsonpath_expr, args.json_dir)
     log.debug("The arguments are: " + str(args))
 
-    quit()
+    # quit()
 
     data = json_convert(args.jsonpath_expr, args.json_dir)
     log.info("JSON data processed")
 
-    data2 = androzoo2data(args.androzoo_file, ',')
+    androzoo = androzoo2data(args.androzoo_file, ',')
     log.info("Androzoo file data processed")
 
     params = (0.352741247536232, 1752521.9999999618, 163469.98334998888)
@@ -432,7 +455,7 @@ if __name__ == '__main__':
     scale = params[-1]
 
     my_dist = st.gennorm(loc=loc, scale=scale, *arg)
-    res_data = create_list_by_dist(data, data2, my_dist)
+    res_data = create_list_by_dist(data, androzoo, my_dist)
 
     print("res_data size: " + str(len(res_data)))
 
@@ -440,7 +463,7 @@ if __name__ == '__main__':
         for item in res_data:
             f.write("{},{:d}\n".format(item['name'], item['value']))
 
-    # res_data = create_list_by_dist(data, data2)
+    # res_data = create_list_by_dist(data, androzoo)
     print(len(res_data))
 
 # ------------------------------------------
