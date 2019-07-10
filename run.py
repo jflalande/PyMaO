@@ -26,6 +26,8 @@ def setup_args():
                         help='Output information to the standart output (-vv is very verbose)',
                         action="count")
 
+    parser.add_argument("-s", "--simulate_json_write", action="store_true")
+
     return parser.parse_args()
 
 def generateXP(s, config, deviceserial=None):
@@ -130,8 +132,11 @@ try:
     # Reading args
     args = vars(setup_args())
 
+    # Temporary, just for logging conf parsing.
+    log.setLevel(DEBUG_LEVELV_NUM)
+
     # Config
-    config = Config(args["config"], args["v"])
+    config = Config(args)
 
     # For debugging purpose:
     logSetup(config.debug)
