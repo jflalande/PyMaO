@@ -31,7 +31,7 @@ class BuildMethodsCFG(Analysis):
         jar_path = self.xp.config.triggerdroid_path
 
         output_dir = self.xp.working_directory
-        heuristics_file = "/home/pwilke/Work/CS/malware/AME/TriggerDroid/res/suspicious3.json"
+        heuristics_file = self.xp.config.heuristicsFile
         ### WARNING ###
 
         apk = jsonanalyses["filename"]
@@ -55,7 +55,7 @@ class BuildMethodsCFG(Analysis):
         command=command_chdir+" ;  "+command_java
 
 
-        errcode, res = self.xp.exec_in_subprocess(command, cwd=True)
+        errcode, res = self.xp.exec_in_subprocess(command, cwd=True, logOutputs=True)
 
 
         cfg = pgv.AGraph(output_dir + "/call-graph.dot")

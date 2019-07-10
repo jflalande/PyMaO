@@ -22,6 +22,11 @@ def setup_args():
 
     parser.add_argument("config", type=str,
                         help="config file")
+    parser.add_argument('-v',
+                        help='Output information to the standart output (-vv is very verbose)',
+                        action="count")
+
+    parser.add_argument("-s", "--simulate_json_write", action="store_true")
 
     return parser.parse_args()
 
@@ -127,8 +132,11 @@ try:
     # Reading args
     args = vars(setup_args())
 
+    # Temporary, just for logging conf parsing.
+    log.setLevel(DEBUG_LEVELV_NUM)
+
     # Config
-    config = Config(args["config"])
+    config = Config(args)
 
     # For debugging purpose:
     logSetup(config.debug)
