@@ -13,7 +13,7 @@ class XPInstallLaunch(Experiment):
 
     SDKHOME = "/home/jf/Android/Sdk"
 
-    ''' By defautl, an XP does not use a drvice '''
+    ''' This XP uses a device '''
     def usesADevice(self):
         return True
 

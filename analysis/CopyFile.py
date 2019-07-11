@@ -18,3 +18,4 @@ class CopyFile(Analysis):
     def analysis(self, analysis, analysis_name, basename, jsonanalyses):
         log.debug("Copying File: ")
         copyfile(self.source, self.target)
+        return True
