@@ -88,7 +88,8 @@ This expression compares if the variable `$..Unzip.status` is equal to the strin
 For our purposes, all the JSONPath expressions are variables.
 
 ### TODO:
-* [ ]  Expand expression for multiple requests
+* [ ] Expand expression for multiple requests
+* [ ] Add an "if" test in histogram
 """
 
 # Name without extension
@@ -192,7 +193,8 @@ def output_histograms(datasets,histograms_def,output_dir):
             #     for histogram_name in row.histogram_collection:
             #     def output_histograms(data,output_dir):
 
-            data = row.histogram_collection[histogram_name]['data']
+            data_old = row.histogram_collection[histogram_name]['data']
+            data = [x for x in data_old if x < 37000000]
 
             log.debugv("Data size is " + str(len(data)))
 
@@ -230,41 +232,52 @@ def output_histograms(datasets,histograms_def,output_dir):
                 ax.xaxis.set_major_locator(mdates.MonthLocator())
                 ax.xaxis.set_major_formatter(mdates.DateFormatter('%m.%y'))
                 fig.autofmt_xdate()
+
             elif hist_type == 'int':
+
                 log.debug("Histogram " + histogram_name + " for " + row_name + " is type int")
                 log.info("Histogram " + histogram_name + " for " + row_name + " is type int")
-                fig, ax = plt.subplots(1, 1, figsize=(200, 40))
+
+                # fig, ax = plt.subplots(1, 1, figsize=(200, 40))
+                fig, ax = plt.subplots(1, 1, figsize=(12, 5))
                 # fig, ax = plt.subplots(1,1)
                 # Ajust bins
-                max_exp = int(floor(loga(max(data), 10)))
-                binwidth = 10**(max_exp - 3)
-                bins = np.arange(min(data), max(data) + binwidth, binwidth)
 
+                ten_exponent = 2
+
+                max_exp = int(floor(loga(max(data), 10)))
+                # binwidth = 10**(max_exp - 3)  # Original
+                binwidth = 10**(max_exp - ten_exponent)
+                bins = np.arange(min(data), max(data) + binwidth, binwidth)
+                # bins = np.arange(0, max(data), 1000000)
+
+                log.info("bins: " + str(bins))
                 # ax.hist(data, bins=bins, ec='black')
+                ax.hist(data, bins=bins)
 
                 # guessed_dist, params = gd.best_fit_distribution(data)
 
-                guessed_dist = st.gennorm
-                # my_params = (0.3324494702448755, 1808293.0000002861, 71602.6687589449)
-                params = guessed_dist.fit(data)
+                # guessed_dist = st.gennorm
+                # # my_params = (0.3324494702448755, 1808293.0000002861, 71602.6687589449)
+                # params = guessed_dist.fit(data)
 
-                # log.info(my_params == params)
-                # log.info("my_params: " + str(my_params))
-                log.info("params:    " + str(params))
+                # # log.info(my_params == params)
+                # # log.info("my_params: " + str(my_params))
+                # log.info("params:    " + str(params))
 
-                arg = params[:-2]
-                # loc: the mean of the distribution
-                loc = params[-2]
-                # scale: the standard deviation of the distribution
-                scale = params[-1]
+                # arg = params[:-2]
+                # # loc: the mean of the distribution
+                # loc = params[-2]
+                # # scale: the standard deviation of the distribution
+                # scale = params[-1]
 
-                my_rv = guessed_dist(*arg, loc=loc, scale=scale)
+                # my_rv = guessed_dist(*arg, loc=loc, scale=scale)
 
-                # ax.hist(data, bins=bins, ec='black')
+                # # ax.hist(data, bins=bins, ec='black')
 
-                # Option 1 (doesn't work)
-                x = np.linspace(0, 5000)
-                ax.plot(x, my_rv.pdf(x), 'r-', lw=2)
+                # # Option 1 (doesn't work)
+                # x = np.linspace(0, 5000)
+                # ax.plot(x, my_rv.pdf(x), 'r-', lw=2)
 
                 # Option 2 ("scale" is not ajusted)
                 # x = np.linspace(guessed_dist.ppf(0.01, *arg), guessed_dist.ppf(0.99, *arg), 5000)
@@ -277,14 +290,23 @@ def output_histograms(datasets,histograms_def,output_dir):
 
                 # ax.plot(data, guessed_dist.pdf(data, *arg), 'g-', lw=5)
 
-                ax.set_title(histogram_name + " - " + row_name)
+                ax.set_title(histogram_name + " - " + row_name, fontsize=20)
                 ax.set_xlim(left=0)  # Start at left zero
-                ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ',')))  # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
 
-                ax.xaxis.set_major_locator(ticker.MultipleLocator(binwidth*10))
+                def megas(x,y):
+                    return int(x/1000000)
+
+                # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
+                # ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
+                ax.xaxis.set_major_formatter(ticker.FuncFormatter(megas))
+                ax.xaxis.set_major_locator(ticker.MultipleLocator(binwidth*10**(ten_exponent - 1)))
+
+                plt.xlabel("APK Size (in MB)")
+                plt.ylabel("Number of APKs")
+
                 plt.xticks(rotation=45)  # Rotate x ticks
                 plt.gcf().subplots_adjust(bottom=0.15)  # Adjust the lables if they go pass the figure
-                plt.grid(linestyle="--")  # Grid in the histogram
+                plt.grid(linestyle="-.")  # Grid in the histogram
             else:
                 fig, ax = plt.subplots(1, 1)
                 ax.hist(data, bins='auto', ec='black')
