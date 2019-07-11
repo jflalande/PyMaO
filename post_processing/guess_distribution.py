@@ -120,7 +120,9 @@ def json_convert(jsonpath_expr, json_dir):
 
         name = filename.split('.')[0]
 
+        # log.debug("my name is: " + str(name))
         parse = jsonpath_expr.split('.')
+        # log.debug("jsonpath parsed in: " + str(parse))
 
         # PATCH: use variable type the next time
         data.append(
@@ -427,6 +429,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Guess the distribution of a series of data")
     parser.add_argument("jsonpath_expr", help="JSONPath expression to search the data")
     parser.add_argument("json_dir", help="JSON files directory (full path)")
+    parser.add_argument("output_file", help="Name of output file")
     parser.add_argument('-v', help='Output information to the standart output (-vv is very verbose)', action="count")
     parser.add_argument("--androzoo_file", help="Androzoo file (separated by comma)")
 
@@ -457,12 +460,13 @@ if __name__ == '__main__':
     # my_dist = st.gennorm(loc=loc, scale=scale, *arg)
     # res_data = create_list_by_dist(data, data2, my_dist)
 
-    res_data = create_list_by_dist(data, data2)
+    res_data = create_list_by_dist(data, androzoo)
 
     print("res_data size: " + str(len(res_data)))
 
     # TODO: Replace filename with date
-    with open('res3.txt', 'w') as f:
+    # with open('res4.txt', 'w') as f:
+    with open(args.output_file, 'w') as f:
         for item in res_data:
             f.write("{},{:d}\n".format(item['name'], item['value']))
 

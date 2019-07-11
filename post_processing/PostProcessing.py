@@ -240,31 +240,31 @@ def output_histograms(datasets,histograms_def,output_dir):
                 binwidth = 10**(max_exp - 3)
                 bins = np.arange(min(data), max(data) + binwidth, binwidth)
 
-                # ax.hist(data, bins=bins, ec='black')
+                ax.hist(data, bins=bins, ec='black')
 
                 # guessed_dist, params = gd.best_fit_distribution(data)
 
-                guessed_dist = st.gennorm
-                # my_params = (0.3324494702448755, 1808293.0000002861, 71602.6687589449)
-                params = guessed_dist.fit(data)
+                # guessed_dist = st.gennorm
+                # # my_params = (0.3324494702448755, 1808293.0000002861, 71602.6687589449)
+                # params = guessed_dist.fit(data)
 
-                # log.info(my_params == params)
-                # log.info("my_params: " + str(my_params))
-                log.info("params:    " + str(params))
+                # # log.info(my_params == params)
+                # # log.info("my_params: " + str(my_params))
+                # log.info("params:    " + str(params))
 
-                arg = params[:-2]
-                # loc: the mean of the distribution
-                loc = params[-2]
-                # scale: the standard deviation of the distribution
-                scale = params[-1]
+                # arg = params[:-2]
+                # # loc: the mean of the distribution
+                # loc = params[-2]
+                # # scale: the standard deviation of the distribution
+                # scale = params[-1]
 
-                my_rv = guessed_dist(*arg, loc=loc, scale=scale)
+                # my_rv = guessed_dist(*arg, loc=loc, scale=scale)
 
                 # ax.hist(data, bins=bins, ec='black')
 
                 # Option 1 (doesn't work)
-                x = np.linspace(0, 5000)
-                ax.plot(x, my_rv.pdf(x), 'r-', lw=2)
+                # x = np.linspace(0, 5000)
+                # ax.plot(x, my_rv.pdf(x), 'r-', lw=2)
 
                 # Option 2 ("scale" is not ajusted)
                 # x = np.linspace(guessed_dist.ppf(0.01, *arg), guessed_dist.ppf(0.99, *arg), 5000)
@@ -293,8 +293,8 @@ def output_histograms(datasets,histograms_def,output_dir):
             filename = histogram_name + "_" + row_name
             # plt.savefig(output_dir + "/histogram_"+ filename + ".png")
             # log.info("Histogram saved as histogram_"+ filename + ".png")
-            plt.savefig(output_dir + "/histogram_"+ filename + ".pdf")
-            log.info("Histogram saved as histogram_"+ filename + ".pdf")
+            plt.savefig(output_dir + "/histogram_" + filename + ".pdf")
+            log.info("Histogram saved as histogram_" + filename + ".pdf")
 
             plt.figure().clear()
             plt.close(plt.figure())
@@ -412,8 +412,8 @@ def output_histograms(datasets,histograms_def,output_dir):
             filename = histogram_name + "_" + joint
             # plt.savefig(output_dir + "/histogram_"+ filename + ".png")
             # log.info("Histogram saved as histogram_"+ filename + ".png")
-            plt.savefig(output_dir + "/joint_histogram_"+ filename + ".pdf")
-            log.info("Histogram saved as histogram_"+ filename + ".pdf")
+            plt.savefig(output_dir + "/joint_histogram_" + filename + ".pdf")
+            log.info("Histogram saved as joint_histogram_" + filename + ".pdf")
             plt.figure().clear()
 
 
