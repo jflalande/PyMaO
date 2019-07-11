@@ -8,6 +8,6 @@ class XPBuildMethodCFG(Experiment):
     def appendAnalysis(self):
 
         self.analyses.append((BuildMethodsCFG(self),[]))
-        self.analyses.append((FindGraftingPoint(self),[
-            {'BuildMethodsCFG': {'status': 'done'}}]))
+        #self.analyses.append((FindGraftingPoint(self),[
+        #    {'BuildMethodsCFG': {'status': 'done'}}]))
 

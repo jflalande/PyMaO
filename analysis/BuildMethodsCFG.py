@@ -2,6 +2,7 @@ from analysis.Analysis import Analysis
 import logging
 import os
 import pygraphviz as pgv
+from shutil import copyfile
 
 log = logging.getLogger("orchestrator")
 
@@ -31,6 +32,7 @@ class BuildMethodsCFG(Analysis):
         jar_path = self.xp.config.triggerdroid_path
 
         output_dir = self.xp.working_directory
+        temp_dir = ""
         heuristics_file = self.xp.config.heuristicsFile
         ### WARNING ###
 
@@ -45,6 +47,7 @@ class BuildMethodsCFG(Analysis):
             "fr.inria.triggerdroid.analysis.Main",
             "-vg", "-o", output_dir,
             "-m", "ORIGIN",
+            "-w", "ALL",
             "-a", jsonanalyses['filename'],
             "-d",
             self.xp.config.sdkhome+"/platforms",
@@ -55,19 +58,63 @@ class BuildMethodsCFG(Analysis):
         command=command_chdir+" ;  "+command_java
 
 
+        # TriggerDroid is launched
         errcode, res = self.xp.exec_in_subprocess(command, cwd=True, logOutputs=True)
 
+        #copyfile(self.xp.working_directory+"heuristicAnalyzed.json", self.xp.output_dir+"/"+basename+"_"+"heuristicAnalyzed.json")
 
-        cfg = pgv.AGraph(output_dir + "/call-graph.dot")
-        nb_methods = len(cfg.nodes())
-        nb_suspicious = num_lines_in_file(output_dir + "/global.json")
-        nb_data_dependency = num_lines_in_file(output_dir + "/extraction.json")
-        nb_sms = num_lines_in_file(output_dir + "/sms.json")
-        nb_binary = num_lines_in_file(output_dir + "/binary.json")
-        nb_dynamic = num_lines_in_file(output_dir + "/dynamic.json")
-        nb_network = num_lines_in_file(output_dir + "/network.json")
-        nb_telephony = num_lines_in_file(output_dir + "/telephony.json")
-        nb_crypto = num_lines_in_file(output_dir + "/crypto.json")
+
+
+        #test si le fichier a été crée
+        if os.path.isfile(output_dir+"/heuristic.json")  :
+            copyfile(output_dir+"/heuristic.json","/Users/vviettri/Documents/malware/malware-xp/output-xp/"+basename+"_"+"heuristic.json")
+
+        if os.path.isfile (output_dir + "/call-graph.dot") :
+            cfg = pgv.AGraph(output_dir + "/call-graph.dot")
+        else :
+            log.debug("The file call-graph.dot doesn't exist")
+
+        if os.path.isfile (output_dir +  "/global.json"):
+            nb_suspicious = num_lines_in_file(output_dir + "/global.json")
+        else :
+            log.debug("The file global.json doesn't exist")
+
+        if os.path.isfile (output_dir +  "/extraction.json"):
+            nb_data_dependency = num_lines_in_file(output_dir + "/extraction.json")
+        else :
+            log.debug("The file extraction.json doesn't exist")
+
+        if os.path.isfile (output_dir +  "/sms.json"):
+            nb_sms = num_lines_in_file(output_dir + "/sms.json")
+        else :
+            log.debug("The file sms.json doesn't exist")
+
+        if os.path.isfile (output_dir +  "/binary.json"):
+            nb_binary = num_lines_in_file(output_dir + "/binary.json")
+        else :
+            log.debug("The file binary.json doesn't exist")
+
+        if os.path.isfile (output_dir +  "/dynamic.json") :
+            nb_dynamic = num_lines_in_file(output_dir + "/dynamic.json")
+        else :
+            log.debug("The file dynamic.json doesn't exist")
+
+        if os.path.isfile (output_dir +  "/network.json"):
+            nb_network = num_lines_in_file(output_dir + "/network.json")
+        else :
+            log.debug("The file network.json doesn't exist")
+
+        if os.path.isfile (output_dir +  "/telephony.json"):
+            nb_telephony = num_lines_in_file(output_dir + "/telephony.json")
+        else :
+            log.debug("The file telephony.json doesn't exist")
+
+        if os.path.isfile (output_dir +"/crypto.json"):
+            nb_crypto = num_lines_in_file(output_dir + "/crypto.json")
+        else :
+            log.debug("The file crypto.json doesn't exist")
+
+        #TODO ajouter le traitement de l'exception
         nb_cats = sum(map(lambda x: 1 if x != 0 else 0,
                           [nb_sms, nb_binary, nb_dynamic, nb_telephony, nb_crypto, nb_network]))
 

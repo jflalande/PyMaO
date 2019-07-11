@@ -51,7 +51,7 @@ class Experiment:
 
     def cleanWorkingDirectory(self):
         log.debugv("Cleaning TMPFS for pid " + self.tid)
-        shutil.rmtree(self.config.tmpfs + "/" + self.tid)
+        #shutil.rmtree(self.config.tmpfs + "/" + self.tid)
 
     def cleanTMPFSDirectory(self):
         log.info("Cleaning TMPFS")
