@@ -16,6 +16,7 @@ from utils.CursesHandler import CursesHandler
 import signal
 import sys
 import ast
+import traceback
 
 def setup_args():
     parser = argparse.ArgumentParser()
@@ -224,7 +225,10 @@ try:
 
     restoreConsole()
 
-except RuntimeError as e:
-    restoreConsole()
-    print("ERROR")
-    print(e)
+except Exception as e:
+    log.error("Exception occured:")
+    #traceback.print_exc()
+    _, _, tb = sys.exc_info()
+    tb_stack = traceback.extract_tb(tb)
+    for line in tb_stack:
+        log.error(line)
