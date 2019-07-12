@@ -88,8 +88,7 @@ This expression compares if the variable `$..Unzip.status` is equal to the strin
 For our purposes, all the JSONPath expressions are variables.
 
 ### TODO:
-* [ ] Expand expression for multiple requests
-* [ ] Add an "if" test in histogram
+* [ ]  Expand expression for multiple requests
 """
 
 # Name without extension
@@ -193,8 +192,7 @@ def output_histograms(datasets,histograms_def,output_dir):
             #     for histogram_name in row.histogram_collection:
             #     def output_histograms(data,output_dir):
 
-            data_old = row.histogram_collection[histogram_name]['data']
-            data = [x for x in data_old if x < 37000000]
+            data = row.histogram_collection[histogram_name]['data']
 
             log.debugv("Data size is " + str(len(data)))
 
@@ -232,28 +230,17 @@ def output_histograms(datasets,histograms_def,output_dir):
                 ax.xaxis.set_major_locator(mdates.MonthLocator())
                 ax.xaxis.set_major_formatter(mdates.DateFormatter('%m.%y'))
                 fig.autofmt_xdate()
-
             elif hist_type == 'int':
-
                 log.debug("Histogram " + histogram_name + " for " + row_name + " is type int")
                 log.info("Histogram " + histogram_name + " for " + row_name + " is type int")
-
-                # fig, ax = plt.subplots(1, 1, figsize=(200, 40))
-                fig, ax = plt.subplots(1, 1, figsize=(12, 5))
+                fig, ax = plt.subplots(1, 1, figsize=(200, 40))
                 # fig, ax = plt.subplots(1,1)
                 # Ajust bins
-
-                ten_exponent = 2
-
                 max_exp = int(floor(loga(max(data), 10)))
-                # binwidth = 10**(max_exp - 3)  # Original
-                binwidth = 10**(max_exp - ten_exponent)
+                binwidth = 10**(max_exp - 3)
                 bins = np.arange(min(data), max(data) + binwidth, binwidth)
-                # bins = np.arange(0, max(data), 1000000)
 
-                log.info("bins: " + str(bins))
-                # ax.hist(data, bins=bins, ec='black')
-                ax.hist(data, bins=bins)
+                ax.hist(data, bins=bins, ec='black')
 
                 # guessed_dist, params = gd.best_fit_distribution(data)
 
@@ -273,9 +260,9 @@ def output_histograms(datasets,histograms_def,output_dir):
 
                 # my_rv = guessed_dist(*arg, loc=loc, scale=scale)
 
-                # # ax.hist(data, bins=bins, ec='black')
+                # ax.hist(data, bins=bins, ec='black')
 
-                # # Option 1 (doesn't work)
+                # Option 1 (doesn't work)
                 # x = np.linspace(0, 5000)
                 # ax.plot(x, my_rv.pdf(x), 'r-', lw=2)
 
@@ -290,23 +277,14 @@ def output_histograms(datasets,histograms_def,output_dir):
 
                 # ax.plot(data, guessed_dist.pdf(data, *arg), 'g-', lw=5)
 
-                ax.set_title(histogram_name + " - " + row_name, fontsize=20)
+                ax.set_title(histogram_name + " - " + row_name)
                 ax.set_xlim(left=0)  # Start at left zero
+                ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ',')))  # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
 
-                def megas(x,y):
-                    return int(x/1000000)
-
-                # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
-                # ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
-                ax.xaxis.set_major_formatter(ticker.FuncFormatter(megas))
-                ax.xaxis.set_major_locator(ticker.MultipleLocator(binwidth*10**(ten_exponent - 1)))
-
-                plt.xlabel("APK Size (in MB)")
-                plt.ylabel("Number of APKs")
-
+                ax.xaxis.set_major_locator(ticker.MultipleLocator(binwidth*10))
                 plt.xticks(rotation=45)  # Rotate x ticks
                 plt.gcf().subplots_adjust(bottom=0.15)  # Adjust the lables if they go pass the figure
-                plt.grid(linestyle="-.")  # Grid in the histogram
+                plt.grid(linestyle="--")  # Grid in the histogram
             else:
                 fig, ax = plt.subplots(1, 1)
                 ax.hist(data, bins='auto', ec='black')
@@ -315,8 +293,8 @@ def output_histograms(datasets,histograms_def,output_dir):
             filename = histogram_name + "_" + row_name
             # plt.savefig(output_dir + "/histogram_"+ filename + ".png")
             # log.info("Histogram saved as histogram_"+ filename + ".png")
-            plt.savefig(output_dir + "/histogram_"+ filename + ".pdf")
-            log.info("Histogram saved as histogram_"+ filename + ".pdf")
+            plt.savefig(output_dir + "/histogram_" + filename + ".pdf")
+            log.info("Histogram saved as histogram_" + filename + ".pdf")
 
             plt.figure().clear()
             plt.close(plt.figure())
@@ -434,8 +412,8 @@ def output_histograms(datasets,histograms_def,output_dir):
             filename = histogram_name + "_" + joint
             # plt.savefig(output_dir + "/histogram_"+ filename + ".png")
             # log.info("Histogram saved as histogram_"+ filename + ".png")
-            plt.savefig(output_dir + "/joint_histogram_"+ filename + ".pdf")
-            log.info("Histogram saved as histogram_"+ filename + ".pdf")
+            plt.savefig(output_dir + "/joint_histogram_" + filename + ".pdf")
+            log.info("Histogram saved as joint_histogram_" + filename + ".pdf")
             plt.figure().clear()
 
 
