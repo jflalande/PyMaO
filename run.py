@@ -226,9 +226,17 @@ try:
     restoreConsole()
 
 except Exception as e:
+    # Logging error
     log.error("Exception occured:")
-    #traceback.print_exc()
     _, _, tb = sys.exc_info()
     tb_stack = traceback.extract_tb(tb)
+    # Printing in logging system
     for line in tb_stack:
         log.error(line)
+    # Restoring console
+    restoreConsole()
+    # Detaching the output from the logging system
+    log.removeHandler(mh)
+    # Launching error !
+    log.error("EXCEPTION catched and forwarded to stdout: " + str(e))
+    raise
