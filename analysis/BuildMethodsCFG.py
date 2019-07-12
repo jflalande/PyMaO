@@ -12,12 +12,17 @@ This analysis reliies on ForceCFI
 """
 
 def num_lines_in_file(fname):
+
+    if not os.path.isfile (fname):
+        log.debug("The file {} doesn't exist".format(fname))
+        return -1
+
     with open(fname, "r") as f:
         res = []
         for line in f:
             if line not in res:
                 res.append(line)
-        return len(res)
+    return len(res)
 
 class BuildMethodsCFG(Analysis):
 
@@ -71,49 +76,19 @@ class BuildMethodsCFG(Analysis):
 
         if os.path.isfile (output_dir + "/call-graph.dot") :
             cfg = pgv.AGraph(output_dir + "/call-graph.dot")
+            nb_methods = len(cfg.nodes())
         else :
             log.debug("The file call-graph.dot doesn't exist")
 
-        if os.path.isfile (output_dir +  "/global.json"):
-            nb_suspicious = num_lines_in_file(output_dir + "/global.json")
-        else :
-            log.debug("The file global.json doesn't exist")
-
-        if os.path.isfile (output_dir +  "/extraction.json"):
-            nb_data_dependency = num_lines_in_file(output_dir + "/extraction.json")
-        else :
-            log.debug("The file extraction.json doesn't exist")
-
-        if os.path.isfile (output_dir +  "/sms.json"):
-            nb_sms = num_lines_in_file(output_dir + "/sms.json")
-        else :
-            log.debug("The file sms.json doesn't exist")
-
-        if os.path.isfile (output_dir +  "/binary.json"):
-            nb_binary = num_lines_in_file(output_dir + "/binary.json")
-        else :
-            log.debug("The file binary.json doesn't exist")
-
-        if os.path.isfile (output_dir +  "/dynamic.json") :
-            nb_dynamic = num_lines_in_file(output_dir + "/dynamic.json")
-        else :
-            log.debug("The file dynamic.json doesn't exist")
-
-        if os.path.isfile (output_dir +  "/network.json"):
-            nb_network = num_lines_in_file(output_dir + "/network.json")
-        else :
-            log.debug("The file network.json doesn't exist")
-
-        if os.path.isfile (output_dir +  "/telephony.json"):
-            nb_telephony = num_lines_in_file(output_dir + "/telephony.json")
-        else :
-            log.debug("The file telephony.json doesn't exist")
-
-        if os.path.isfile (output_dir +"/crypto.json"):
-            nb_crypto = num_lines_in_file(output_dir + "/crypto.json")
-        else :
-            log.debug("The file crypto.json doesn't exist")
-
+        nb_suspicious = num_lines_in_file(output_dir + "/global.json")
+        nb_data_dependency = num_lines_in_file(output_dir + "/extraction.json")
+        nb_sms = num_lines_in_file(output_dir + "/sms.json")
+        nb_binary = num_lines_in_file(output_dir + "/binary.json")
+        nb_dynamic = num_lines_in_file(output_dir + "/dynamic.json")
+        nb_network = num_lines_in_file(output_dir + "/network.json")
+        nb_telephony = num_lines_in_file(output_dir + "/telephony.json")
+        nb_crypto = num_lines_in_file(output_dir + "/crypto.json")
+        
         #TODO ajouter le traitement de l'exception
         nb_cats = sum(map(lambda x: 1 if x != 0 else 0,
                           [nb_sms, nb_binary, nb_dynamic, nb_telephony, nb_crypto, nb_network]))
