@@ -126,10 +126,7 @@ try:
     win_right.refresh()
     win_logs.scrollok(True)
 
-    # Add an handler for the log object for redirecting messages to win
-    mh = CursesHandler(win_logs)
-    #mh.setFormatter('%(asctime)s [%(levelname)8s] %(message)s')
-    log.addHandler(mh)
+
 
     # Reading args
     args = vars(setup_args())
@@ -143,6 +140,11 @@ try:
     # For debugging purpose:
     logSetup(config.debug)
 
+    # Add an handler for the log object for redirecting messages to win
+    mh = CursesHandler(win_logs, config.log_trace)
+    #mh.setFormatter('%(asctime)s [%(levelname)8s] %(message)s')
+    log.addHandler(mh)
+
     # Displaying for the user
     log.debugv("ARGS: " + str(args))
     log.info("Reading config file: " + args["config"])
@@ -153,6 +155,7 @@ try:
     log.info(" - tmpfs: " + str(config.tmpfs))
     log.info(" - sdkhome: " + str(config.sdkhome))
     log.info(" - analysis clean: " + str(config.no_analysis_clean))
+    log.info(" - log trace in trace.log: " + str(config.log_trace))
     if config.no_analysis_clean:
         log.warning("Generated files from an analysis will NOT be cleaned!")
 

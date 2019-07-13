@@ -4,12 +4,15 @@ from utils.Colors import Colors
 import collections
 
 class CursesHandler(logging.Handler):
-    def __init__(self, screen):
+    def __init__(self, screen, log_trace):
         logging.Handler.__init__(self)
         # The screen object of curses
         self.screen = screen
         # A queue used to store last logs messages
         self.dq = collections.deque()
+        self.log_trace =log_trace
+        if log_trace:
+            self.trace = open("trace.log", "w")
 
     def saveMessageInDeque(self, record):
         self.dq.append(record)
@@ -22,6 +25,10 @@ class CursesHandler(logging.Handler):
     def printLogFromDeque(self):
         for line in self.dq:
             print(line)
+
+    def logFile(self, line):
+        if self.log_trace:
+            self.trace.write(line + '\n')
 
     def emit(self, record):
         # Formatting message
@@ -49,4 +56,7 @@ class CursesHandler(logging.Handler):
 
         # Saving message for further output when ncurses ends
         self.saveMessageInDeque(LVL + "| " + msg)
+
+        # Saving message in the log file
+        self.logFile(LVL + "| " + msg)
 

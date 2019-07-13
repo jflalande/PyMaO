@@ -10,16 +10,19 @@ class Config:
     devices = []
     tmpfs = None
     sdkhome = None
+    log_trace = False
+    no_analysis_clean = False
+
     targetXP = None
     apkbase = None
     jsonbase = None
     targetsymlink = None
     simulate_json_write = False
-    no_analysis_clean = False
+
     triggerdroid_path = None
     heuristicsfile = None
 
-    conf_structure = {'general' : ['nb_workers', 'devices', 'tmpfs', 'sdkhome', 'debug', 'no_analysis_clean'],
+    conf_structure = {'general' : ['nb_workers', 'devices', 'tmpfs', 'sdkhome', 'debug', 'no_analysis_clean', 'log_trace'],
                       'xp': ['targetxp', 'apkbase', 'jsonbase', 'simulate_json_write', 'targetsymlink'],
                       'analysis': ['triggerdroid_path', 'heuristics_file']}
 
@@ -54,7 +57,7 @@ class Config:
         self.tmpfs = confparser['general']['tmpfs']
         self.sdkhome = confparser['general']['sdkhome']
         self.no_analysis_clean = confparser.getboolean('general','no_analysis_clean')
-
+        self.log_trace = confparser.getboolean('general','log_trace')
 
 
         self.targetXP = confparser['xp']['targetXP']
