@@ -152,7 +152,9 @@ try:
     log.info(" - devices: " + str(config.devices))
     log.info(" - tmpfs: " + str(config.tmpfs))
     log.info(" - sdkhome: " + str(config.sdkhome))
-    log.info(" - analysis clean: " + str(config.noanalysisclean))
+    log.info(" - analysis clean: " + str(config.no_analysis_clean))
+    if config.no_analysis_clean:
+        log.warning("Generated files from an analysis will NOT be cleaned!")
 
     # ==================================================
     log.info("Analysis parameters")

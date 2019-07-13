@@ -15,11 +15,11 @@ class Config:
     jsonbase = None
     targetsymlink = None
     simulate_json_write = False
-    noanalysisclean = False
+    no_analysis_clean = False
     triggerdroid_path = None
     heuristicsfile = None
 
-    conf_structure = {'general' : ['nb_workers', 'devices', 'tmpfs', 'sdkhome', 'debug', 'noanalysisclean'],
+    conf_structure = {'general' : ['nb_workers', 'devices', 'tmpfs', 'sdkhome', 'debug', 'no_analysis_clean'],
                       'xp': ['targetxp', 'apkbase', 'jsonbase', 'simulate_json_write', 'targetsymlink'],
                       'analysis': ['triggerdroid_path', 'heuristics_file']}
 
@@ -53,6 +53,8 @@ class Config:
         self.devices = ast.literal_eval(confparser['general']['devices'])
         self.tmpfs = confparser['general']['tmpfs']
         self.sdkhome = confparser['general']['sdkhome']
+        self.no_analysis_clean = confparser.getboolean('general','no_analysis_clean')
+
 
 
         self.targetXP = confparser['xp']['targetXP']
