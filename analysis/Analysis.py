@@ -46,7 +46,8 @@ class Analysis:
         errcode, res = self.xp.exec_in_subprocess(command)
         if res == "":
             log.error("No tmpfs mount detected.")
-            log.error("Suggestion: sudo mount -t tmpfs -o size=1G tmpfs " + self.xp.config.tmpfs)
+            log.error("For MAC users: diskutil erasevolume HFS+ \"RAMDisk\" `hdiutil attach -nomount ram://2097152`")
+            log.error("For Linux users: sudo mount -t tmpfs -o size=1G tmpfs " + self.xp.config.tmpfs)
             quit()
 
     def updateJsonAnalyses(self, analysis_name, jsonanalyses, newdata):

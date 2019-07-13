@@ -15,12 +15,13 @@ class Config:
     jsonbase = None
     targetsymlink = None
     simulate_json_write = False
+    noanalysisclean = False
     triggerdroid_path = None
-    heuristicsFile = None
+    heuristicsfile = None
 
-    conf_structure = {'general' : ['nb_workers', 'devices', 'tmpfs', 'sdkhome', 'debug'],
+    conf_structure = {'general' : ['nb_workers', 'devices', 'tmpfs', 'sdkhome', 'debug', 'noanalysisclean'],
                       'xp': ['targetxp', 'apkbase', 'jsonbase', 'simulate_json_write', 'targetsymlink'],
-                      'analyses': ['triggerdroidpath', 'heuristicsfile']}
+                      'analysis': ['triggerdroid_path', 'heuristics_file']}
 
     def check_config_file(self,cp):
         for s in cp.sections():
@@ -60,7 +61,7 @@ class Config:
         self.targetsymlink = confparser['xp']['targetsymlink']
         self.simulate_json_write = simulate or confparser.getboolean('xp','simulate_json_write')
 
-        self.triggerdroid_path = confparser['analyses']['triggerDroidPath']
-        self.heuristicsFile = confparser['analyses']['heuristicsFile']
+        self.triggerdroid_path = confparser['analysis']['triggerdroid_path']
+        self.heuristics_file = confparser['analysis']['heuristics_file']
 
         config_file.close()
