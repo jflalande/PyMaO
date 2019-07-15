@@ -157,11 +157,11 @@ def androzoo2data(az_list_path, separator):
 
 
 # Create models from data
-def best_fit_distribution(data, bins=None, ax=None):
+def best_fit_distribution(data, bins=None, ax=None, kde=False):
     """Model data by finding best fit distribution to data"""
     # Get histogram of original data
     if bins is None:
-        max_exp = int(math.floor(math.log(max(data),10)))
+        max_exp = int(math.floor(math.log(max(data), 10)))
         binwidth = 10**(max_exp - 3)
         bins = np.arange(min(data), max(data) + binwidth, binwidth)
     y, x = np.histogram(data, bins=bins, density=True)
@@ -185,6 +185,26 @@ def best_fit_distribution(data, bins=None, ax=None):
     best_distribution = st.norm
     best_params = (0.0, 1.0)
     best_sse = np.inf
+
+    # distribution = st.gaussian_kde(data, 0.07)
+
+    # pdf = distribution.pdf(x)
+    # sse = np.sum(np.power(y - pdf, 2.0))
+
+    # # if axis pass in add to plot
+    # try:
+    #     if ax:
+    #         # pd.Series(pdf, x).plot(ax=ax)
+    #         print("Here I should add the PDF curve to the plot")
+    # # end
+    # except Exception:
+    #     pass
+
+    # # identify if this distribution is better
+    # if best_sse > sse > 0:
+    #     best_distribution = distribution
+    #     best_sse = sse
+    #     log.info("Best so far: kernel density estimation (SSE: " + str(sse) + ")")
 
     # Estimate distribution parameters from data
     for distribution in DISTRIBUTIONS:
@@ -221,10 +241,15 @@ def best_fit_distribution(data, bins=None, ax=None):
                     best_distribution = distribution
                     best_params = params
                     best_sse = sse
-                    log.info("Best so far: "+str(best_distribution.name) + ", with: " + str(best_params))
+                    log.info("Best so far: "+str(best_distribution.name) + " (SSE: " + str(sse) + "), with: " + str(best_params))
 
         except Exception:
+            print("An exception occurred with " + str(distribution.name))
             pass
+
+    log.info("That's all folks!")
+
+    time.sleep(30)
 
     return best_distribution, best_params
     # return best_distribution.name, best_params
@@ -303,7 +328,15 @@ def dist_generator(dist, n):
     yield from dist.rvs(n)
 
 
-def create_list_by_dist(data, androzoo, dist=None):
+def kde_sample_generator(kde):
+    resample = kde.resample()[0]
+    # print("this is a resample of size: " + str(len(resample)))
+    for sample in resample:
+        # print("This sample is :" + str(sample))
+        yield sample
+
+
+def create_list_by_dist(data, androzoo, dist=None, use_kde=False, kde_bandwidth=0.1):
     # data = from jsons
     # androzoo = from androzoo_file
 
@@ -316,8 +349,10 @@ def create_list_by_dist(data, androzoo, dist=None):
     # return makesample(N, buckelems, mi, ma, bs, dist)
 
     # Guess the distribution of MWlist, get the name and parameters of the distribution
-    if dist is None:
-        dist, dist_params = best_fit_distribution(data_values)
+    if dist is None and use_kde is False:
+        binwidth = 10**5
+        bins = np.arange(0, max(data_values) + binwidth, 2*binwidth)
+        dist, dist_params = best_fit_distribution(data_values, bins=bins)
 
         arg = dist_params[:-2]
         loc = dist_params[-2]
@@ -326,7 +361,7 @@ def create_list_by_dist(data, androzoo, dist=None):
         # log.debug("Creating a similar distribution with " + str(n) + " values")
         # Create a random list following MWlist (guessing it: ntc, gengamma, fisk, johnsonsu ...)
         guessed_dist = dist(loc=loc, scale=scale, *arg)
-    else:
+    elif dist is not None:
         guessed_dist = dist
 
     n = len(androzoo)
@@ -363,10 +398,20 @@ def create_list_by_dist(data, androzoo, dist=None):
 
     # rand_from_guesses = next(guessed_values)
 
+    if use_kde is True:
+        kde = st.gaussian_kde(data_values, kde_bandwidth)
+        sample = kde_sample_generator(kde)
+
+    kde_exausted = False
+
     rand_from_guesses = 0
 
     while rand_from_guesses <= 0:
-        rand_from_guesses = guessed_dist.rvs()
+        if use_kde is True:
+            rand_from_guesses = next(sample)
+            # log.info("rand len: " + str(len(rand_from_guesses)))
+        else:
+            rand_from_guesses = dist.rvs()
 
     orig_androzoo = androzoo
 
@@ -396,7 +441,16 @@ def create_list_by_dist(data, androzoo, dist=None):
                             new_data.append(element)
                             rand_from_guesses = 0
                             while rand_from_guesses <= 0:
-                                rand_from_guesses = guessed_dist.rvs()
+                                if use_kde is True:
+                                    try:
+                                        rand_from_guesses = next(sample)
+                                    except StopIteration:
+                                        kde_exausted = True
+                                        break
+                                else:
+                                    rand_from_guesses = dist.rvs()
+                            # while rand_from_guesses <= 0:
+                            #     rand_from_guesses = guessed_dist.rvs()
                     except KeyError:
                         continue
                 else:
@@ -418,10 +472,39 @@ def create_list_by_dist(data, androzoo, dist=None):
         #          " 2017: " + str(years['2017']) + " 2018:" + str(years['2018']))
         rand_from_guesses = 0
         while rand_from_guesses <= 0:
-            rand_from_guesses = guessed_dist.rvs()
+            if use_kde is True:
+                try:
+                    rand_from_guesses = next(sample)
+                except StopIteration:
+                    kde_exausted = True
+                    break
+            else:
+                rand_from_guesses = dist.rvs()
 
-        if len(androzoo) != len(relist_androzoo):
+        if len(androzoo) != len(relist_androzoo) and kde_exausted is False:
             androzoo = relist_androzoo
+        elif kde_exausted is True:
+            kde = st.gaussian_kde(data_values, kde_bandwidth)
+            sample = kde_sample_generator(kde)
+            log.info("Processing GW num: " + str(len(new_data)))
+            log.info("2015: " + str(years['2015']))
+            log.info("2016: " + str(years['2016']))
+            log.info("2017: " + str(years['2017']))
+            log.info("2018: " + str(years['2018']))
+            log.info("No other apks to try, reseting")
+            new_data = []
+            androzoo = orig_androzoo
+            years = {
+                '2015': 0,
+                '2016': 0,
+                '2017': 0,
+                '2018': 0,
+            }
+            if use_kde is True:
+                kde = st.gaussian_kde(data_values, kde_bandwidth)
+                sample = kde_sample_generator(kde)
+            kde_exausted = False
+            time.sleep(1)
         else:
             # log.info("No other apks to try, exiting")
             # break
@@ -439,6 +522,10 @@ def create_list_by_dist(data, androzoo, dist=None):
                 '2017': 0,
                 '2018': 0,
             }
+            if use_kde is True:
+                kde = st.gaussian_kde(data_values, kde_bandwidth)
+                sample = kde_sample_generator(kde)
+            kde_exausted = False
             time.sleep(1)
 
     log.info("Processing GW num: " + str(len(new_data)))
@@ -489,7 +576,9 @@ if __name__ == '__main__':
     # my_dist = st.gennorm(loc=loc, scale=scale, *arg)
     # res_data = create_list_by_dist(data, androzoo, my_dist)
 
-    res_data = create_list_by_dist(data, androzoo)
+    # res_data = create_list_by_dist(data, androzoo)
+
+    res_data = create_list_by_dist(data, androzoo, use_kde=True, kde_bandwidth=0.05)
 
     print("res_data size: " + str(len(res_data)))
 

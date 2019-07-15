@@ -193,6 +193,14 @@ def output_histograms(datasets,histograms_def,output_dir):
             #     def output_histograms(data,output_dir):
 
             data = row.histogram_collection[histogram_name]['data']
+            backup = []
+            original_data = data
+
+            for value in data:
+                if value < (37 * 10**6):
+                    backup.append(value)
+
+            data = backup
 
             log.debugv("Data size is " + str(len(data)))
 
@@ -233,15 +241,25 @@ def output_histograms(datasets,histograms_def,output_dir):
             elif hist_type == 'int':
                 log.debug("Histogram " + histogram_name + " for " + row_name + " is type int")
                 log.info("Histogram " + histogram_name + " for " + row_name + " is type int")
-                fig, ax = plt.subplots(1, 1, figsize=(200, 40))
+                fig, ax = plt.subplots(1, 1, figsize=(8, 6))
+
                 # fig, ax = plt.subplots(1,1)
                 # Ajust bins
-                max_exp = int(floor(loga(max(data), 10)))
-                binwidth = 10**(max_exp - 3)
-                bins = np.arange(min(data), max(data) + binwidth, binwidth)
+                # max_exp = int(floor(loga(max(original_data), 10)))
+                # binwidth = 10**(max_exp - 3)
 
-                ax.hist(data, bins=bins, ec='black')
+                # TODO: parameterize binwidth
+                binwidth = 10**5
+                bins = np.arange(0, max(data) + binwidth, 2*binwidth)
+                # bins = np.arange(100000, max(original_data) + binwidth, binwidth)
 
+                # log.info("Max exp: " + str(max_exp))
+                log.info("bindwidth: " + str(binwidth))
+                log.info("Bins: " + str(bins))
+                # ax.hist(data, bins=bins, ec='black')
+                ax.hist(data, bins=bins)
+
+                # TODO: argument option to calculate distribution
                 # guessed_dist, params = gd.best_fit_distribution(data)
 
                 # guessed_dist = st.gennorm
@@ -277,13 +295,31 @@ def output_histograms(datasets,histograms_def,output_dir):
 
                 # ax.plot(data, guessed_dist.pdf(data, *arg), 'g-', lw=5)
 
-                ax.set_title(histogram_name + " - " + row_name)
-                ax.set_xlim(left=0)  # Start at left zero
-                ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ',')))  # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
+                # Start at left zero
+                ax.set_xlim(left=0)
 
-                ax.xaxis.set_major_locator(ticker.MultipleLocator(binwidth*10))
-                plt.xticks(rotation=45)  # Rotate x ticks
-                plt.gcf().subplots_adjust(bottom=0.15)  # Adjust the lables if they go pass the figure
+                @ticker.FuncFormatter
+                def megas(x, pos):
+                    return int(x/10**6)
+
+                # The formatter for the labels in the ticks (ticks are the marks with numbers in the x axis)
+                # ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
+                ax.xaxis.set_major_formatter(megas)
+
+                # Where the major ticks should be
+                # ax.xaxis.set_major_locator(ticker.MultipleLocator(binwidth))
+                ax.xaxis.set_major_locator(ticker.MultipleLocator(10**6))
+
+                # Rotate x ticks
+                plt.xticks(rotation=45)
+
+                # Adjust the lables if they go pass the figure
+                plt.gcf().subplots_adjust(bottom=0.15)
+
+                ax.set_title(histogram_name + " - " + row_name)
+                plt.xlabel('APK size (in MB)')
+                plt.ylabel('Number of APKs')
+
                 plt.grid(linestyle="--")  # Grid in the histogram
             else:
                 fig, ax = plt.subplots(1, 1)
@@ -298,9 +334,101 @@ def output_histograms(datasets,histograms_def,output_dir):
 
             plt.figure().clear()
             plt.close(plt.figure())
+
+
+            # Density graph
+            if hist_type == 'int':
+                log.debug("Density histogram " + histogram_name + " for " + row_name + " is type int")
+                log.info("Density histogram " + histogram_name + " for " + row_name + " is type int")
+                fig, ax = plt.subplots(1, 1, figsize=(8, 6))
+
+                # fig, ax = plt.subplots(1,1)
+                # Ajust bins
+                # max_exp = int(floor(loga(max(original_data), 10)))
+                # binwidth = 10**(max_exp - 3)
+
+                # TODO: parameterize binwidth
+                binwidth = 10**5
+                bins = np.arange(0, max(data) + binwidth, 2*binwidth)
+                # bins = np.arange(100000, max(original_data) + binwidth, binwidth)
+                plt.style.use('seaborn-deep')
+                # plt.gca().set_color_cycle(['blue', 'red', 'green', 'yellow'])
+                # log.info("Max exp: " + str(max_exp))
+                log.info("bindwidth: " + str(binwidth))
+                log.info("Bins: " + str(bins))
+                # ax.hist(data, bins=bins, ec='black')
+                ax.hist(data, bins=bins, density=True)
+
+                mn, mx = plt.xlim()
+                # TODO: argument option to calculate distribution
+                # guessed_dist, params = gd.best_fit_distribution(data)
+
+                guessed_dist = st.gennorm
+                params = (0.3324494702448755, 1808293.0000002861, 71602.6687589449)
+                # params = guessed_dist.fit(data)
+
+                # log.info(my_params == params)
+                # log.info("my_params: " + str(my_params))
+                log.info("params:    " + str(params))
+
+                arg = params[:-2]
+                # loc: the mean of the distribution
+                loc = params[-2]
+                # scale: the standard deviation of the distribution
+                scale = params[-1]
+
+                my_rv = guessed_dist(*arg, loc=loc, scale=scale)
+
+                x = np.linspace(my_rv.ppf(0.01), my_rv.ppf(0.99), 5000)
+                ax.plot(x, my_rv.pdf(x), 'r--', lw=0.5, label=guessed_dist.name)
+
+                # Plotting KDE
+                # for bandwidth in [1,0.1,0.05,0.01,0.005]:
+                for bandwidth in [0.01]:
+                    kde = st.gaussian_kde(data, bandwidth)
+                    x = np.linspace(mn, mx, 5000)
+                    ax.plot(x, kde.pdf(x), lw=0.5, label='KDE @ '+str(bandwidth))
+
+                ax.legend(loc='upper right')
+                # Start at left zero
+                ax.set_xlim(left=0)
+
+                @ticker.FuncFormatter
+                def megas(x, pos):
+                    return int(x/10**6)
+
+                # The formatter for the labels in the ticks (ticks are the marks with numbers in the x axis)
+                # ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
+                ax.xaxis.set_major_formatter(megas)
+
+                # Where the major ticks should be
+                # ax.xaxis.set_major_locator(ticker.MultipleLocator(binwidth))
+                ax.xaxis.set_major_locator(ticker.MultipleLocator(10**6))
+
+                # Rotate x ticks
+                plt.xticks(rotation=45)
+
+                # Adjust the lables if they go pass the figure
+                plt.gcf().subplots_adjust(bottom=0.15)
+
+                ax.set_title(histogram_name + " - " + row_name)
+                plt.xlabel('APK size (in MB)')
+                plt.ylabel('Probability')
+
+                plt.grid(linestyle="--")  # Grid in the histogram
+
+                filename = "density_" + histogram_name + "_" + row_name
+                # plt.savefig(output_dir + "/histogram_"+ filename + ".png")
+                # log.info("Histogram saved as histogram_"+ filename + ".png")
+                plt.savefig(output_dir + "/" + filename + ".pdf")
+                log.info("Histogram saved as density_histogram_" + filename + ".pdf")
+
+                plt.figure().clear()
+                plt.close(plt.figure())
+
             # print("Figure clear")
 
-        # Draw joint histogram
+        # Draw joint histogram if there is more than one row (dataset)
         if len(datasets) > 1:
 
             # ax.hist(dataset_list, bins, label=['x', 'y'])
@@ -756,12 +884,14 @@ def postprocessing(myjsonconfig, verbose=0):
             else:
                 log.debugv("There are no histograms in the config file, moving on")
 
+            # TODO: If dataset dir doesn't exists, continue
             mypath = myjson['rows'][row]
 
             try:
                 files = [f for f in listdir(mypath) if isfile(join(mypath, f)) and f.endswith(".json")]
             except Exception:
                 raise Exception("Cannot open dir")
+                continue
 
             # Process each file into the rows
             numFiles = len(files)
