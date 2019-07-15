@@ -11,6 +11,7 @@ import numpy as np
 import collections
 import random
 import math
+import time
 
 
 ################################################################################
@@ -367,6 +368,8 @@ def create_list_by_dist(data, androzoo, dist=None):
     while rand_from_guesses <= 0:
         rand_from_guesses = guessed_dist.rvs()
 
+    orig_androzoo = androzoo
+
     while len(new_data) < 5000:
         relist_androzoo = []
         # rand_from_guesses = next(guessed_values)
@@ -410,16 +413,37 @@ def create_list_by_dist(data, androzoo, dist=None):
             # if len(new_data) >= 5000:
             #     break
         log.debug("androzoo exhausted, changing")
-        log.debug("Processing GW num: " + str(len(new_data)))
+        # log.info("Processing GW num: " + str(len(new_data)))
+        # log.info("By year, 2015: " + str(years['2015']) + " 2016: " + str(years['2016']) +
+        #          " 2017: " + str(years['2017']) + " 2018:" + str(years['2018']))
         rand_from_guesses = 0
         while rand_from_guesses <= 0:
             rand_from_guesses = guessed_dist.rvs()
 
-        if androzoo.sort() != relist_androzoo.sort():
+        if len(androzoo) != len(relist_androzoo):
             androzoo = relist_androzoo
         else:
-            log.info("No other apks to try, exiting")
-            break
+            # log.info("No other apks to try, exiting")
+            # break
+            log.info("Processing GW num: " + str(len(new_data)))
+            log.info("2015: " + str(years['2015']))
+            log.info("2016: " + str(years['2016']))
+            log.info("2017: " + str(years['2017']))
+            log.info("2018: " + str(years['2018']))
+            log.info("No other apks to try, reseting")
+            new_data = []
+            androzoo = orig_androzoo
+            years = {
+                '2015': 0,
+                '2016': 0,
+                '2017': 0,
+                '2018': 0,
+            }
+            time.sleep(1)
+
+    log.info("Processing GW num: " + str(len(new_data)))
+    log.info("By year, 2015: " + str(years['2015']) + " 2016: " + str(years['2016']) +
+             " 2017: " + str(years['2017']) + " 2018:" + str(years['2018']))
 
     return new_data
 
@@ -446,29 +470,33 @@ if __name__ == '__main__':
 
     # quit()
 
+    # json_convert retuns a list
     data = json_convert(args.jsonpath_expr, args.json_dir)
     log.info("JSON data processed")
 
+    # androzoo2data returns a list
     androzoo = androzoo2data(args.androzoo_file, ',')
     log.info("Androzoo file data processed")
 
+    # TODO: parameterize in program argument: distribution name and parameters
+
+    # params = (0.352741247536232, 1752521.9999999618, 163469.98334998888)
     # params = (0.352741247536232, 1752521.9999999618, 163469.98334998888)
     # arg = params[:-2]
     # loc = params[-2]
     # scale = params[-1]
 
     # my_dist = st.gennorm(loc=loc, scale=scale, *arg)
-    # res_data = create_list_by_dist(data, data2, my_dist)
+    # res_data = create_list_by_dist(data, androzoo, my_dist)
 
     res_data = create_list_by_dist(data, androzoo)
 
     print("res_data size: " + str(len(res_data)))
 
-    # TODO: Replace filename with date
     # with open('res4.txt', 'w') as f:
     with open(args.output_file, 'w') as f:
         for item in res_data:
-            f.write("{},{:d}\n".format(item['name'], item['value']))
+            f.write("{},{:d},{}\n".format(item['name'], item['size'], item['year']))
 
     # res_data = create_list_by_dist(data, androzoo)
     print(len(res_data))

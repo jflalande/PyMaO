@@ -1,0 +1,13 @@
+{
+	"rows":{
+		"mal":"/home/tomas/gits/bureaucs/GOODMAL/MAL/01",
+		"gud":"/home/tomas/gits/bureaucs/GOODMAL/GOOD/02"
+	},
+	"histograms":{
+		"Size":[
+			"$..GetAPKSize.size",
+			"int"
+		]
+  },
+	"output_dir":"/home/tomas/orch/gud_res"
+}
