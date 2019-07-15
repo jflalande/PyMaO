@@ -16,6 +16,15 @@ cd ~/Android/Sdk/tools
 ./bin/sdkmanager "platform-tools"
 ```
 
+Install APKiD (requiered for experiments that use Apkid analysis)
+
+```
+sudo pip3 install --upgrade wheel
+sudo pip3 wheel --wheel-dir=/tmp/yara-python --build-option="build" --build-option="--enable-dex" git+https://github.com/VirusTotal/yara-python.git@v3.10.0
+sudo pip3 install --no-index --find-links=/tmp/yara-python yara-python
+sudo pip3 install apkid
+```
+
 # Usage
 
 - create a new XP in the experiment/ folder
