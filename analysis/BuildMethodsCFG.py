@@ -38,7 +38,7 @@ class BuildMethodsCFG(Analysis):
 
         output_dir = self.xp.working_directory
         temp_dir = ""
-        heuristics_file = self.xp.config.heuristicsFile
+        heuristics_file = self.xp.config.heuristics_file
         ### WARNING ###
 
         apk = jsonanalyses["filename"]
@@ -71,6 +71,11 @@ class BuildMethodsCFG(Analysis):
 
 
         #test si le fichier a été crée
+        print("print de tmpfs")
+        for root, dirs, files in os.walk(".", topdown=False):
+            for name in files:
+                print(os.path.join(root, name))
+
         if os.path.isfile(output_dir+"/heuristic.json")  :
             copyfile(output_dir+"/heuristic.json","/Users/vviettri/Documents/malware/malware-xp/output-xp/"+basename+"_"+"heuristic.json")
 
@@ -79,6 +84,13 @@ class BuildMethodsCFG(Analysis):
             nb_methods = len(cfg.nodes())
         else :
             log.debug("The file call-graph.dot doesn't exist")
+
+        if os.path.isfile (output_dir + "/allInvoke.json") :
+            copyfile(output_dir+"/allInvoke.json","/Users/vviettri/Documents/malware/malware-xp/output-xp/"+basename+"_"+"allInvoke.json")
+
+        else :
+            log.debug("The file allInvoke.json  doesn't exist")
+
 
         nb_suspicious = num_lines_in_file(output_dir + "/global.json")
         nb_data_dependency = num_lines_in_file(output_dir + "/extraction.json")
@@ -89,24 +101,24 @@ class BuildMethodsCFG(Analysis):
         nb_telephony = num_lines_in_file(output_dir + "/telephony.json")
         nb_crypto = num_lines_in_file(output_dir + "/crypto.json")
         
-        #TODO ajouter le traitement de l'exception
-        nb_cats = sum(map(lambda x: 1 if x != 0 else 0,
-                          [nb_sms, nb_binary, nb_dynamic, nb_telephony, nb_crypto, nb_network]))
-
-        # list_dot = [entry for entry in os.scandir(output_dir) if (not entry.name.startswith('.') and entry.is_file())]
-
-        self.updateJsonAnalyses(analysis_name, jsonanalyses,
-                                {"nbMethods": nb_methods,
-                                 "nbSuspicious": nb_suspicious,
-                                 "nbDataDependency": nb_data_dependency,
-                                 "nbSms": nb_sms,
-                                 "nbBinary": nb_binary,
-                                 "nbDynamic": nb_dynamic,
-                                 "nbNetwork": nb_network,
-                                 "nbTelephony": nb_telephony,
-                                 "nbCrypto": nb_crypto,
-                                 "nbCats": nb_cats,
-                                })
+        # #TODO ajouter le traitement de l'exception
+        # nb_cats = sum(map(lambda x: 1 if x != 0 else 0,
+        #                   [nb_sms, nb_binary, nb_dynamic, nb_telephony, nb_crypto, nb_network]))
+        #
+        # # list_dot = [entry for entry in os.scandir(output_dir) if (not entry.name.startswith('.') and entry.is_file())]
+        #
+        # self.updateJsonAnalyses(analysis_name, jsonanalyses,
+        #                         {"nbMethods": nb_methods,
+        #                          "nbSuspicious": nb_suspicious,
+        #                          "nbDataDependency": nb_data_dependency,
+        #                          "nbSms": nb_sms,
+        #                          "nbBinary": nb_binary,
+        #                          "nbDynamic": nb_dynamic,
+        #                          "nbNetwork": nb_network,
+        #                          "nbTelephony": nb_telephony,
+        #                          "nbCrypto": nb_crypto,
+        #                          "nbCats": nb_cats,
+        #                         })
 
         os.chdir(current_dir)
 
