@@ -67,20 +67,24 @@ class StatsInvoke(Analysis):
         errcode, res = self.xp.exec_in_subprocess(command, cwd=True, logOutputs=True)
 
         res={}
-        with open(output_dir + "/allInvoke.json", "r") as invokeFile:
-            for line in invokeFile:
-                package=line.split(",")[0]
-                method =line.split(",")[1]
-                method=method.replace('\n','')
+        if os.path.isfile (output_dir + "/allInvoke.json") :
 
-                if package in res :
-                    if method in res[package] :
-                        res[package][method]+=1
+            with open(output_dir + "/allInvoke.json", "r") as invokeFile:
+                for line in invokeFile:
+                    package=line.split(",")[0]
+                    method =line.split(",")[1]
+                    method=method.replace('\n','')
+
+                    if package in res :
+                        if method in res[package] :
+                            res[package][method]+=1
+                        else :
+                            res[package][method] = 1
                     else :
+                        res[package]={}
                         res[package][method] = 1
-                else :
-                    res[package]={}
-                    res[package][method] = 1
+        else :
+            log.debug("The file allInvoke.json  doesn't exist")
 
 
         for package in res :
