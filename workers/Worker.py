@@ -99,8 +99,8 @@ def doJob(queue, xp, worker_nb):
 
         # Erasing .json file
         writeJson(apkname, xp, jsondata)
-        log.debug("Finished " + apkname + " -- JSON: " + str(jsondata))
-
+        log.debug("Finished " + apkname)
+        log.debugv("==> JSON: " + str(jsondata))
 
 
 """Rewrites the JSON file for an apk"""

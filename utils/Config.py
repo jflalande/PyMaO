@@ -10,17 +10,21 @@ class Config:
     devices = []
     tmpfs = None
     sdkhome = None
+    log_trace = False
+    no_analysis_clean = False
+
     targetXP = None
     apkbase = None
     jsonbase = None
     targetsymlink = None
     simulate_json_write = False
-    triggerdroid_path = None
-    heuristicsFile = None
 
-    conf_structure = {'general' : ['nb_workers', 'devices', 'tmpfs', 'sdkhome', 'debug'],
+    triggerdroid_path = None
+    heuristicsfile = None
+
+    conf_structure = {'general' : ['nb_workers', 'devices', 'tmpfs', 'sdkhome', 'debug', 'no_analysis_clean', 'log_trace'],
                       'xp': ['targetxp', 'apkbase', 'jsonbase', 'simulate_json_write', 'targetsymlink'],
-                      'analyses': ['triggerdroidpath', 'heuristicsfile']}
+                      'analysis': ['triggerdroid_path', 'heuristics_file']}
 
     def check_config_file(self,cp):
         for s in cp.sections():
@@ -52,6 +56,8 @@ class Config:
         self.devices = ast.literal_eval(confparser['general']['devices'])
         self.tmpfs = confparser['general']['tmpfs']
         self.sdkhome = confparser['general']['sdkhome']
+        self.no_analysis_clean = confparser.getboolean('general','no_analysis_clean')
+        self.log_trace = confparser.getboolean('general','log_trace')
 
 
         self.targetXP = confparser['xp']['targetXP']
@@ -60,7 +66,7 @@ class Config:
         self.targetsymlink = confparser['xp']['targetsymlink']
         self.simulate_json_write = simulate or confparser.getboolean('xp','simulate_json_write')
 
-        self.triggerdroid_path = confparser['analyses']['triggerDroidPath']
-        self.heuristicsFile = confparser['analyses']['heuristicsFile']
+        self.triggerdroid_path = confparser['analysis']['triggerdroid_path']
+        self.heuristics_file = confparser['analysis']['heuristics_file']
 
         config_file.close()

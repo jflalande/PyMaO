@@ -16,6 +16,7 @@ from utils.CursesHandler import CursesHandler
 import signal
 import sys
 import ast
+import traceback
 
 def setup_args():
     parser = argparse.ArgumentParser()
@@ -92,6 +93,7 @@ try:
     curses.curs_set(False)
 
     curses.start_color()
+    curses.init_color(0, 0, 0, 0) # I really want black
     curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
     curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
     curses.init_pair(3, curses.COLOR_YELLOW, curses.COLOR_BLACK)
@@ -124,10 +126,7 @@ try:
     win_right.refresh()
     win_logs.scrollok(True)
 
-    # Add an handler for the log object for redirecting messages to win
-    mh = CursesHandler(win_logs)
-    #mh.setFormatter('%(asctime)s [%(levelname)8s] %(message)s')
-    log.addHandler(mh)
+
 
     # Reading args
     args = vars(setup_args())
@@ -141,6 +140,11 @@ try:
     # For debugging purpose:
     logSetup(config.debug)
 
+    # Add an handler for the log object for redirecting messages to win
+    mh = CursesHandler(win_logs, config.log_trace)
+    #mh.setFormatter('%(asctime)s [%(levelname)8s] %(message)s')
+    log.addHandler(mh)
+
     # Displaying for the user
     log.debugv("ARGS: " + str(args))
     log.info("Reading config file: " + args["config"])
@@ -150,6 +154,16 @@ try:
     log.info(" - devices: " + str(config.devices))
     log.info(" - tmpfs: " + str(config.tmpfs))
     log.info(" - sdkhome: " + str(config.sdkhome))
+    log.info(" - analysis clean: " + str(config.no_analysis_clean))
+    log.info(" - log trace in trace.log: " + str(config.log_trace))
+    if config.no_analysis_clean:
+        log.warning("Generated files from an analysis will NOT be cleaned!")
+
+    # ==================================================
+    log.info("Analysis parameters")
+    log.info("===================")
+    log.info(" - triggerdroid path: " + str(config.triggerdroid_path))
+    log.info(" - heuristics file: " + str(config.heuristicsfile))
 
     # ==================================================
     log.info("XP parameters")
@@ -224,7 +238,28 @@ try:
 
     restoreConsole()
 
-except RuntimeError as e:
+    # Printing logs
+    mh.printLogFromDeque()
+
+except Exception as e:
+    # Logging error
+    log.error("EXCEPTION catched and forwarded to stdout: " + str(e))
+
+    _, _, tb = sys.exc_info()
+    tb_stack = traceback.extract_tb(tb)
+    # Printing in logging system
+    for line in tb_stack:
+        log.error(line)
+
+    # Restoring console
     restoreConsole()
-    print("ERROR")
-    print(e)
+    # Detaching the output from the logging system
+    log.removeHandler(mh)
+
+    # Printing logs
+    mh.printLogFromDeque()
+
+    # Launching error !
+    log.error("EXCEPTION catched and forwarded to stdout: " + str(e))
+    raise
+

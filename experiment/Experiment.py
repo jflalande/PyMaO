@@ -43,6 +43,10 @@ class Experiment:
 
     def setupWorkingDirectory(self):
         log.debugv("Creating working directory " + self.config.tmpfs + "/" + self.tid)
+        if self.config.no_analysis_clean:
+            if os.path.isdir(self.config.tmpfs + "/" + self.tid):
+                log.warning("TMPFS directory already exists - skipping! (no cleaned option?): " + self.config.tmpfs + "/" + self.tid)
+                return
         try:
             os.mkdir(self.config.tmpfs + "/" + self.tid)
             self.working_directory = self.config.tmpfs + "/" + self.tid
@@ -50,8 +54,11 @@ class Experiment:
             raise Exception("Error creating directory " + self.config.tmpfs + "/" + self.tid)
 
     def cleanWorkingDirectory(self):
-        log.debugv("Cleaning TMPFS for pid " + self.tid)
-        shutil.rmtree(self.config.tmpfs + "/" + self.tid)
+        if self.config.no_analysis_clean:
+            log.debugv("NOT cleaning TMPFS for pid " + self.tid)
+        else:
+            log.debugv("Cleaning TMPFS for pid " + self.tid)
+            shutil.rmtree(self.config.tmpfs + "/" + self.tid)
 
     def cleanTMPFSDirectory(self):
         log.info("Cleaning TMPFS")
