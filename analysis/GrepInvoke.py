@@ -22,18 +22,21 @@ class GrepInvoke(Analysis):
             for line in f:
                 # Line is "invoke {arg0,...,argn}, classname->method(params)ret"
 
-                # Get only the method descriptor
-                line = line.split(',')[-1]
+                try:
+                    # Get only the method descriptor
+                    line = line.split(',')[-1]
 
-                # Remove args and ret type
-                line = line.split('(')[0]
+                    # Remove args and ret type
+                    line = line.split('(')[0]
 
-                # Remove ';' and first 'L' and replace '/' to .''
-                line = line[2:].replace(';','').replace('/','.')
+                    # Remove ';' and first 'L' and replace '/' to .''
+                    line = line[2:].replace(';','').replace('/','.')
 
-                cls, meth = line.split('->')
+                    cls, meth = line.split('->')
 
-                output_json[cls][meth] += 1
+                    output_json[cls][meth] += 1
+                except ValueError:
+                    pass
 
         self.updateJsonAnalyses(analysis_name, jsonanalyses, output_json)
 
