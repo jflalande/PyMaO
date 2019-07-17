@@ -164,7 +164,7 @@ def epoch_to_date(epoch):
 os.stat_float_times(False)
 
 
-def output_histograms(datasets,histograms_def,output_dir):
+def output_histograms(datasets, histograms_def, output_dir):
 
     # Pretty colors for the delight of the eye
     plt.style.use('seaborn-deep')
@@ -176,7 +176,7 @@ def output_histograms(datasets,histograms_def,output_dir):
     for histogram_name in histograms_def:
         log.info("Processing histogram " + histogram_name)
         # joint_histogram = {}
-        joint_histogram = { 'type':histograms_def[histogram_name][1], 'data':{} }
+        joint_histogram = {'type': histograms_def[histogram_name][1], 'data': {}}
 
         # rows = []
 
@@ -192,19 +192,18 @@ def output_histograms(datasets,histograms_def,output_dir):
             #     for histogram_name in row.histogram_collection:
             #     def output_histograms(data,output_dir):
 
-            data = row.histogram_collection[histogram_name]['data']
-            backup = []
-            original_data = data
+            data = row.histogram_collection[histogram_name].data
 
-            for value in data:
-                if value < (37 * 10**6):
-                    backup.append(value)
-
-            data = backup
+            # backup = []
+            # original_data = data
+            # for value in data:
+            #     if value < (37 * 10**6):
+            #         backup.append(value)
+            # data = backup
 
             log.debugv("Data size is " + str(len(data)))
 
-            hist_type = row.histogram_collection[histogram_name]['type']
+            hist_type = row.histogram_collection[histogram_name].type
 
             # Collect all the data from this row according to the name of
             # the histogram
@@ -518,21 +517,21 @@ def output_histograms(datasets,histograms_def,output_dir):
                 # fig, ax = plt.subplots(1,1)
                 plt.style.use('seaborn-deep')
 
-                max_exp = int(floor(loga(max(mix_data),10)))
+                max_exp = int(floor(loga(max(mix_data), 10)))
                 binwidth = 10**(max_exp - 3)
 
-                ax.hist(data, bins=np.arange(min(mix_data), max(mix_data) + binwidth, binwidth),label=label)
+                ax.hist(data, bins=np.arange(min(mix_data), max(mix_data) + binwidth, binwidth), label=label)
                 ax.legend(loc='upper right')
                 log.debug("This title is " + histogram_name + " - " + joint)
                 ax.set_title(histogram_name + " - " + joint)
-                ax.set_xlim(left=0) # Start at left zero
-                ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ','))) # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
+                ax.set_xlim(left=0)  # Start at left zero
+                ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ',')))  # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
                 ax.xaxis.set_major_locator(ticker.MultipleLocator(binwidth*10))
-                plt.xticks(rotation=45) # Rotate x ticks
+                plt.xticks(rotation=45)  # Rotate x ticks
                 plt.gcf().subplots_adjust(bottom=0.15) # Adjust the lables if they go pass the figure
-                plt.grid(linestyle="--") # Grid in the histogram
+                plt.grid(linestyle="--")  # Grid in the histogram
             else:
-                fig, ax = plt.subplots(1,1)
+                fig, ax = plt.subplots(1, 1)
                 ax.hist(data, bins='auto', ec='black')
                 log.debug("This title is " + histogram_name + " - " + joint)
                 ax.set_title(histogram_name + " - " + joint)
@@ -545,7 +544,7 @@ def output_histograms(datasets,histograms_def,output_dir):
             plt.figure().clear()
 
 
-def output_to_files(datasets,out_dir):
+def output_to_files(datasets, out_dir):
     log.info("Processing finished, outputing files")
 
     jsonfile = out_dir + "/" + OUTPUT_FILENAME + ".json"
@@ -589,11 +588,11 @@ def output_to_files(datasets,out_dir):
         row = datasets[row_name]
 
         # Assigning the name of the row
-        ws.cell(row=row_num, column=col_num,value=row_name)
+        ws.cell(row=row_num, column=col_num, value=row_name)
         col_num += 1
 
         # Assigning the total of the row
-        ws.cell(row=row_num,column=col_num,value=row.total)
+        ws.cell(row=row_num, column=col_num, value=row.total)
         ws.merge_cells(start_row=row_num, start_column=col_num, end_row=row_num+1, end_column=col_num)
         col_num += 1
 
@@ -658,6 +657,26 @@ def topN(dico, N, poll_type):
 ################################################################################
 
 
+class Histogram:
+    def __init__(self, req, type):
+        self.req = req
+        # self.req_parser = None
+        self.poll = {}
+        self.res_poll = {}
+        self.data = []
+        self.type = type
+        if len(self.req.split(":")) < 2:
+            # Normal request
+            self.req_type = None
+            self.jpath = self.req.split(" ")[0]
+            self.req_parser = BooleanParser.BooleanParser(self.req)
+        else:
+            # This is poll request, it only needs to retrive a value
+            # self.req_type can be top or bottom
+            self.jpath, self.req_type, self.num_of_poll = self.req.split(":")
+            self.num_of_poll = int(self.num_of_poll)
+
+
 class Column:
     def __init__(self, name, parent_row, req, depend=None):
         self.name = name
@@ -677,8 +696,8 @@ class Column:
         else:
             # This is poll request, it only needs to retrive a value
             # self.req_type can be top or bottom
-            self.jpath, self.req_type, self.num_poll = self.req.split(":")
-            self.num_poll = int(self.num_poll)
+            self.jpath, self.req_type, self.num_of_poll = self.req.split(":")
+            self.num_of_poll = int(self.num_of_poll)
         self.depend = depend
         # print("Column " + self.name  + " created")
 
@@ -697,7 +716,7 @@ class Column:
                     self.pct_depend = (self.total / self.depend.total)*100
         else:
             # print('getting poll')
-            self.res_poll = topN(self.poll, self.num_poll, self.req_type)
+            self.res_poll = topN(self.poll, self.num_of_poll, self.req_type)
 
 
 class Row:
@@ -725,7 +744,14 @@ class Row:
         self.columns.append(new_column)
 
     def create_histogram(self, name, request, type):
-        self.histogram_collection[name] = {"type": type, "request": request, "data": []}
+        # self.histogram_collection[name] = {"type": type, "request": request, "data": []}
+        new_histogram = Histogram(request, type)
+        self.histogram_collection[name] = new_histogram
+
+    def create_bar(self, name, request, type):
+        # self.bar_collection[name] = {"type": type, "request": request, "data": []}
+        new_bar = Histogram(request, type)
+        self.bar_collection[name] = new_bar
 
     def process(self, json_file):
         self.total += 1
@@ -783,23 +809,43 @@ class Row:
 
         if (self.histogram_collection.keys()) != 0:
             for histogram_name in self.histogram_collection:
-                histogram_dict = self.histogram_collection[histogram_name]
+                # histogram_dict = self.histogram_collection[histogram_name]
+                histogram = self.histogram_collection[histogram_name]
 
                 # Find the value of the JSONPath expression if it's not in the dictionary
-                expression = histogram_dict['request']
+                # expression = histogram_dict['request']
+                expression = histogram.request
+
+                # Check if is value, dict, or list
 
                 if expression not in self.var_dict.keys():
                     try:
-                        parse = expression.split('.')
                         name = json_file['name']
+                        parse = expression.split('.')
+                        for i, expr in enumerate(parse):
+                            if i == 1:
+                                expression_val = json_file[name]
+                            else:
+                                expression_val = expression[expr]
                         log.debugv('the parsed list is: ' + str(parse))
-                        log.debugv('My name is: ' + str(parse[2]))
-                        self.var_dict[expression] = json_file[name][parse[2]][parse[3]]
-                        if histogram_dict['type'] == 'date' and self.var_dict[expression] == "":
-                            log.debugv('This date "' + expression + '" is now 0')
-                            self.var_dict[expression] = 0
+                        # log.debugv('My name is: ' + str(parse[2]))
+                        expression_class = expression_val.__class__
+                        if expression_class == int or expression_class == float or expression_class == str \
+                                or expression_class == bool:
+                            # This may fail
+                            # self.var_dict[expression] = json_file[name][parse[2]][parse[3]]
+                            self.var_dict[expression] = expression_val
+                            if histogram.type == 'date' and self.var_dict[expression] == "":
+                                log.debugv('This date "' + expression + '" is now 0')
+                                self.var_dict[expression] = 0
+                        elif expression_class == dict:
+                            print(expression + " is a dictionnary")
+
+                        elif expression_class == list:
+                            print(expression + " is a list")
+
                     except Exception as e:
-                        if histogram_dict['type'] == 'data':
+                        if histogram.type == 'data':
                             self.var_dict[expression] = 0
                         else:
                             self.var_dict[expression] = None
@@ -809,12 +855,84 @@ class Row:
                 if self.var_dict[expression] is not None:
                     val = self.var_dict[expression]
                     log.debugv("The value for " + str(expression) + " is: " + str(val))
-                    if histogram_dict['type'] == 'int':
-                        histogram_dict['data'].append(int(val))
+                    # if histogram_dict['type'] == 'int':
+                    if histogram.req_type == 'int':
+                        # histogram_dict['data'].append(int(val))
+                        histogram.data.append(int(val))
                     else:
-                        histogram_dict['data'].append(val)
+                        # histogram_dict['data'].append(val)
+                        histogram.data.append(val)
         else:
             log.debugv("No histograms, moving on")
+
+        if (self.bar_collection.keys()) != 0:
+            print("hello")
+            for bar_name in self.bar_collection:
+                # bar_dict = self.bar_collection[bar_name]
+                bar = self.bar_collection[bar_name]
+
+                # Find the value of the JSONPath expression if it's not in the dictionary
+                # expression = bar_dict['request']
+                expression = bar.request
+
+                # Check if is value, dict, or list
+
+                if expression not in self.var_dict.keys():
+                    try:
+                        name = json_file['name']
+                        parse = expression.split('.')
+                        request_tail = ""
+                        for i, expr in enumerate(parse):
+                            if i == 1:
+                                expression_val = json_file[name]
+                            else:
+                                if expr == '*':
+                                    request_tail = parse(i+1)
+                                    break
+                                else:
+                                    expression_val = expression[expr]
+                        log.debugv('the parsed list is: ' + str(parse))
+                        # log.debugv('My name is: ' + str(parse[2]))
+                        expression_class = expression_val.__class__
+                        if expression_class == int or expression_class == float or expression_class == str \
+                                or expression_class == bool:
+                            # This may fail
+                            # self.var_dict[expression] = json_file[name][parse[2]][parse[3]]
+                            self.var_dict[expression] = expression_val
+                            if bar.type == 'date' and self.var_dict[expression] == "":
+                                log.debugv('This date "' + expression + '" is now 0')
+                                self.var_dict[expression] = 0
+                        elif expression_class == dict:
+                            print(expression + " is a dictionnary")
+                            # Add keys and values directly to dictionnary
+                            for key in expression_val:
+                                if key in self.var_dict:
+                                    self.var_dict[key] += expression_val[request_tail]
+                                else:
+                                    self.var_dict[key] = expression_val[request_tail]
+                        elif expression_class == list:
+                            print(expression + " is a list")
+
+                    except Exception as e:
+                        if bar.type == 'data':
+                            self.var_dict[expression] = 0
+                        else:
+                            self.var_dict[expression] = None
+                log.debugv("--- Histogram: This is the result of the parsing: " + str(self.var_dict[expression]))
+
+                # Add the value if it exists
+                if self.var_dict[expression] is not None:
+                    val = self.var_dict[expression]
+                    log.debugv("The value for " + str(expression) + " is: " + str(val))
+                    # if bar_dict['type'] == 'int':
+                    if bar.req_type == 'int':
+                        # bar_dict['data'].append(int(val))
+                        bar.data.append(int(val))
+                    else:
+                        # bar_dict['data'].append(val)
+                        bar.data.append(val)
+        else:
+            log.debugv("No bars, moving on")
 
         # Reinitialize the dictionary
         self.var_dict = {}
@@ -832,6 +950,7 @@ def postprocessing(myjsonconfig, verbose=0):
     # quit()
     #
     # logSetup(verbose)
+
     t_start = time.time()
     filename = myjsonconfig
 
@@ -845,18 +964,10 @@ def postprocessing(myjsonconfig, verbose=0):
         log.debugv("This is the config file: " + str(myjson))
 
         log.info("Output dir: " + myjson['output_dir'])
-        jsonfile = myjson['output_dir'] + "/" + OUTPUT_FILENAME + ".json"
-        # xlsxfile = myjson['output_dir'] +  "/" + OUTPUT_FILENAME + ".xlsx"
-        # rawfile = myjson['output_dir'] +  "/" + OUTPUT_FILENAME + "_raw.json"
-
-        # Check of the result file already exists
-        # if os.path.isfile(jsonfile):
-        #     log.warning("The output file already exist. Quitting")
-
-        # else:
+        # jsonfile = myjson['output_dir'] + "/" + OUTPUT_FILENAME + ".json"
 
         # Initialize Row and Columns objects
-        datasets={} # An empty dataset (dictionary)
+        datasets = {}  # An empty dataset (dictionary)
 
         # for each row, because they are different datasets
         for row in myjson['rows']:
@@ -880,9 +991,22 @@ def postprocessing(myjsonconfig, verbose=0):
                 for histogram in myjson['histograms']:
                     log.debugv("Adding " + histogram + " histogram")
                     # Each row will contain the same values: name, request (JSONPath), and type
-                    datasets[row].create_histogram(histogram,myjson['histograms'][histogram][0],myjson['histograms'][histogram][1])
+                    histogram_request = myjson['histograms'][histogram][0]
+                    histogram_type = myjson['histograms'][histogram][1]
+                    datasets[row].create_histogram(histogram, histogram_request, histogram_type)
             else:
                 log.debugv("There are no histograms in the config file, moving on")
+
+            # Create bars
+            if 'bars' in myjson.keys():
+                for bar in myjson['bars']:
+                    log.debugv("Adding " + bar + " bar")
+                    # Each row will contain the same values: name, request (JSONPath), and type
+                    bar_request = myjson['bars'][bar][0]
+                    bar_type = myjson['bars'][bar][1]
+                    datasets[row].create_bar(bar, bar_request, bar_type)
+            else:
+                log.debugv("There are no bars in the config file, moving on")
 
             # TODO: If dataset dir doesn't exists, continue
             mypath = myjson['rows'][row]
@@ -903,17 +1027,21 @@ def postprocessing(myjsonconfig, verbose=0):
                 with open(mypath + "/" + filename) as f:
                     mwjson = json.load(f)
 
+                # Get the name of the file (without the extension)
                 mwjson['name'] = filename.split('.')[0]
                 datasets[row].process(mwjson)
 
             if verbose >= 1:
                 for histo in myjson['histograms']:
-                    log.debug("Dataset " + row + " has " + str(len(datasets[row].histogram_collection[histo]['data'])) + " entries in " + histo)
+                    log.debug("Dataset " + row + " has " + str(len(datasets[row].histogram_collection[histo].data)) + " entries in " + histo)
+
+        print(datasets)
+        quit()
 
         output_to_files(datasets, myjson['output_dir'])
 
         t_end = time.time()
-        log.info("PROCESS TIME: " + str(round(t_end - t_start,1)) + " s")
+        log.info("PROCESS TIME: " + str(round(t_end - t_start, 1)) + " s")
 
         if 'histograms' in myjson.keys():
             if verbose == 2:
@@ -922,7 +1050,7 @@ def postprocessing(myjsonconfig, verbose=0):
                     for histo in myjson['histograms']:
                         log.debugv("Dataset " + datasets[name].name + " has " + str(len(datasets[name].histogram_collection[histo]['data'])) + " entries in " + histo)
 
-            output_histograms(datasets, myjson['histograms'],myjson['output_dir'])
+            output_histograms(datasets, myjson['histograms'], myjson['output_dir'])
 
     t_end = time.time()
     log.info("TOTAL TIME: " + str(round(t_end - t_start,1)) + " s")
@@ -934,9 +1062,12 @@ if __name__ == "__main__":
     # Doc : https://docs.python.org/3/howto/argparse.html#id1
     parser = argparse.ArgumentParser(description="PostProcessing, for json files generated by the orchestrator.")
     parser.add_argument('json_config_file', help='The path to the JSON config file')
+    parser.add_argument('-s', help='Optrion for StatsInvoke')
     parser.add_argument('-v', help='Output information to the standart output (-vv is very verbose)', action="count")
+
     # parser.add_argument('-H', metavar='Result JSON file', help='Output information to the standart output (-vv is very verbose)')
-    args=parser.parse_args()
+
+    args = parser.parse_args()
 
     if args.v is not None:
         verbosity = args.v
