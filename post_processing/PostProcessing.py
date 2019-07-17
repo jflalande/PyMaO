@@ -4,6 +4,7 @@ import logging  # Log info output
 import datetime
 import argparse  # Program argument parser
 import json
+import collections  # imported for OrderedDict
 
 from os import listdir
 from os.path import isfile, join
@@ -544,6 +545,238 @@ def output_histograms(datasets, histograms_def, output_dir):
             plt.figure().clear()
 
 
+def output_bars(datasets, bars_def, output_dir):
+
+    # Pretty colors for the delight of the eye
+    plt.style.use('seaborn-deep')
+
+    # joint_bar = {}
+    # for bar in bars_def:
+    #     joint_bar[name] = {'type':bars_def[1], 'data'=[]}
+
+    for bar_name in bars_def:
+        log.info("Processing bar " + bar_name)
+        # joint_bar = {'type': bars_def[bar_name][1], 'data': {}}
+
+        for row_name in datasets:
+
+            log.debugv("Assigning row " + row_name)
+            row = datasets[row_name]
+
+            # Print individual bars
+            # Verify if there are bars to output
+            # if len(row.bar_collection.keys()) != 0:
+            #     for bar_name in row.bar_collection:
+            #     def output_bars(data,output_dir):
+
+            data = row.bar_collection[bar_name].data
+
+            # backup = []
+            # original_data = data
+            # for value in data:
+            #     if value < (37 * 10**6):
+            #         backup.append(value)
+            # data = backup
+
+            log.debugv("Data size is " + str(len(data)))
+
+            bar_type = row.bar_collection[bar_name].type
+
+            # Collect all the data from this row according to the name of
+            # the bar
+            # joint_bar['data'][row_name] = data
+
+            log.debugv("The data of " + bar_name + " is " + str(data))
+
+            if bar_type == 'date':
+                # TODO:
+                log.debug("This is a date bar (which should be a histogram)")
+            elif bar_type == 'int':
+                log.debug("Bar " + bar_name + " for " + row_name + " is type int")
+                # log.info("Bar " + bar_name + " for " + row_name + " is type int")
+                fig, ax = plt.subplots(1, 1, figsize=(8, 8))
+                # fig, ax = plt.subplots(1, 1, 'all')
+                names = list(data)
+                vals = data.values()
+
+                # width = 0.7
+
+                N = np.arange(len(data))
+
+                rects = ax.bar(N, vals, align='center')
+
+                # Add value to the bars
+                for rect, label in zip(rects, vals):
+                    height = rect.get_height()
+                    label = '{:,}'.format(label)
+                    ax.text(rect.get_x() + rect.get_width() / 1.5, height + 5, label,
+                            ha='center', va='bottom', rotation=90, fontsize=7)
+                ax.set_xticks(N)
+                ax.set_xticklabels(names)
+
+                # Adding extra y ticks
+                yticks = list(plt.yticks()[0])
+                steps = yticks[-1] - yticks[-2]
+                last_tick = yticks[-1]
+                extraticks = list(np.arange(yticks[-1], last_tick+2*steps, steps))
+                plt.yticks(yticks + extraticks)
+
+                # Rotate x ticks labels
+                for tick in ax.get_xticklabels():
+                    tick.set_rotation(90)
+
+                # Thousands comma separator
+                @ticker.FuncFormatter
+                def thousand(x, pos):
+                    return format(int(x), ',')
+
+                ax.yaxis.set_major_formatter(thousand)
+
+                # Change ticks' label size
+                plt.tick_params(axis='both', which='major', labelsize=7)
+                ax.set_title(bar_name + " - " + row_name)
+                plt.xlabel('API names')
+                plt.ylabel('Number of calls')
+
+                # Ajust the bottom of the subplot, to add space
+                fig.subplots_adjust(bottom=0.35)
+                # bottom, top = plt.ylim()
+                # plt.ylim(bottom, top + 20)
+
+                # plt.margins(0.2)
+                # plt.subplots_adjust(bottom=1.15)
+                # plt.tight_layout(h_pad=1)
+            else:
+                # TODO:
+                log.debug("Else")
+
+            filename = bar_name + "_" + row_name
+            # plt.savefig(output_dir + "/bar_"+ filename + ".png")
+            # log.info("Bar saved as bar_"+ filename + ".png")
+            plt.savefig(output_dir + "/bar_" + filename + ".pdf")
+            log.info("Bar saved as bar_" + filename + ".pdf")
+
+            plt.figure().clear()
+            plt.close(plt.figure())
+
+
+        # TODO: Draw joint bar if there is more than one row (dataset)
+        # if len(datasets) > 1:
+
+        #     # ax.bar(dataset_list, bins, label=['x', 'y'])
+        #     label = []
+        #     data = []
+        #     mix_data = []
+
+        #     for row_name in joint_bar['data']:
+        #         log.debug("Getting " + row_name)
+        #         label.append(row_name)
+        #         row_data = joint_bar['data'][row_name]
+        #         # print(str(row_name) + " is of type " + str(type(row_data)))
+        #         data.append(row_data)
+        #         mix_data.extend(row_data)
+
+        #     log.debug("dataset has " + str(len(data)) + " entries")
+
+        #     for num in data:
+        #         # print("num is " + str(num))
+        #         log.debug("The size of num is " + str(len(num)))
+
+        #     s = "+"
+        #     joint = s.join(label)
+
+        #     if bar_type == 'date':
+        #         log.debug("Bar " + bar_name + " is type date")
+        #         # Processing the dates to get the maximun and minimum month-year
+        #         mindate = dt.datetime.fromtimestamp(min(mix_data))
+        #         maxdate = dt.datetime.fromtimestamp(max(mix_data))
+        #         bindate = dt.datetime(year=mindate.year, month=mindate.month, day=1)
+        #         mybins = [bindate.timestamp()]
+        #         while bindate < maxdate:
+        #             if bindate.month == 12:
+        #                 bindate = dt.datetime(year=bindate.year + 1, month=1, day=1)
+        #             else:
+        #                 bindate = dt.datetime(year=bindate.year, month=bindate.month + 1, day=1)
+        #             mybins.append(bindate.timestamp())
+        #         mybins = mdates.epoch2num(mybins)
+
+        #         # plot_data = mdates.epoch2num(data)
+        #         plot_data = []
+        #         for list in data:
+        #             plot_data.append(mdates.epoch2num(list))
+
+        #         fig, ax = plt.subplots(1,1, figsize=(200, 20), facecolor='white')
+        #         # fig, ax = plt.subplots(1,1,facecolor='white')
+        #         ax.bar(plot_data, bins=mybins, ec='black')
+        #         log.debug("This title is " + bar_name + " - " + joint)
+        #         ax.set_title(bar_name + " - " + joint)
+        #         ax.xaxis.set_major_locator(mdates.MonthLocator())
+        #         ax.xaxis.set_major_formatter(mdates.DateFormatter('%m.%y'))
+        #         # fig.autofmt_xdate()
+
+        #         # Changing the space between the ticks
+
+        #         # plt.gca().margins(x=0)
+        #         # plt.gcf().canvas.draw()
+        #         tl = plt.gca().get_xticklabels()
+        #         # log.debug("tl = " + str(tl))
+        #         ticks_label = [t.get_window_extent().width for t in tl]
+        #         log.debug(str(ticks_label))
+        #         maxsize = max(ticks_label)
+
+        #         # If the ticks label list brings 0 in everyting
+        #         if maxsize == 0:
+        #             maxsize = 4
+        #         log.debug("maxsize = " + str(maxsize))
+        #         m = 0.2 # inch margin
+        #         N = len(mix_data)
+        #         log.debug("N = " + str(N))
+        #         log.debug("plt.gcf().dpi = " + str(plt.gcf().dpi))
+        #         s = maxsize/plt.gcf().dpi*N+2*m
+        #         margin = m/plt.gcf().get_size_inches()[0]
+        #         #
+        #         # print("plt.gcf().get_size_inches()[1] = " + str(plt.gcf().get_size_inches()[1]))
+        #         log.debug("plt.gcf().get_size_inches() = " + str(plt.gcf().get_size_inches()))
+        #         log.debug("s = " + str(s))
+        #         plt.gcf().subplots_adjust(left=margin, right=1.-margin)
+        #         # plt.gcf().set_size_inches(s, 10)
+        #         plt.gcf().set_size_inches(s*0.25, plt.gcf().get_size_inches()[1])
+
+        #         fig.autofmt_xdate()
+
+        #     elif bar_type == 'int':
+        #         log.debug("Bar " + bar_name + " is type int")
+        #         fig, ax = plt.subplots(1, 1, figsize=(200, 20))
+        #         # fig, ax = plt.subplots(1,1)
+        #         plt.style.use('seaborn-deep')
+
+        #         max_exp = int(floor(loga(max(mix_data), 10)))
+        #         binwidth = 10**(max_exp - 3)
+
+        #         ax.bar(data, bins=np.arange(min(mix_data), max(mix_data) + binwidth, binwidth), label=label)
+        #         ax.legend(loc='upper right')
+        #         log.debug("This title is " + bar_name + " - " + joint)
+        #         ax.set_title(bar_name + " - " + joint)
+        #         ax.set_xlim(left=0)  # Start at left zero
+        #         ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ',')))  # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
+        #         ax.xaxis.set_major_locator(ticker.MultipleLocator(binwidth*10))
+        #         plt.xticks(rotation=45)  # Rotate x ticks
+        #         plt.gcf().subplots_adjust(bottom=0.15) # Adjust the lables if they go pass the figure
+        #         plt.grid(linestyle="--")  # Grid in the bar
+        #     else:
+        #         fig, ax = plt.subplots(1, 1)
+        #         ax.bar(data, bins='auto', ec='black')
+        #         log.debug("This title is " + bar_name + " - " + joint)
+        #         ax.set_title(bar_name + " - " + joint)
+
+        #     filename = bar_name + "_" + joint
+        #     # plt.savefig(output_dir + "/bar_"+ filename + ".png")
+        #     # log.info("Bar saved as bar_"+ filename + ".png")
+        #     plt.savefig(output_dir + "/joint_bar_" + filename + ".pdf")
+        #     log.info("Bar saved as joint_bar_" + filename + ".pdf")
+        #     plt.figure().clear()
+
+
 def output_to_files(datasets, out_dir):
     log.info("Processing finished, outputing files")
 
@@ -657,9 +890,30 @@ def topN(dico, N, poll_type):
 ################################################################################
 
 
+class Bar:
+    def __init__(self, req, type):
+        self.request = req
+        # self.req_parser = None
+        self.poll = {}
+        self.res_poll = {}
+        # self.data = []
+        self.data = {}
+        self.type = type
+        if len(self.request.split(":")) < 2:
+            # Normal request
+            self.req_type = None
+            self.jpath = self.request.split(" ")[0]
+            # self.req_parser = BooleanParser.BooleanParser(self.req)
+        else:
+            # This is poll request, it only needs to retrive a value
+            # self.req_type can be top or bottom
+            self.jpath, self.req_type, self.num_of_poll = self.request.split(":")
+            self.num_of_poll = int(self.num_of_poll)
+
+
 class Histogram:
     def __init__(self, req, type):
-        self.req = req
+        self.request = req
         # self.req_parser = None
         self.poll = {}
         self.res_poll = {}
@@ -669,7 +923,7 @@ class Histogram:
             # Normal request
             self.req_type = None
             self.jpath = self.req.split(" ")[0]
-            self.req_parser = BooleanParser.BooleanParser(self.req)
+            # self.req_parser = BooleanParser.BooleanParser(self.req)
         else:
             # This is poll request, it only needs to retrive a value
             # self.req_type can be top or bottom
@@ -728,6 +982,7 @@ class Row:
         # self.
         self.columns = []
         self.histogram_collection = {}
+        self.bar_collection = {}
         # print("Row " + self.name + " created")
 
     def create_column(self, name, req, depend_name=None):
@@ -750,7 +1005,7 @@ class Row:
 
     def create_bar(self, name, request, type):
         # self.bar_collection[name] = {"type": type, "request": request, "data": []}
-        new_bar = Histogram(request, type)
+        new_bar = Bar(request, type)
         self.bar_collection[name] = new_bar
 
     def process(self, json_file):
@@ -758,7 +1013,7 @@ class Row:
 
         if len(self.columns) != 0:
             for column in self.columns:
-                log.debugv('Processing data ' + str(self.total) )
+                log.debugv('Processing data ' + str(self.total))
                 log.debugv('parsing: ' + str(column.name))
 
                 # Find the value of the JSONPath expression if it's not in the dictionary
@@ -865,8 +1120,9 @@ class Row:
         else:
             log.debugv("No histograms, moving on")
 
+        # Moving to bars  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         if (self.bar_collection.keys()) != 0:
-            print("hello")
+            # print("hello")
             for bar_name in self.bar_collection:
                 # bar_dict = self.bar_collection[bar_name]
                 bar = self.bar_collection[bar_name]
@@ -876,64 +1132,79 @@ class Row:
                 expression = bar.request
 
                 # Check if is value, dict, or list
+                log.debugv("Bar request: " + str(expression))
 
                 if expression not in self.var_dict.keys():
-                    try:
-                        name = json_file['name']
-                        parse = expression.split('.')
-                        request_tail = ""
-                        for i, expr in enumerate(parse):
-                            if i == 1:
-                                expression_val = json_file[name]
+                    # try:
+                    name = json_file['name']
+                    parse = expression.split('.')
+                    request_tail = ""
+                    log.debugv('the parsed list is: ' + str(parse))
+                    for i, expr in enumerate(parse):
+                        log.debugv("parse number: " + str(i) + ", expr is: " + str(expr))
+                        if i == 1:
+                            expression_val = json_file[name]
+                        elif i > 1:
+                            if expr == '*':
+                                request_tail = parse[i+1]
+                                break
                             else:
-                                if expr == '*':
-                                    request_tail = parse(i+1)
-                                    break
-                                else:
-                                    expression_val = expression[expr]
-                        log.debugv('the parsed list is: ' + str(parse))
-                        # log.debugv('My name is: ' + str(parse[2]))
-                        expression_class = expression_val.__class__
-                        if expression_class == int or expression_class == float or expression_class == str \
-                                or expression_class == bool:
-                            # This may fail
-                            # self.var_dict[expression] = json_file[name][parse[2]][parse[3]]
-                            self.var_dict[expression] = expression_val
-                            if bar.type == 'date' and self.var_dict[expression] == "":
-                                log.debugv('This date "' + expression + '" is now 0')
-                                self.var_dict[expression] = 0
-                        elif expression_class == dict:
-                            print(expression + " is a dictionnary")
-                            # Add keys and values directly to dictionnary
-                            for key in expression_val:
-                                if key in self.var_dict:
-                                    self.var_dict[key] += expression_val[request_tail]
-                                else:
-                                    self.var_dict[key] = expression_val[request_tail]
-                        elif expression_class == list:
-                            print(expression + " is a list")
-
-                    except Exception as e:
-                        if bar.type == 'data':
+                                expression_val = expression_val[expr]
+                    # log.debugv('My name is: ' + str(parse[2]))
+                    expression_class = expression_val.__class__
+                    log.debugv('expression is of ' + str(expression_class))
+                    if expression_class == int or expression_class == float or expression_class == str \
+                            or expression_class == bool:
+                        # This may fail
+                        # self.var_dict[expression] = json_file[name][parse[2]][parse[3]]
+                        self.var_dict[expression] = expression_val
+                        if bar.type == 'date' and self.var_dict[expression] == "":
+                            log.debugv('This date "' + expression + '" is now 0')
                             self.var_dict[expression] = 0
-                        else:
-                            self.var_dict[expression] = None
-                log.debugv("--- Histogram: This is the result of the parsing: " + str(self.var_dict[expression]))
+                    elif expression_class == dict:
+                        log.debugv(expression + " is a dictionnary")
+                        log.debugv("The request tail is " + str(request_tail))
+                        # Add keys and values directly to dictionnary
+                        log.debugv("This dictonnary contains: " + str(expression_val))
+                        for key in expression_val:
+                            # Skip status
+                            if key == "status":
+                                continue
+                            value = expression_val[key][request_tail]
+                            log.debugv("The key is:" + str(key) + "and the value is: " + str(value))
+
+                            if key in self.var_dict:
+                                self.var_dict[key] += value
+                            else:
+                                self.var_dict[key] = value
+                    elif expression_class == list:
+                        log.debugv(expression + " is a list")
+
+                    # except Exception as e:
+                    #     log.warning("An excepcion occured: " + str(e))
+                    #     if bar.type == 'data':
+                    #         self.var_dict[expression] = 0
+                    #     else:
+                    #         self.var_dict[expression] = None
+                # log.debugv("--- Bar: This is the result of the parsing: " + str(self.var_dict))
+
+                bar.data = Counter(bar.data) + Counter(self.var_dict)
 
                 # Add the value if it exists
-                if self.var_dict[expression] is not None:
-                    val = self.var_dict[expression]
-                    log.debugv("The value for " + str(expression) + " is: " + str(val))
-                    # if bar_dict['type'] == 'int':
-                    if bar.req_type == 'int':
-                        # bar_dict['data'].append(int(val))
-                        bar.data.append(int(val))
-                    else:
-                        # bar_dict['data'].append(val)
-                        bar.data.append(val)
+                # if self.var_dict[expression] is not None:
+                #     val = self.var_dict[expression]
+                #     log.debugv("The value for " + str(expression) + " is: " + str(val))
+                #     # if bar_dict['type'] == 'int':
+                #     if bar.req_type == 'int':
+                #         # bar_dict['data'].append(int(val))
+                #         bar.data.append(int(val))
+                #     else:
+                #         # bar_dict['data'].append(val)
+                #         bar.data.append(val)
         else:
             log.debugv("No bars, moving on")
 
+        # time.sleep(1)
         # Reinitialize the dictionary
         self.var_dict = {}
 
@@ -1032,11 +1303,27 @@ def postprocessing(myjsonconfig, verbose=0):
                 datasets[row].process(mwjson)
 
             if verbose >= 1:
-                for histo in myjson['histograms']:
-                    log.debug("Dataset " + row + " has " + str(len(datasets[row].histogram_collection[histo].data)) + " entries in " + histo)
+                if 'histograms' in myjson.keys():
+                    for histo in myjson['histograms']:
+                        log.debug("Dataset " + row + " has " + str(len(datasets[row].histogram_collection[histo].data)) + " entries in " + histo)
 
-        print(datasets)
-        quit()
+        # print(datasets)
+        for row_name in datasets:
+            row = datasets[row_name]
+
+            for bar_name in row.bar_collection:
+                bar = row.bar_collection[bar_name]
+
+                top_num = 30
+                counter = Counter(bar.data)
+                top = counter.most_common(top_num)
+                log.debug("This top has " + str(len(top)) + " elements")
+                # print(top)
+                bar.data = collections.OrderedDict(top)
+
+                for i, key in enumerate(bar.data):
+                    value = bar.data[key]
+                    log.debug("Element: " + str(i) +" Key '" + str(key) + "' contains: " + str(value))
 
         output_to_files(datasets, myjson['output_dir'])
 
@@ -1051,6 +1338,9 @@ def postprocessing(myjsonconfig, verbose=0):
                         log.debugv("Dataset " + datasets[name].name + " has " + str(len(datasets[name].histogram_collection[histo]['data'])) + " entries in " + histo)
 
             output_histograms(datasets, myjson['histograms'], myjson['output_dir'])
+
+        if 'bars' in myjson.keys():
+            output_bars(datasets, myjson['bars'], myjson['output_dir'])
 
     t_end = time.time()
     log.info("TOTAL TIME: " + str(round(t_end - t_start,1)) + " s")
