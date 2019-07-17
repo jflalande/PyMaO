@@ -556,7 +556,7 @@ def output_bars(datasets, bars_def, output_dir):
 
     for bar_name in bars_def:
         log.info("Processing bar " + bar_name)
-        # joint_bar = {'type': bars_def[bar_name][1], 'data': {}}
+        joint_bar = {'type': bars_def[bar_name][1], 'data': {}}
 
         for row_name in datasets:
 
@@ -568,6 +568,21 @@ def output_bars(datasets, bars_def, output_dir):
             # if len(row.bar_collection.keys()) != 0:
             #     for bar_name in row.bar_collection:
             #     def output_bars(data,output_dir):
+
+            # TODO: if top in request, then
+            for bar_name in row.bar_collection:
+                bar = row.bar_collection[bar_name]
+
+                top_num = 30
+                counter = Counter(bar.data)
+                top = counter.most_common(top_num)
+                log.debug("This top has " + str(len(top)) + " elements")
+                # print(top)
+                bar.data = collections.OrderedDict(top)
+
+                for i, key in enumerate(bar.data):
+                    value = bar.data[key]
+                    log.debug("Element: " + str(i) +" Key '" + str(key) + "' contains: " + str(value))
 
             data = row.bar_collection[bar_name].data
 
@@ -584,7 +599,7 @@ def output_bars(datasets, bars_def, output_dir):
 
             # Collect all the data from this row according to the name of
             # the bar
-            # joint_bar['data'][row_name] = data
+            joint_bar['data'][row_name] = data
 
             log.debugv("The data of " + bar_name + " is " + str(data))
 
@@ -644,7 +659,7 @@ def output_bars(datasets, bars_def, output_dir):
                 # plt.ylim(bottom, top + 20)
 
                 # plt.margins(0.2)
-                # plt.subplots_adjust(bottom=1.15)
+                # PLT.SUBPLOTS_ADJUST(BOTTOM=1.15)
                 # plt.tight_layout(h_pad=1)
             else:
                 # TODO:
@@ -659,122 +674,88 @@ def output_bars(datasets, bars_def, output_dir):
             plt.figure().clear()
             plt.close(plt.figure())
 
+        # Draw joint bar if there is more than one row (dataset)
+        if len(datasets) > 1:
 
-        # TODO: Draw joint bar if there is more than one row (dataset)
-        # if len(datasets) > 1:
+            # ax.bar(dataset_list, bins, label=['x', 'y'])
+            labels = []
+            # mix_data = [[] for _ in range(len(datasets))]
+            mix_data = {}
 
-        #     # ax.bar(dataset_list, bins, label=['x', 'y'])
-        #     label = []
-        #     data = []
-        #     mix_data = []
+            # Get the labels in a list, and values in dictionary of lists
+            for row_num, row_name in enumerate(joint_bar['data']):
+                log.debug("Getting " + row_name)
+                data = joint_bar['data'][row_name]
 
-        #     for row_name in joint_bar['data']:
-        #         log.debug("Getting " + row_name)
-        #         label.append(row_name)
-        #         row_data = joint_bar['data'][row_name]
-        #         # print(str(row_name) + " is of type " + str(type(row_data)))
-        #         data.append(row_data)
-        #         mix_data.extend(row_data)
+                if row_name not in mix_data.keys():
+                    mix_data[row_name] = []
+                row_data = mix_data[row_name]
 
-        #     log.debug("dataset has " + str(len(data)) + " entries")
+                for num, label in enumerate(data.keys()):
+                    if label not in labels:
+                        # labels.append(label)
+                        print("Num is " + str(num.__class__))
+                        print("label is " + str(label.__class__))
+                        log.debug("label: " + label + " num: " + str(num))
+                        labels.insert(num, label)
+                        row_data.append(data[label])
+                        for name in mix_data:
+                            if name == label:
+                                continue
+                            mix_data[name].insert(num, 0)
+                    else:
+                        # labels(label, num + index_offset)
+                        index_offset = labels.index(label)
+                        while len(row_data) < index_offset:
+                            row_data.append(0)
+                        row_data.insert(num, label)
+                        # row_data.insert(data[label], index_offset)
+                        # index_offset = num
 
-        #     for num in data:
-        #         # print("num is " + str(num))
-        #         log.debug("The size of num is " + str(len(num)))
+                # row_data = joint_bar['data'][row_name]
+                # print(str(row_name) + " is of type " + str(type(row_data)))
+                # mix_data.append(row_data)
+                # mix_data.extend(row_data)
 
-        #     s = "+"
-        #     joint = s.join(label)
+            log.debug("mix_data have length of " + str(len(mix_data)))
+            log.debug("dataset has " + str(len(data)) + " entries")
 
-        #     if bar_type == 'date':
-        #         log.debug("Bar " + bar_name + " is type date")
-        #         # Processing the dates to get the maximun and minimum month-year
-        #         mindate = dt.datetime.fromtimestamp(min(mix_data))
-        #         maxdate = dt.datetime.fromtimestamp(max(mix_data))
-        #         bindate = dt.datetime(year=mindate.year, month=mindate.month, day=1)
-        #         mybins = [bindate.timestamp()]
-        #         while bindate < maxdate:
-        #             if bindate.month == 12:
-        #                 bindate = dt.datetime(year=bindate.year + 1, month=1, day=1)
-        #             else:
-        #                 bindate = dt.datetime(year=bindate.year, month=bindate.month + 1, day=1)
-        #             mybins.append(bindate.timestamp())
-        #         mybins = mdates.epoch2num(mybins)
+            for num in data:
+                # print("num is " + str(num))
+                log.debug("The size of num is " + str(len(num)))
 
-        #         # plot_data = mdates.epoch2num(data)
-        #         plot_data = []
-        #         for list in data:
-        #             plot_data.append(mdates.epoch2num(list))
+            s = "+"
+            joint = s.join(label)
 
-        #         fig, ax = plt.subplots(1,1, figsize=(200, 20), facecolor='white')
-        #         # fig, ax = plt.subplots(1,1,facecolor='white')
-        #         ax.bar(plot_data, bins=mybins, ec='black')
-        #         log.debug("This title is " + bar_name + " - " + joint)
-        #         ax.set_title(bar_name + " - " + joint)
-        #         ax.xaxis.set_major_locator(mdates.MonthLocator())
-        #         ax.xaxis.set_major_formatter(mdates.DateFormatter('%m.%y'))
-        #         # fig.autofmt_xdate()
+            if bar_type == 'date':
+                log.info("Bars with dates in it")
+            elif bar_type == 'int':
+                log.debug("Bar " + bar_name + " is type int")
+                # fig, ax = plt.subplots(1,1)
 
-        #         # Changing the space between the ticks
+                fig, ax = plt.subplots(1, 1, figsize=(8, 8))
 
-        #         # plt.gca().margins(x=0)
-        #         # plt.gcf().canvas.draw()
-        #         tl = plt.gca().get_xticklabels()
-        #         # log.debug("tl = " + str(tl))
-        #         ticks_label = [t.get_window_extent().width for t in tl]
-        #         log.debug(str(ticks_label))
-        #         maxsize = max(ticks_label)
+                N = np.arange(len(mix_data))
 
-        #         # If the ticks label list brings 0 in everyting
-        #         if maxsize == 0:
-        #             maxsize = 4
-        #         log.debug("maxsize = " + str(maxsize))
-        #         m = 0.2 # inch margin
-        #         N = len(mix_data)
-        #         log.debug("N = " + str(N))
-        #         log.debug("plt.gcf().dpi = " + str(plt.gcf().dpi))
-        #         s = maxsize/plt.gcf().dpi*N+2*m
-        #         margin = m/plt.gcf().get_size_inches()[0]
-        #         #
-        #         # print("plt.gcf().get_size_inches()[1] = " + str(plt.gcf().get_size_inches()[1]))
-        #         log.debug("plt.gcf().get_size_inches() = " + str(plt.gcf().get_size_inches()))
-        #         log.debug("s = " + str(s))
-        #         plt.gcf().subplots_adjust(left=margin, right=1.-margin)
-        #         # plt.gcf().set_size_inches(s, 10)
-        #         plt.gcf().set_size_inches(s*0.25, plt.gcf().get_size_inches()[1])
+                width = 0.5
+                widths = [0-width/2, width/2]
 
-        #         fig.autofmt_xdate()
+                for num, row_name in enumerate(mix_data):
+                    ax.bar(N+widths[num], mix_data[row_name], align='center')
 
-        #     elif bar_type == 'int':
-        #         log.debug("Bar " + bar_name + " is type int")
-        #         fig, ax = plt.subplots(1, 1, figsize=(200, 20))
-        #         # fig, ax = plt.subplots(1,1)
-        #         plt.style.use('seaborn-deep')
 
-        #         max_exp = int(floor(loga(max(mix_data), 10)))
-        #         binwidth = 10**(max_exp - 3)
+            else:
+                fig, ax = plt.subplots(1, 1)
+                ax.bar(data, bins='auto', ec='black')
+                log.debug("This title is " + bar_name + " - " + joint)
+                ax.set_title(bar_name + " - " + joint)
 
-        #         ax.bar(data, bins=np.arange(min(mix_data), max(mix_data) + binwidth, binwidth), label=label)
-        #         ax.legend(loc='upper right')
-        #         log.debug("This title is " + bar_name + " - " + joint)
-        #         ax.set_title(bar_name + " - " + joint)
-        #         ax.set_xlim(left=0)  # Start at left zero
-        #         ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ',')))  # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
-        #         ax.xaxis.set_major_locator(ticker.MultipleLocator(binwidth*10))
-        #         plt.xticks(rotation=45)  # Rotate x ticks
-        #         plt.gcf().subplots_adjust(bottom=0.15) # Adjust the lables if they go pass the figure
-        #         plt.grid(linestyle="--")  # Grid in the bar
-        #     else:
-        #         fig, ax = plt.subplots(1, 1)
-        #         ax.bar(data, bins='auto', ec='black')
-        #         log.debug("This title is " + bar_name + " - " + joint)
-        #         ax.set_title(bar_name + " - " + joint)
-
-        #     filename = bar_name + "_" + joint
-        #     # plt.savefig(output_dir + "/bar_"+ filename + ".png")
-        #     # log.info("Bar saved as bar_"+ filename + ".png")
-        #     plt.savefig(output_dir + "/joint_bar_" + filename + ".pdf")
-        #     log.info("Bar saved as joint_bar_" + filename + ".pdf")
-        #     plt.figure().clear()
+            filename = bar_name + "_" + joint
+            # plt.savefig(output_dir + "/bar_"+ filename + ".png")
+            # log.info("Bar saved as bar_"+ filename + ".png")
+            plt.savefig(output_dir + "/joint_bar_" + filename + ".pdf")
+            log.info("Bar saved as joint_bar_" + filename + ".pdf")
+            plt.figure().clear()
 
 
 def output_to_files(datasets, out_dir):
@@ -1188,8 +1169,8 @@ class Row:
                     #         self.var_dict[expression] = None
                 # log.debugv("--- Bar: This is the result of the parsing: " + str(self.var_dict))
 
-                bar.data = Counter(bar.data) + Counter(self.var_dict)
-
+            bar.data = Counter(bar.data) + Counter(self.var_dict)
+            # log.info("bar data is of " + str(bar.data.__class__))
                 # Add the value if it exists
                 # if self.var_dict[expression] is not None:
                 #     val = self.var_dict[expression]
@@ -1306,24 +1287,6 @@ def postprocessing(myjsonconfig, verbose=0):
                 if 'histograms' in myjson.keys():
                     for histo in myjson['histograms']:
                         log.debug("Dataset " + row + " has " + str(len(datasets[row].histogram_collection[histo].data)) + " entries in " + histo)
-
-        # print(datasets)
-        for row_name in datasets:
-            row = datasets[row_name]
-
-            for bar_name in row.bar_collection:
-                bar = row.bar_collection[bar_name]
-
-                top_num = 30
-                counter = Counter(bar.data)
-                top = counter.most_common(top_num)
-                log.debug("This top has " + str(len(top)) + " elements")
-                # print(top)
-                bar.data = collections.OrderedDict(top)
-
-                for i, key in enumerate(bar.data):
-                    value = bar.data[key]
-                    log.debug("Element: " + str(i) +" Key '" + str(key) + "' contains: " + str(value))
 
         output_to_files(datasets, myjson['output_dir'])
 
