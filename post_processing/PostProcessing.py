@@ -566,6 +566,7 @@ def output_bars(datasets, bars_def, output_dir):
     # switch for distribution graph
 
     hatchs = ['/', '.', 'x']
+    orig_datasets = datasets.copy()
 
     for bar_num, bar_name in enumerate(bars_def):
         log.info("Processing bar " + bar_name)
@@ -585,14 +586,14 @@ def output_bars(datasets, bars_def, output_dir):
             # data_orig = {}
 
             # TODO: if top in request, then
-            for bar_name in row.bar_collection:
-                bar = row.bar_collection[bar_name]
+            for bar_name2 in row.bar_collection:
+                bar = row.bar_collection[bar_name2]
                 # data_orig[bar_name] = bar.data.copy()
 
                 top_num = 30
                 counter = Counter(bar.data)
                 top = counter.most_common(top_num)
-                log.debug("This top has " + str(len(top)) + " elements")
+                log.debug("Top of " + str(bar_name2) + " has " + str(len(top)) + " elements")
                 # print(top)
                 bar.data = collections.OrderedDict(top)
 
@@ -686,14 +687,14 @@ def output_bars(datasets, bars_def, output_dir):
                 # TODO:
                 log.debug("Else")
 
-            filename = bar_name + "_" + row_name
+            filename = bar_name.replace(" ", "_") + "_" + row_name
             # plt.savefig(output_dir + "/bar_"+ filename + ".png")
             # log.info("Bar saved as bar_"+ filename + ".png")
             plt.savefig(output_dir + "/bar_" + filename + ".pdf")
             log.info("Bar saved as bar_" + filename + ".pdf")
 
             plt.figure().clear()
-            plt.close(plt.figure())
+            plt.close(fig)
 
         # Draw joint bar if there is more than one row (dataset)
         if len(datasets) > 1:
@@ -799,21 +800,20 @@ def output_bars(datasets, bars_def, output_dir):
             log.info("Bar saved as joint_bar_" + filename + ".pdf")
             plt.savefig(output_dir + "/joint_bar_" + filename + ".png")
             log.info("Bar saved as joint_bar_" + filename + ".png")
+
             plt.figure().clear()
+            plt.close(fig)
 
             if len(datasets) == 2:
-                log.debug("Starting the diff bars")
+                log.debug("Starting the diff bars for " + bar_name)
                 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+                datasets = orig_datasets
                 data_orig = {}
-                # diff_mal = {}
-                # diff_good = {}
-                # diff_only_mal = {}
-
 
                 # TODO: extend to any number of bar diagrams
-                for row_name in datasets:
-                    for bar_name in datasets[row_name].bar_collection:
-                        data_orig[row_name] = datasets[row_name].bar_collection[bar_name].data
+                for row_name2 in datasets:
+                    # for bar_name2 in datasets[row_name2].bar_collection:
+                    data_orig[row_name2] = datasets[row_name2].bar_collection[bar_name].data
 
                 log.debug("Number of labels: " + str(len(labels)))
                 log.debug("data_orig len: " + str(len(data_orig)))
@@ -822,23 +822,29 @@ def output_bars(datasets, bars_def, output_dir):
                 log.debug("row name list: " + str(row_name_list))
 
                 # TODO: Put labels in config file
+                if bar_name == "Total API calls per package":
+                    main_title = "Difference in number of packages "
+                    main_title2 = "Packages found only in "
+                elif bar_name == "Total API calls per method":
+                    main_title = "Difference in number of methods "
+                    main_title2 = "Methods found only in "
                 diff_dict = {
                     row_name_list[0]: {
                         'xlabel': "API names",
                         'ylabel': "Number of calls",
-                        'title': "Difference in number of packages " + row_name_list[0] + " - " + row_name_list[1],
+                        'title': main_title + row_name_list[0] + " - " + row_name_list[1],
                         'data': {}
                     },
                     row_name_list[1]: {
                         'xlabel': "API names",
                         'ylabel': "Number of calls",
-                        'title': "Difference in number of packages " + row_name_list[1] + " - " + row_name_list[0],
+                        'title': main_title + row_name_list[1] + " - " + row_name_list[0],
                         'data': {}
                     },
-                    'diff_only_mal': {
+                    'only_mal': {
                         'xlabel': "API names",
                         'ylabel': "Number of calls",
-                        'title': "Packages found only in " + row_name_list[1],
+                        'title': main_title2 + row_name_list[1],
                         'data': {}
                     }
                 }
@@ -847,14 +853,14 @@ def output_bars(datasets, bars_def, output_dir):
 
                     val = []
 
-                    for num, row_name in enumerate(row_name_list):
-                        if label in data_orig[row_name]:
+                    for num, row_name2 in enumerate(row_name_list):
+                        if label in data_orig[row_name2]:
                             # TODO: Generalize for the other case
-                            if label not in data_orig[row_name_list[0]] and row_name != row_name_list[0]:
+                            if label not in data_orig[row_name_list[0]] and row_name2 != row_name_list[0]:
                                 # diff_only_mal[label] = data_orig[row_name][label]
-                                diff_dict['diff_only_mal']['data'][label] = data_orig[row_name][label]
-                                log.debug(str(label) + " added in diff_only_mal")
-                            val.append(data_orig[row_name][label])
+                                diff_dict['only_mal']['data'][label] = data_orig[row_name2][label]
+                                log.debug(str(label) + " added in only_mal")
+                            val.append(data_orig[row_name2][label])
                         else:
                             val.append(0)
 
@@ -872,7 +878,7 @@ def output_bars(datasets, bars_def, output_dir):
                     diff_data = diff['data']
                     counter = Counter(diff_data)
                     top = counter.most_common(top_num)
-                    log.debug("Top of " + str(num) + " has " + str(len(top)) + " elements")
+                    log.debug("Top of " + name + " has " + str(len(top)) + " elements")
                     # print(top)
                     diff_data = collections.OrderedDict(top)
                     log.debug("printing this list: " + str(diff_data))
@@ -920,7 +926,7 @@ def output_bars(datasets, bars_def, output_dir):
                     plt.title(diff['title'])
 
                     # filename = bar_name + "_" + row_name
-                    filename = name
+                    filename = "bar_" + bar_name.replace(" ", "_") + "_diff_" + name.replace(" ", "_")
                     # plt.savefig(output_dir + "/bar_"+ filename + ".png")
                     # log.info("Bar saved as bar_"+ filename + ".png")
                     plt.savefig(output_dir + "/" + filename + ".pdf")
@@ -929,7 +935,7 @@ def output_bars(datasets, bars_def, output_dir):
                     log.info("Bar saved as " + filename + ".png")
 
                     plt.figure().clear()
-                    plt.close(plt.figure())
+                    plt.close(fig)
 
 
 def output_to_files(datasets, out_dir):
@@ -1333,14 +1339,24 @@ class Row:
                                 # log.debug("Adding value of " + key)
                                 for key1 in this_dict:
                                     value += this_dict[key1]
+                            elif request_tail == '*':
+                                this_dict = expression_val[key]
+                                for key1 in this_dict:
+                                    value = this_dict[key1]
+                                    compound_key_name = key + "." + key1
+                                    if compound_key_name in self.var_dict:
+                                        self.var_dict[compound_key_name] += value
+                                    else:
+                                        self.var_dict[compound_key_name] = value
                             else:
                                 value = expression_val[key][request_tail]
                                 log.debugv("The key is:" + str(key) + "and the value is: " + str(value))
 
-                            if key in self.var_dict:
-                                self.var_dict[key] += value
-                            else:
-                                self.var_dict[key] = value
+                            if request_tail != '*':
+                                if key in self.var_dict:
+                                    self.var_dict[key] += value
+                                else:
+                                    self.var_dict[key] = value
                     elif expression_class == list:
                         log.debugv(expression + " is a list")
 
@@ -1352,11 +1368,13 @@ class Row:
                     #         self.var_dict[expression] = None
                 # log.debugv("--- Bar: This is the result of the parsing: " + str(self.var_dict))
 
-            for label in self.var_dict:
-                if label in bar.data:
-                    bar.data[label] += self.var_dict[label]
-                else:
-                    bar.data[label] = self.var_dict[label]
+                for label in self.var_dict:
+                    if label in bar.data:
+                        bar.data[label] += self.var_dict[label]
+                    else:
+                        bar.data[label] = self.var_dict[label]
+
+                self.var_dict = {}
 
             # bar.data = Counter(bar.data) + Counter(self.var_dict)
 
@@ -1377,7 +1395,7 @@ class Row:
 
         # time.sleep(1)
         # Reinitialize the dictionary
-        self.var_dict = {}
+        # self.var_dict = {}
 
 ################################################################################
 #                                                                              #
