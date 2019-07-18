@@ -550,10 +550,6 @@ def output_bars(datasets, bars_def, output_dir):
     # Pretty colors for the delight of the eye
     plt.style.use('seaborn-deep')
 
-    # joint_bar = {}
-    # for bar in bars_def:
-    #     joint_bar[name] = {'type':bars_def[1], 'data'=[]}
-
     for bar_name in bars_def:
         log.info("Processing bar " + bar_name)
         joint_bar = {'type': bars_def[bar_name][1], 'data': {}}
@@ -626,8 +622,6 @@ def output_bars(datasets, bars_def, output_dir):
                     label = '{:,}'.format(label)
                     ax.text(rect.get_x() + rect.get_width() / 1.5, height + 5, label,
                             ha='center', va='bottom', rotation=90, fontsize=7)
-                ax.set_xticks(N)
-                ax.set_xticklabels(names)
 
                 # Adding extra y ticks
                 yticks = list(plt.yticks()[0])
@@ -636,15 +630,21 @@ def output_bars(datasets, bars_def, output_dir):
                 extraticks = list(np.arange(yticks[-1], last_tick+2*steps, steps))
                 plt.yticks(yticks + extraticks)
 
+                # Add x ticks labels
+                ax.set_xticks(N)
+                ax.set_xticklabels(names)
+
                 # Rotate x ticks labels
                 for tick in ax.get_xticklabels():
                     tick.set_rotation(90)
+
+                # Ajust the bottom of the subplot, to add space
+                fig.subplots_adjust(bottom=0.35)
 
                 # Thousands comma separator
                 @ticker.FuncFormatter
                 def thousand(x, pos):
                     return format(int(x), ',')
-
                 ax.yaxis.set_major_formatter(thousand)
 
                 # Change ticks' label size
@@ -653,8 +653,6 @@ def output_bars(datasets, bars_def, output_dir):
                 plt.xlabel('API names')
                 plt.ylabel('Number of calls')
 
-                # Ajust the bottom of the subplot, to add space
-                fig.subplots_adjust(bottom=0.35)
                 # bottom, top = plt.ylim()
                 # plt.ylim(bottom, top + 20)
 
@@ -680,52 +678,43 @@ def output_bars(datasets, bars_def, output_dir):
             # ax.bar(dataset_list, bins, label=['x', 'y'])
             labels = []
             # mix_data = [[] for _ in range(len(datasets))]
-            mix_data = {}
+            # mix_data = {}
 
-            # Get the labels in a list, and values in dictionary of lists
-            for row_num, row_name in enumerate(joint_bar['data']):
+            # Get the labels in a list
+            for row_name in joint_bar['data']:
                 log.debug("Getting " + row_name)
-                data = joint_bar['data'][row_name]
+                row_data = joint_bar['data'][row_name]
 
-                if row_name not in mix_data.keys():
-                    mix_data[row_name] = []
-                row_data = mix_data[row_name]
+                log.debug("Initially, " + row_name + " has a size of: " + str(len(data)))
 
-                for num, label in enumerate(data.keys()):
+                for num, label in enumerate(row_data):
                     if label not in labels:
-                        # labels.append(label)
-                        print("Num is " + str(num.__class__))
-                        print("label is " + str(label.__class__))
-                        log.debug("label: " + label + " num: " + str(num))
                         labels.insert(num, label)
-                        row_data.append(data[label])
-                        for name in mix_data:
-                            if name == label:
-                                continue
-                            mix_data[name].insert(num, 0)
-                    else:
-                        # labels(label, num + index_offset)
-                        index_offset = labels.index(label)
-                        while len(row_data) < index_offset:
-                            row_data.append(0)
-                        row_data.insert(num, label)
-                        # row_data.insert(data[label], index_offset)
-                        # index_offset = num
 
-                # row_data = joint_bar['data'][row_name]
-                # print(str(row_name) + " is of type " + str(type(row_data)))
-                # mix_data.append(row_data)
-                # mix_data.extend(row_data)
+            mix_data = []
+            zero_array = [0 for _ in range(len(labels))]
+
+            for _ in range(len(datasets)):
+                # Copy the array, instead of reference it
+                mix_data.append(zero_array.copy())
+
+            # Add values to the lists
+            for row_num, row_name in enumerate(joint_bar['data']):
+                row_data = joint_bar['data'][row_name]
+                for label in row_data:
+                    label_index = labels.index(label)
+                    mix_data[row_num][label_index] = row_data[label]
+                log.debug("mix_data for " + str(row_num) + " has " + str(len(mix_data[row_num])) + " elements")
+                log.debug(str(mix_data[row_num]))
+
+            for num, this_list in enumerate(mix_data):
+                log.debug("list " + str(num) + " contains: " + str(this_list))
 
             log.debug("mix_data have length of " + str(len(mix_data)))
             log.debug("dataset has " + str(len(data)) + " entries")
 
-            for num in data:
-                # print("num is " + str(num))
-                log.debug("The size of num is " + str(len(num)))
-
             s = "+"
-            joint = s.join(label)
+            joint = s.join(joint_bar['data'].keys()).replace(" ", "_")
 
             if bar_type == 'date':
                 log.info("Bars with dates in it")
@@ -735,22 +724,46 @@ def output_bars(datasets, bars_def, output_dir):
 
                 fig, ax = plt.subplots(1, 1, figsize=(8, 8))
 
-                N = np.arange(len(mix_data))
+                N = np.arange(len(labels))
+                # N = np.linspace(1, len(labels) + 10, len(labels))
 
-                width = 0.5
+                width = 0.35
                 widths = [0-width/2, width/2]
 
-                for num, row_name in enumerate(mix_data):
-                    ax.bar(N+widths[num], mix_data[row_name], align='center')
+                # for num, row_name in enumerate(mix_data):
+                #     ax.bar(N+widths[num], mix_data[row_name], align='center')
+                for num in range(len(mix_data)):
+                    rects = ax.bar(N+widths[num], mix_data[num], width, align='center')
+                    for rect, label in zip(rects, mix_data[num]):
+                        height = rect.get_height()
+                        label = '{:,}'.format(label)
+                        ax.text(rect.get_x() + rect.get_width() / 1.5, height + 5, label,
+                                ha='center', va='bottom', rotation=90, fontsize=4)
 
+                # Adding extra y ticks
+                yticks = list(plt.yticks()[0])
+                steps = yticks[-1] - yticks[-2]
+                last_tick = yticks[-1]
+                extraticks = list(np.arange(yticks[-1], last_tick+2*steps, steps))
+                plt.yticks(yticks + extraticks)
 
+                # Add x ticks labels
+                ax.set_xticks(N)
+                ax.set_xticklabels(labels)
+
+                # Rotate x ticks labels
+                for tick in ax.get_xticklabels():
+                    tick.set_rotation(90)
+
+                # Ajust the bottom of the subplot, to add space
+                fig.subplots_adjust(bottom=0.45)
             else:
                 fig, ax = plt.subplots(1, 1)
                 ax.bar(data, bins='auto', ec='black')
                 log.debug("This title is " + bar_name + " - " + joint)
                 ax.set_title(bar_name + " - " + joint)
 
-            filename = bar_name + "_" + joint
+            filename = bar_name.replace(" ", "_") + "_" + joint
             # plt.savefig(output_dir + "/bar_"+ filename + ".png")
             # log.info("Bar saved as bar_"+ filename + ".png")
             plt.savefig(output_dir + "/joint_bar_" + filename + ".pdf")
@@ -1101,7 +1114,7 @@ class Row:
         else:
             log.debugv("No histograms, moving on")
 
-        # Moving to bars  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        # Moving to bars ================================================================================
         if (self.bar_collection.keys()) != 0:
             # print("hello")
             for bar_name in self.bar_collection:
@@ -1142,11 +1155,13 @@ class Row:
                         if bar.type == 'date' and self.var_dict[expression] == "":
                             log.debugv('This date "' + expression + '" is now 0')
                             self.var_dict[expression] = 0
+                    # As the expression gets a dict, add the key/values for all according to the last key in the request
                     elif expression_class == dict:
                         log.debugv(expression + " is a dictionnary")
                         log.debugv("The request tail is " + str(request_tail))
                         # Add keys and values directly to dictionnary
                         log.debugv("This dictonnary contains: " + str(expression_val))
+                        # For each key, add the value
                         for key in expression_val:
                             # Skip status
                             if key == "status":
