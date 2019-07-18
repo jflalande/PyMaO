@@ -5,6 +5,7 @@ import datetime
 import argparse  # Program argument parser
 import json
 import collections  # imported for OrderedDict
+import math
 
 from os import listdir
 from os.path import isfile, join
@@ -335,7 +336,6 @@ def output_histograms(datasets, histograms_def, output_dir):
             plt.figure().clear()
             plt.close(plt.figure())
 
-
             # Density graph
             if hist_type == 'int':
                 log.debug("Density histogram " + histogram_name + " for " + row_name + " is type int")
@@ -525,11 +525,19 @@ def output_histograms(datasets, histograms_def, output_dir):
                 ax.legend(loc='upper right')
                 log.debug("This title is " + histogram_name + " - " + joint)
                 ax.set_title(histogram_name + " - " + joint)
-                ax.set_xlim(left=0)  # Start at left zero
-                ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ',')))  # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
+
+                # Start at left zero
+                ax.set_xlim(left=0)
+
+                # The formatter for the labels in the ticks (ticks are the marks withc numbers in the x axis)
+                ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
                 ax.xaxis.set_major_locator(ticker.MultipleLocator(binwidth*10))
-                plt.xticks(rotation=45)  # Rotate x ticks
-                plt.gcf().subplots_adjust(bottom=0.15) # Adjust the lables if they go pass the figure
+
+                # Rotate x ticks
+                plt.xticks(rotation=45)
+
+                # Adjust the lables if they go pass the figure
+                plt.gcf().subplots_adjust(bottom=0.15)
                 plt.grid(linestyle="--")  # Grid in the histogram
             else:
                 fig, ax = plt.subplots(1, 1)
@@ -550,7 +558,16 @@ def output_bars(datasets, bars_def, output_dir):
     # Pretty colors for the delight of the eye
     plt.style.use('seaborn-deep')
 
-    for bar_name in bars_def:
+    # TODO: Specify in config file:
+    # color
+    # hatchs
+    # bar width
+    # top or botom number
+    # switch for distribution graph
+
+    hatchs = ['/', '.', 'x']
+
+    for bar_num, bar_name in enumerate(bars_def):
         log.info("Processing bar " + bar_name)
         joint_bar = {'type': bars_def[bar_name][1], 'data': {}}
 
@@ -565,9 +582,12 @@ def output_bars(datasets, bars_def, output_dir):
             #     for bar_name in row.bar_collection:
             #     def output_bars(data,output_dir):
 
+            # data_orig = {}
+
             # TODO: if top in request, then
             for bar_name in row.bar_collection:
                 bar = row.bar_collection[bar_name]
+                # data_orig[bar_name] = bar.data.copy()
 
                 top_num = 30
                 counter = Counter(bar.data)
@@ -578,7 +598,7 @@ def output_bars(datasets, bars_def, output_dir):
 
                 for i, key in enumerate(bar.data):
                     value = bar.data[key]
-                    log.debug("Element: " + str(i) +" Key '" + str(key) + "' contains: " + str(value))
+                    log.debug("Element: " + str(i) + " Key '" + str(key) + "' contains: " + str(value))
 
             data = row.bar_collection[bar_name].data
 
@@ -612,9 +632,12 @@ def output_bars(datasets, bars_def, output_dir):
 
                 # width = 0.7
 
+                log.debug("names: " + str(names))
+                log.debug("vals: " + str(vals))
+
                 N = np.arange(len(data))
 
-                rects = ax.bar(N, vals, align='center')
+                rects = ax.bar(N, vals, align='center', hatch=hatchs[bar_num])
 
                 # Add value to the bars
                 for rect, label in zip(rects, vals):
@@ -651,7 +674,7 @@ def output_bars(datasets, bars_def, output_dir):
                 plt.tick_params(axis='both', which='major', labelsize=7)
                 ax.set_title(bar_name + " - " + row_name)
                 plt.xlabel('API names')
-                plt.ylabel('Number of calls')
+                plt.ylabel('Number of calls (in millions)')
 
                 # bottom, top = plt.ylim()
                 # plt.ylim(bottom, top + 20)
@@ -675,10 +698,7 @@ def output_bars(datasets, bars_def, output_dir):
         # Draw joint bar if there is more than one row (dataset)
         if len(datasets) > 1:
 
-            # ax.bar(dataset_list, bins, label=['x', 'y'])
             labels = []
-            # mix_data = [[] for _ in range(len(datasets))]
-            # mix_data = {}
 
             # Get the labels in a list
             for row_name in joint_bar['data']:
@@ -687,6 +707,7 @@ def output_bars(datasets, bars_def, output_dir):
 
                 log.debug("Initially, " + row_name + " has a size of: " + str(len(data)))
 
+                # Store those not previously stored
                 for num, label in enumerate(row_data):
                     if label not in labels:
                         labels.insert(num, label)
@@ -726,16 +747,17 @@ def output_bars(datasets, bars_def, output_dir):
 
                 fig, ax = plt.subplots(1, 1, figsize=(8, 8))
 
-                N = np.arange(len(labels))
-                # N = np.linspace(1, len(labels) + 10, len(labels))
-
-                width = 0.35
+                width = 0.5
                 widths = [0-width/2, width/2]
+
+                # N = np.arange(len(labels))
+                N = np.linspace(1, len(labels) + 2*width, len(labels))
 
                 # for num, row_name in enumerate(mix_data):
                 #     ax.bar(N+widths[num], mix_data[row_name], align='center')
                 for num in range(len(mix_data)):
-                    rects = ax.bar(N+widths[num], mix_data[num], width, align='center', label=row_name_list[num])
+                    rects = ax.bar(N+widths[num], mix_data[num], width, align='center', label=row_name_list[num],
+                                   hatch=hatchs[num])
                     for rect, label in zip(rects, mix_data[num]):
                         height = rect.get_height()
                         label = '{:,}'.format(label)
@@ -773,11 +795,141 @@ def output_bars(datasets, bars_def, output_dir):
                 ax.set_title(bar_name + " - " + joint)
 
             filename = bar_name.replace(" ", "_") + "_" + joint
-            # plt.savefig(output_dir + "/bar_"+ filename + ".png")
-            # log.info("Bar saved as bar_"+ filename + ".png")
             plt.savefig(output_dir + "/joint_bar_" + filename + ".pdf")
             log.info("Bar saved as joint_bar_" + filename + ".pdf")
+            plt.savefig(output_dir + "/joint_bar_" + filename + ".png")
+            log.info("Bar saved as joint_bar_" + filename + ".png")
             plt.figure().clear()
+
+            if len(datasets) == 2:
+                log.debug("Starting the diff bars")
+                colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+                data_orig = {}
+                # diff_mal = {}
+                # diff_good = {}
+                # diff_only_mal = {}
+
+
+                # TODO: extend to any number of bar diagrams
+                for row_name in datasets:
+                    for bar_name in datasets[row_name].bar_collection:
+                        data_orig[row_name] = datasets[row_name].bar_collection[bar_name].data
+
+                log.debug("Number of labels: " + str(len(labels)))
+                log.debug("data_orig len: " + str(len(data_orig)))
+
+                row_name_list = list(data_orig.keys())
+                log.debug("row name list: " + str(row_name_list))
+
+                # TODO: Put labels in config file
+                diff_dict = {
+                    row_name_list[0]: {
+                        'xlabel': "API names",
+                        'ylabel': "Number of calls",
+                        'title': "Difference in number of packages " + row_name_list[0] + " - " + row_name_list[1],
+                        'data': {}
+                    },
+                    row_name_list[1]: {
+                        'xlabel': "API names",
+                        'ylabel': "Number of calls",
+                        'title': "Difference in number of packages " + row_name_list[1] + " - " + row_name_list[0],
+                        'data': {}
+                    },
+                    'diff_only_mal': {
+                        'xlabel': "API names",
+                        'ylabel': "Number of calls",
+                        'title': "Packages found only in " + row_name_list[1],
+                        'data': {}
+                    }
+                }
+
+                for num, label in enumerate(labels):
+
+                    val = []
+
+                    for num, row_name in enumerate(row_name_list):
+                        if label in data_orig[row_name]:
+                            # TODO: Generalize for the other case
+                            if label not in data_orig[row_name_list[0]] and row_name != row_name_list[0]:
+                                # diff_only_mal[label] = data_orig[row_name][label]
+                                diff_dict['diff_only_mal']['data'][label] = data_orig[row_name][label]
+                                log.debug(str(label) + " added in diff_only_mal")
+                            val.append(data_orig[row_name][label])
+                        else:
+                            val.append(0)
+
+                    val_diff = val[0] - val[1]
+                    if val_diff > 0:
+                        # diff_good[label] = val_diff
+                        diff_dict[row_name_list[0]]['data'][label] = val_diff
+                    elif val_diff < 0:
+                        # diff_mal[label] = abs(val_diff)
+                        diff_dict[row_name_list[1]]['data'][label] = abs(val_diff)
+
+                for num, name in enumerate(diff_dict):
+                    diff = diff_dict[name]
+                    top_num = 30
+                    diff_data = diff['data']
+                    counter = Counter(diff_data)
+                    top = counter.most_common(top_num)
+                    log.debug("Top of " + str(num) + " has " + str(len(top)) + " elements")
+                    # print(top)
+                    diff_data = collections.OrderedDict(top)
+                    log.debug("printing this list: " + str(diff_data))
+
+                    names = list(diff_data.keys())
+                    vals = diff_data.values()
+
+                    log.debug("names: " + str(names))
+                    log.debug("vals: " + str(vals))
+                    # width = 0.7
+
+                    fig, ax = plt.subplots(1, 1, figsize=(8, 8))
+
+                    N = np.arange(len(diff_data))
+
+                    rects = ax.bar(N, vals, align='center', color=colors[num], hatch=hatchs[num])
+
+                    # Add value to the bars
+                    for rect, label in zip(rects, vals):
+                        height = rect.get_height()
+                        label = '{:,}'.format(label)
+                        ax.text(rect.get_x() + rect.get_width() / 1.5, height + 5, label,
+                                ha='center', va='bottom', rotation=90, fontsize=7)
+
+                    # Adding extra y ticks
+                    yticks = list(plt.yticks()[0])
+                    steps = yticks[-1] - yticks[-2]
+                    last_tick = yticks[-1]
+                    extraticks = list(np.arange(yticks[-1], last_tick+2*steps, steps))
+                    plt.yticks(yticks + extraticks)
+
+                    # Add x ticks labels
+                    ax.set_xticks(N)
+                    ax.set_xticklabels(names)
+
+                    # Rotate x ticks labels
+                    for tick in ax.get_xticklabels():
+                        tick.set_rotation(90)
+
+                    # Ajust the bottom of the subplot, to add space
+                    fig.subplots_adjust(bottom=0.45)
+
+                    plt.xlabel(diff['xlabel'])
+                    plt.ylabel(diff['ylabel'])
+                    plt.title(diff['title'])
+
+                    # filename = bar_name + "_" + row_name
+                    filename = name
+                    # plt.savefig(output_dir + "/bar_"+ filename + ".png")
+                    # log.info("Bar saved as bar_"+ filename + ".png")
+                    plt.savefig(output_dir + "/" + filename + ".pdf")
+                    log.info("Bar saved as " + filename + ".pdf")
+                    plt.savefig(output_dir + "/" + filename + ".png")
+                    log.info("Bar saved as " + filename + ".png")
+
+                    plt.figure().clear()
+                    plt.close(plt.figure())
 
 
 def output_to_files(datasets, out_dir):
@@ -1175,8 +1327,15 @@ class Row:
                             # Skip status
                             if key == "status":
                                 continue
-                            value = expression_val[key][request_tail]
-                            log.debugv("The key is:" + str(key) + "and the value is: " + str(value))
+                            if request_tail == "#":
+                                this_dict = expression_val[key]
+                                value = 0
+                                # log.debug("Adding value of " + key)
+                                for key1 in this_dict:
+                                    value += this_dict[key1]
+                            else:
+                                value = expression_val[key][request_tail]
+                                log.debugv("The key is:" + str(key) + "and the value is: " + str(value))
 
                             if key in self.var_dict:
                                 self.var_dict[key] += value
@@ -1193,7 +1352,14 @@ class Row:
                     #         self.var_dict[expression] = None
                 # log.debugv("--- Bar: This is the result of the parsing: " + str(self.var_dict))
 
-            bar.data = Counter(bar.data) + Counter(self.var_dict)
+            for label in self.var_dict:
+                if label in bar.data:
+                    bar.data[label] += self.var_dict[label]
+                else:
+                    bar.data[label] = self.var_dict[label]
+
+            # bar.data = Counter(bar.data) + Counter(self.var_dict)
+
             # log.info("bar data is of " + str(bar.data.__class__))
                 # Add the value if it exists
                 # if self.var_dict[expression] is not None:
@@ -1298,7 +1464,7 @@ def postprocessing(myjsonconfig, verbose=0):
             log.info("Processing " + str(numFiles) + " files")
             for filename in files:
 
-                log.debugv(row + "$ Processing file number " + str(numFiles) + ": " + filename + " JSON file")
+                log.debugv(row + ": Processing file number " + str(numFiles) + ": " + filename + " JSON file")
                 numFiles -= 1
                 with open(mypath + "/" + filename) as f:
                     mwjson = json.load(f)
@@ -1330,7 +1496,7 @@ def postprocessing(myjsonconfig, verbose=0):
             output_bars(datasets, myjson['bars'], myjson['output_dir'])
 
     t_end = time.time()
-    log.info("TOTAL TIME: " + str(round(t_end - t_start,1)) + " s")
+    log.info("TOTAL TIME: " + str(round(t_end - t_start, 1)) + " s")
     quit()
 
 
