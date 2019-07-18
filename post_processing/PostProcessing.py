@@ -496,7 +496,7 @@ def output_histograms(datasets, histograms_def, output_dir):
                 if maxsize == 0:
                     maxsize = 4
                 log.debug("maxsize = " + str(maxsize))
-                m = 0.2 # inch margin
+                m = 0.2  # inch margin
                 N = len(mix_data)
                 log.debug("N = " + str(N))
                 log.debug("plt.gcf().dpi = " + str(plt.gcf().dpi))
@@ -693,6 +693,7 @@ def output_bars(datasets, bars_def, output_dir):
 
             mix_data = []
             zero_array = [0 for _ in range(len(labels))]
+            row_name_list = []
 
             for _ in range(len(datasets)):
                 # Copy the array, instead of reference it
@@ -701,6 +702,7 @@ def output_bars(datasets, bars_def, output_dir):
             # Add values to the lists
             for row_num, row_name in enumerate(joint_bar['data']):
                 row_data = joint_bar['data'][row_name]
+                row_name_list.append(row_name)
                 for label in row_data:
                     label_index = labels.index(label)
                     mix_data[row_num][label_index] = row_data[label]
@@ -733,7 +735,7 @@ def output_bars(datasets, bars_def, output_dir):
                 # for num, row_name in enumerate(mix_data):
                 #     ax.bar(N+widths[num], mix_data[row_name], align='center')
                 for num in range(len(mix_data)):
-                    rects = ax.bar(N+widths[num], mix_data[num], width, align='center')
+                    rects = ax.bar(N+widths[num], mix_data[num], width, align='center', label=row_name_list[num])
                     for rect, label in zip(rects, mix_data[num]):
                         height = rect.get_height()
                         label = '{:,}'.format(label)
@@ -744,7 +746,8 @@ def output_bars(datasets, bars_def, output_dir):
                 yticks = list(plt.yticks()[0])
                 steps = yticks[-1] - yticks[-2]
                 last_tick = yticks[-1]
-                extraticks = list(np.arange(yticks[-1], last_tick+2*steps, steps))
+                multiplier = 1
+                extraticks = list(np.arange(yticks[-1], last_tick+multiplier*steps, steps))
                 plt.yticks(yticks + extraticks)
 
                 # Add x ticks labels
@@ -757,6 +760,12 @@ def output_bars(datasets, bars_def, output_dir):
 
                 # Ajust the bottom of the subplot, to add space
                 fig.subplots_adjust(bottom=0.45)
+
+                plt.tick_params(axis='both', which='major', labelsize=7)
+                ax.set_title(bar_name + " - " + row_name)
+                plt.xlabel('API names')
+                plt.ylabel('Number of calls')
+                ax.legend(loc='upper right')
             else:
                 fig, ax = plt.subplots(1, 1)
                 ax.bar(data, bins='auto', ec='black')
