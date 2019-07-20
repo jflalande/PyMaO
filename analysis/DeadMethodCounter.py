@@ -19,10 +19,12 @@ class DeadMethodCounter(Analysis):
             pck = m[:m.rfind('.')]
             if pck in invoked:
                 cms = invoked[pck]
-                if not m in cms:
+                nm = m[m.rfind('.')+1:]
+                if nm not in cms:
                     dead_methods.add(m)
             else:
                 dead_methods.add(m)
+                pck = pck[:pck.rfind('.')]
                 dead_pck.add(pck)
 
         self.updateJsonAnalyses(analysis_name, jsonanalyses, {'dead_pck': list(dead_pck), 'dead_methods': list(dead_methods)})

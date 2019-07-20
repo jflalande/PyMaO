@@ -17,14 +17,14 @@ class StatCounter(Analysis):
         output_json['methods'] = set()
         output_json['packages'] = set()
 
-        command = "grep -Ehr \"\\.class L.*;\" ./apktool/"
+        command = "grep -Ehr \"\\.class( .* | )L.*;\" ./apktool/"
         errcode, res = self.xp.exec_in_subprocess(command, cwd=True, logOutputs=True)
         with open(self.xp.working_directory+"/log") as f:
             for line in f:
-                # Line is ".class Lcom/package/classname;"
+                # Line is ".class( .* | )Lcom/package/classname;"
 
                 try:
-                    line = line.split(' ')[1]
+                    line = line.split(' ')[-1]
                     line = line[1:line.rfind('/')]
 
                     line = line.replace('/', '.')
