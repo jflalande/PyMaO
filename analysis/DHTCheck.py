@@ -88,8 +88,9 @@ class DHTCheck(Analysis):
             self.updateJsonAnalyses(analysis_name, jsonanalyses, {"DHTclassesperlibs": dict(classes_per_libs)})
 
         # Dumping in a file for DEBUG purpose
-        log.debug("Dumping in the file: " + self.xp.jsonbase + basename + ".log")
-        with  open(self.xp.jsonbase + "/" + basename + ".log" , "w" ) as f:
+        filename = jsonanalyses["filename"]
+        log.debug("Dumping in the file: " + self.xp.getJsonbase(filename) + basename + ".log")
+        with open(self.xp.getJsonbase(filename) + "/" + basename + ".log" , "w" ) as f:
             f.write(res)
 
         return True

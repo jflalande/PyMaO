@@ -1,6 +1,7 @@
 import logging
 import configparser
 import ast
+import os.path
 
 log = logging.getLogger("orchestrator")
 
@@ -61,12 +62,52 @@ class Config:
 
 
         self.targetXP = confparser['xp']['targetXP']
-        self.apkbase = confparser['xp']['apkbase']
-        self.jsonbase = confparser['xp']['jsonbase']
-        self.targetsymlink = confparser['xp']['targetsymlink']
+        try:
+            self.apkbase = ast.literal_eval(confparser['xp']['apkbase'])
+            self.jsonbase = ast.literal_eval(confparser['xp']['jsonbase'])
+            self.targetsymlink = ast.literal_eval(confparser['xp']['targetsymlink'])
+        except SyntaxError:
+            # Backward compatibility with old dataset config style
+            # i.e. one dataset without quotes
+            self.apkbase = ast.literal_eval(confparser['xp']['apkbase'])
+            self.jsonbase = ast.literal_eval(confparser['xp']['jsonbase'])
+            self.targetsymlink = ast.literal_eval(confparser['xp']['targetsymlink'])
         self.simulate_json_write = simulate or confparser.getboolean('xp','simulate_json_write')
-
+        
         self.triggerdroid_path = confparser['analysis']['triggerdroid_path']
         self.heuristics_file = confparser['analysis']['heuristics_file']
 
         config_file.close()
+
+        self.check_config_parameters()
+
+
+    def check_config_parameters(self):
+        if type(self.apkbase) != type(self.jsonbase) or type(self.apkbase) != type(self.targetsymlink):
+            
+            log.error ("Error in configuration file: apkbase, jsonbase and targetsymlink must all have the same type (list or string).")
+            quit()
+        if isinstance(self.apkbase, list):
+            if len(self.apkbase) != len(self.jsonbase) or len(self.apkbase) != len(self.targetsymlink):
+                
+                log.error ("Error in configuration file: apk, jsonbase and targetsymlink must all have the same length (when they are lists of strings).")
+                quit()
+
+    def getJsonbase(self, apk_fullpath):
+        if not isinstance(self.jsonbase, list):
+            return self.jsonbase
+        else:
+            dirname = os.path.dirname(apk_fullpath)
+            return [jsonbase for apkbase, jsonbase in
+                    zip(self.apkbase, self.jsonbase) if
+                    dirname.startswith(apkbase)][0]
+
+    def getTargetsymlink(self, apk_fullpath):
+        if not isinstance(self.targetsymlink, list):
+            return self.targetsymlink
+        else:
+            dirname = os.path.dirname(apk_fullpath)
+
+            return [targetsymlink for apkbase, targetsymlink in
+                    zip(self.apkbase, self.targetsymlink) if
+                    dirname.startswith(apkbase)][0]
