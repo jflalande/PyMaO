@@ -69,9 +69,9 @@ class Config:
         except SyntaxError:
             # Backward compatibility with old dataset config style
             # i.e. one dataset without quotes
-            self.apkbase = ast.literal_eval(confparser['xp']['apkbase'])
-            self.jsonbase = ast.literal_eval(confparser['xp']['jsonbase'])
-            self.targetsymlink = ast.literal_eval(confparser['xp']['targetsymlink'])
+            self.apkbase = confparser['xp']['apkbase']
+            self.jsonbase = confparser['xp']['jsonbase']
+            self.targetsymlink = confparser['xp']['targetsymlink']
         self.simulate_json_write = simulate or confparser.getboolean('xp','simulate_json_write')
         
         self.triggerdroid_path = confparser['analysis']['triggerdroid_path']
