@@ -5,7 +5,8 @@ import datetime
 import argparse  # Program argument parser
 import json
 import collections  # imported for OrderedDict
-import math
+# import math
+import copy
 
 from os import listdir
 from os.path import isfile, join
@@ -14,7 +15,7 @@ import BooleanParser
 
 import sys
 
-from collections import Counter # For getting top or botton N
+from collections import Counter # For getting top or botton N elements from a list
 from openpyxl import Workbook   # For outputing results in xlsx (Excel format)
 import datetime as dt
 
@@ -431,10 +432,9 @@ def output_histograms(datasets, histograms_def, output_dir):
         # Draw joint histogram if there is more than one row (dataset)
         if len(datasets) > 1:
 
-            # ax.hist(dataset_list, bins, label=['x', 'y'])
             label = []
-            data = []
-            mix_data = []
+            data = []  # This contains the lists of data for each dataset
+            mix_data = []  # The sum of all the data in the datasets
 
             for row_name in joint_histogram['data']:
                 log.debug("Getting " + row_name)
@@ -469,6 +469,7 @@ def output_histograms(datasets, histograms_def, output_dir):
                 mybins = mdates.epoch2num(mybins)
 
                 # plot_data = mdates.epoch2num(data)
+
                 plot_data = []
                 for list in data:
                     plot_data.append(mdates.epoch2num(list))
@@ -565,18 +566,31 @@ def output_bars(datasets, bars_def, output_dir):
     # top or botom number
     # switch for distribution graph
 
-    hatchs = ['/', '.', 'x']
-    orig_datasets = datasets.copy()
+    # hatchs = ['/', '.', 'x']
+    # hatchs = ['/', '.']
+    # orig_datasets = datasets.copy()
+    orig_datasets = copy.deepcopy(datasets)
+    # orig_datasets = {}
+
+    bar_ylabel = "Number of invoked methods"
+    bar_xlabel = "API Names"
 
     for bar_num, bar_name in enumerate(bars_def):
         log.info("Processing bar " + bar_name)
         joint_bar = {'type': bars_def[bar_name][1], 'data': {}}
+
+        top_data = {}
 
         for row_name in datasets:
 
             log.debugv("Assigning row " + row_name)
             row = datasets[row_name]
 
+            # top_data[row_name] = {}
+            # row_top_data = top_data[row_name]
+
+            # Initializing top data
+            # top_data = {}
             # Print individual bars
             # Verify if there are bars to output
             # if len(row.bar_collection.keys()) != 0:
@@ -586,22 +600,28 @@ def output_bars(datasets, bars_def, output_dir):
             # data_orig = {}
 
             # TODO: if top in request, then
-            for bar_name2 in row.bar_collection:
-                bar = row.bar_collection[bar_name2]
-                # data_orig[bar_name] = bar.data.copy()
+            # for bar_name2 in row.bar_collection:
+            bar = row.bar_collection[bar_name]
+            # data_orig[bar_name] = bar.data.copy()
+            log.debug("bar " + str(bar_name) + " has " + str(len(bar.data)) + " elements at the beginning")
+            # time.sleep(1)
 
-                top_num = 30
-                counter = Counter(bar.data)
-                top = counter.most_common(top_num)
-                log.debug("Top of " + str(bar_name2) + " has " + str(len(top)) + " elements")
-                # print(top)
-                bar.data = collections.OrderedDict(top)
+            # top_num = 30
+            top_num = 10
+            counter = Counter(bar.data)
+            top = counter.most_common(top_num)
+            log.debug("Top of " + str(bar_name) + " has " + str(len(top)) + " elements")
+            # print(top)
+            # row_top_data[bar_name] = collections.OrderedDict(top)
+            top_data[row_name] = collections.OrderedDict(top)
 
-                for i, key in enumerate(bar.data):
-                    value = bar.data[key]
-                    log.debug("Element: " + str(i) + " Key '" + str(key) + "' contains: " + str(value))
+            for i, key in enumerate(bar.data):
+                value = bar.data[key]
+                log.debugv("Element: " + str(i) + " Key '" + str(key) + "' contains: " + str(value))
 
-            data = row.bar_collection[bar_name].data
+            # data = row.bar_collection[bar_name].data
+            # data = row_top_data[bar_name]
+            data = top_data[row_name]
 
             # backup = []
             # original_data = data
@@ -633,18 +653,19 @@ def output_bars(datasets, bars_def, output_dir):
 
                 # width = 0.7
 
-                log.debug("names: " + str(names))
-                log.debug("vals: " + str(vals))
+                log.debugv("names: " + str(names))
+                log.debugv("vals: " + str(vals))
 
                 N = np.arange(len(data))
 
-                rects = ax.bar(N, vals, align='center', hatch=hatchs[bar_num])
+                # rects = ax.bar(N, vals, align='center', hatch=hatchs[bar_num])
+                rects = ax.bar(N, vals, align='center')
 
                 # Add value to the bars
                 for rect, label in zip(rects, vals):
                     height = rect.get_height()
                     label = '{:,}'.format(label)
-                    ax.text(rect.get_x() + rect.get_width() / 1.5, height + 5, label,
+                    ax.text(rect.get_x() + rect.get_width() / 1.5, 1.05*height + 5, label,
                             ha='center', va='bottom', rotation=90, fontsize=7)
 
                 # Adding extra y ticks
@@ -675,7 +696,7 @@ def output_bars(datasets, bars_def, output_dir):
                 plt.tick_params(axis='both', which='major', labelsize=7)
                 ax.set_title(bar_name + " - " + row_name)
                 plt.xlabel('API names')
-                plt.ylabel('Number of calls (in millions)')
+                plt.ylabel(bar_ylabel)
 
                 # bottom, top = plt.ylim()
                 # plt.ylim(bottom, top + 20)
@@ -706,7 +727,7 @@ def output_bars(datasets, bars_def, output_dir):
                 log.debug("Getting " + row_name)
                 row_data = joint_bar['data'][row_name]
 
-                log.debug("Initially, " + row_name + " has a size of: " + str(len(data)))
+                # log.debug("Initially, " + row_name + " has a size of: " + str(len(data)))
 
                 # Store those not previously stored
                 for num, label in enumerate(row_data):
@@ -725,17 +746,23 @@ def output_bars(datasets, bars_def, output_dir):
             for row_num, row_name in enumerate(joint_bar['data']):
                 row_data = joint_bar['data'][row_name]
                 row_name_list.append(row_name)
-                for label in row_data:
+                # for label in row_data:
+                for label in labels:
                     label_index = labels.index(label)
-                    mix_data[row_num][label_index] = row_data[label]
+                    if label in row_data:
+                        mix_data[row_num][label_index] = row_data[label]
+                    else:
+                        mix_data[row_num][label_index] = orig_datasets[row_name].bar_collection[bar_name].data[label]
                 log.debug("mix_data for " + str(row_num) + " has " + str(len(mix_data[row_num])) + " elements")
                 log.debug(str(mix_data[row_num]))
+
+            # fill the zeros
 
             for num, this_list in enumerate(mix_data):
                 log.debug("list " + str(num) + " contains: " + str(this_list))
 
             log.debug("mix_data have length of " + str(len(mix_data)))
-            log.debug("dataset has " + str(len(data)) + " entries")
+            # log.debug("dataset has " + str(len(data)) + " entries")
 
             s = "+"
             joint = s.join(joint_bar['data'].keys()).replace(" ", "_")
@@ -757,12 +784,13 @@ def output_bars(datasets, bars_def, output_dir):
                 # for num, row_name in enumerate(mix_data):
                 #     ax.bar(N+widths[num], mix_data[row_name], align='center')
                 for num in range(len(mix_data)):
-                    rects = ax.bar(N+widths[num], mix_data[num], width, align='center', label=row_name_list[num],
-                                   hatch=hatchs[num])
+                    # rects = ax.bar(N+widths[num], mix_data[num], width, align='center', label=row_name_list[num],
+                    #                hatch=hatchs[num])
+                    rects = ax.bar(N+widths[num], mix_data[num], width, align='center', label=row_name_list[num])
                     for rect, label in zip(rects, mix_data[num]):
                         height = rect.get_height()
-                        label = '{:,}'.format(label)
-                        ax.text(rect.get_x() + rect.get_width() / 1.5, height + 5, label,
+                        new_label = '{:,}'.format(label)
+                        ax.text(rect.get_x() + rect.get_width() / 1.5, height + 5, new_label,
                                 ha='center', va='bottom', rotation=90, fontsize=4)
 
                 # Adding extra y ticks
@@ -786,8 +814,10 @@ def output_bars(datasets, bars_def, output_dir):
 
                 plt.tick_params(axis='both', which='major', labelsize=7)
                 ax.set_title(bar_name + " - " + row_name)
-                plt.xlabel('API names')
-                plt.ylabel('Number of calls')
+                plt.xlabel("API Names")
+                plt.ylabel(bar_ylabel)
+                # plt.xlabel(bar_xtitle)
+                # plt.ylabel(bar_ytitle)
                 ax.legend(loc='upper right')
             else:
                 fig, ax = plt.subplots(1, 1)
@@ -804,9 +834,13 @@ def output_bars(datasets, bars_def, output_dir):
             plt.figure().clear()
             plt.close(fig)
 
+            # ==============================================================================================
+
             if len(datasets) == 2:
+                log.debug("================================================================================")
                 log.debug("Starting the diff bars for " + bar_name)
                 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+
                 datasets = orig_datasets
                 data_orig = {}
 
@@ -814,9 +848,10 @@ def output_bars(datasets, bars_def, output_dir):
                 for row_name2 in datasets:
                     # for bar_name2 in datasets[row_name2].bar_collection:
                     data_orig[row_name2] = datasets[row_name2].bar_collection[bar_name].data
+                    log.debug("bar for " + row_name2 + " has " + str(len(data_orig[row_name2])) + " elements")
 
-                log.debug("Number of labels: " + str(len(labels)))
-                log.debug("data_orig len: " + str(len(data_orig)))
+                # log.debug("Number of labels: " + str(len(labels)))
+                # log.debug("data_orig len: " + str(len(data_orig)))
 
                 row_name_list = list(data_orig.keys())
                 log.debug("row name list: " + str(row_name_list))
@@ -825,42 +860,71 @@ def output_bars(datasets, bars_def, output_dir):
                 if bar_name == "Total API calls per package":
                     main_title = "Difference in number of packages "
                     main_title2 = "Packages found only in "
+                elif bar_name == "Total API packages per sample":
+                    main_title = "Difference in number of packages "
+                    main_title2 = "Packages found only in "
                 elif bar_name == "Total API calls per method":
                     main_title = "Difference in number of methods "
                     main_title2 = "Methods found only in "
+                elif bar_name == "Total API methods per sample":
+                    main_title = "Difference in number of methods "
+                    main_title2 = "Methods found only in "
+
                 diff_dict = {
                     row_name_list[0]: {
                         'xlabel': "API names",
-                        'ylabel': "Number of calls",
+                        'ylabel': "Number of invoked methods",
                         'title': main_title + row_name_list[0] + " - " + row_name_list[1],
                         'data': {}
                     },
                     row_name_list[1]: {
                         'xlabel': "API names",
-                        'ylabel': "Number of calls",
+                        'ylabel': "Number of invoked methods",
                         'title': main_title + row_name_list[1] + " - " + row_name_list[0],
                         'data': {}
                     },
                     'only_mal': {
                         'xlabel': "API names",
-                        'ylabel': "Number of calls",
+                        'ylabel': "Number of invoked methods",
                         'title': main_title2 + row_name_list[1],
                         'data': {}
                     }
                 }
 
+                # labels = data_orig[]
+                labels = set()
+
+                # Get the labels in a list
+                for row_name in data_orig:
+                    log.debug("Getting " + row_name + " labels")
+                    row_data = data_orig[row_name]
+
+                    log.debug("Initially, " + row_name + " has a size of: " + str(len(row_data)))
+
+                    for label in row_data.keys():
+                        labels.add(label)
+
+                labels = list(labels)
+
+                my_only_mal = ['java.io.File.exists', 'java.io.FileOutputStream.<init>', 'java.io.InputStream.read']
+
                 for num, label in enumerate(labels):
 
                     val = []
 
-                    for num, row_name2 in enumerate(row_name_list):
-                        if label in data_orig[row_name2]:
+                    # GOOD, then MAL
+                    for row_name3 in row_name_list:
+                        if label in my_only_mal:
+                            log.debug("Checking label " + label + " with value " + str(data_orig[row_name3][label]) + " @ " + row_name3)
+                        log.debugv("Checking label " + label + " @ " + str(num))
+                        if label in data_orig[row_name3].keys():
                             # TODO: Generalize for the other case
-                            if label not in data_orig[row_name_list[0]] and row_name2 != row_name_list[0]:
-                                # diff_only_mal[label] = data_orig[row_name][label]
-                                diff_dict['only_mal']['data'][label] = data_orig[row_name2][label]
-                                log.debug(str(label) + " added in only_mal")
-                            val.append(data_orig[row_name2][label])
+                            if label not in data_orig[row_name_list[0]].keys() and row_name3 == row_name_list[1]:
+                                diff_dict['only_mal']['data'][label] = data_orig[row_name3][label]
+                                if label in my_only_mal:
+                                    log.debug(str(label) + " with value " + str(data_orig[row_name3][label]) + " added in only_mal")
+
+                            val.append(data_orig[row_name3][label])
                         else:
                             val.append(0)
 
@@ -872,35 +936,59 @@ def output_bars(datasets, bars_def, output_dir):
                         # diff_mal[label] = abs(val_diff)
                         diff_dict[row_name_list[1]]['data'][label] = abs(val_diff)
 
+                # from_mal_minus_good = diff_dict[row_name_list[1]]['data'].copy()
+                # log.debug("mal diff has " + str(len(diff_dict[row_name_list[1]]['data'])) + " elements")
+                from_mal_minus_good = copy.deepcopy(diff_dict[row_name_list[1]]['data'])
+                log.debug("The copy has " + str(len(from_mal_minus_good)) + " elements")
+
                 for num, name in enumerate(diff_dict):
                     diff = diff_dict[name]
-                    top_num = 30
+                    # top_num = 30
+                    top_num = 10
                     diff_data = diff['data']
+                    # if len(diff_data)
                     counter = Counter(diff_data)
                     top = counter.most_common(top_num)
                     log.debug("Top of " + name + " has " + str(len(top)) + " elements")
                     # print(top)
-                    diff_data = collections.OrderedDict(top)
-                    log.debug("printing this list: " + str(diff_data))
+                    diff_data = collections.OrderedDict(top).copy()
+                    log.debug("printing top of " + name + ": " + str(diff_data))
+
+                    if name == 'only_mal' and len(diff_data) < top_num:
+                        log.debug("only_mal doesn't have 30 bars")
+                        num_diff = top_num - len(diff_data)
+                        log.debug("il le manque " + str(num_diff) + " elements")
+                        num_labels_put = 0
+                        for label in from_mal_minus_good:
+                            if num_diff <= num_labels_put:
+                                break
+                            if label in diff_data:
+                                log.debug("Label " + label +" exists, moving")
+                                continue
+                            log.debug("Adding label " + label)
+                            diff_data[label] = from_mal_minus_good[label]
+                            num_labels_put += 1
+                        log.debug("only_mal now have " + str(len(diff_data)))
 
                     names = list(diff_data.keys())
                     vals = diff_data.values()
 
-                    log.debug("names: " + str(names))
-                    log.debug("vals: " + str(vals))
+                    log.debugv("names: " + str(names))
+                    log.debugv("vals: " + str(vals))
                     # width = 0.7
 
                     fig, ax = plt.subplots(1, 1, figsize=(8, 8))
 
                     N = np.arange(len(diff_data))
 
-                    rects = ax.bar(N, vals, align='center', color=colors[num], hatch=hatchs[num])
+                    # rects = ax.bar(N, vals, align='center', color=colors[num], hatch=hatchs[num])
+                    rects = ax.bar(N, vals, align='center', color=colors[num])
 
                     # Add value to the bars
                     for rect, label in zip(rects, vals):
                         height = rect.get_height()
                         label = '{:,}'.format(label)
-                        ax.text(rect.get_x() + rect.get_width() / 1.5, height + 5, label,
+                        ax.text(rect.get_x() + rect.get_width() / 1.5, 1.05*height, label,
                                 ha='center', va='bottom', rotation=90, fontsize=7)
 
                     # Adding extra y ticks
@@ -917,12 +1005,17 @@ def output_bars(datasets, bars_def, output_dir):
                     # Rotate x ticks labels
                     for tick in ax.get_xticklabels():
                         tick.set_rotation(90)
+                        # tick.label.set_fontsize(8)
 
+                    # Change x ticks size
+                    ax.tick_params(axis='x', labelsize=8)
                     # Ajust the bottom of the subplot, to add space
-                    fig.subplots_adjust(bottom=0.45)
+                    fig.subplots_adjust(bottom=0.65)
 
-                    plt.xlabel(diff['xlabel'])
-                    plt.ylabel(diff['ylabel'])
+                    # plt.xlabel(diff['xlabel'])
+                    # plt.ylabel(diff['ylabel'])
+                    plt.xlabel(bar_xlabel)
+                    plt.ylabel(bar_ylabel)
                     plt.title(diff['title'])
 
                     # filename = bar_name + "_" + row_name
@@ -937,6 +1030,129 @@ def output_bars(datasets, bars_def, output_dir):
                     plt.figure().clear()
                     plt.close(fig)
 
+                # ====================================================================================================
+
+                # Check if this has to do with calculation API methods
+
+                # Top 30 most used API methods (or packages) by malware in relation to goodware
+                top_total_sorted = {
+                    row_name_list[0]: {},
+                    row_name_list[1]: {}
+                }
+
+                # top_num = 30
+                top_num = 10
+                diff_data = diff_dict[row_name_list[1]]['data']
+                counter = Counter(diff_data)
+                top = counter.most_common(top_num)
+                log.debug("Top of " + name + " has " + str(len(top)) + " elements")
+                # print(top)
+                diff_data = collections.OrderedDict(top)
+                # top_diff_mal_vs_good = {}
+                log.debug("Printing labels in diff_dict " + row_name_list[1] + ": "
+                          + str(diff_data))
+                # text_height = 0
+                for label in diff_data:
+                # for label in top_data[row_name_list[1]]:
+                    log.debug("Adding " + label + " to top 30")
+                    for row_name2 in row_name_list:
+                        if label in data_orig[row_name2]:
+                            top_total_sorted[row_name2][label] = data_orig[row_name2][label]
+                        else:
+                            top_total_sorted[row_name2][label] = 0
+                        # if text_height < top_total_sorted[row_name2][label]:
+                            # text_height = top_total_sorted[row_name2][label]
+                    # print(label)
+
+                # text_height = 1.05*text_height + 5
+
+                names = list(diff_data.keys())
+
+                for n, myname in enumerate(names):
+                    log.debug("My old name was: " + myname)
+                    names[n] = '.'.join(myname.split('.')[-2:])
+                    log.debug("My new name is: " + myname)
+
+                # vals = top_total_sorted.values()
+
+                log.debugv("names: " + str(names))
+                log.debugv("vals: " + str(vals))
+                # width = 0.7
+
+                fig, ax = plt.subplots(1, 1, figsize=(6, 6))
+
+                # N = np.arange(len(top_total_sorted))
+                width = 0.5
+                widths = [0-width/2, width/2]
+
+                # N = np.arange(len(labels))
+                # N = np.linspace(1, len(diff_data) + 2*width, len(diff_data))
+                N = np.linspace(1, len(diff_data) + width, len(diff_data))
+
+                # rects = ax.bar(N, vals, align='center', color=colors[num], hatch=hatchs[num])
+                # for num in range(len(top_total_sorted)):
+                for num, row_name80 in enumerate(top_total_sorted):
+                    # names = top_total_sorted[row_name80].keys()
+                    vals = top_total_sorted[row_name80].values()
+                    # rects = ax.bar(N+widths[num], mix_data[num], width, align='center', label=row_name_list[num],
+                    #                hatch=hatchs[num])
+                    rects = ax.bar(N+widths[num], vals, width, align='center',
+                                   label=row_name80)
+                    for rect, label in zip(rects, top_total_sorted[row_name80]):
+                        height = rect.get_height()
+                        new_label = '{:,}'.format(top_total_sorted[row_name80][label])
+                        ax.text(rect.get_x() + rect.get_width() / 1.5, 1.02*height,
+                                new_label, ha='center', va='bottom',
+                                rotation=90, fontsize=8)
+
+                # Add value to the bars
+                # for rect, label in zip(rects, vals):
+                #     height = rect.get_height()
+                #     label = '{:,}'.format(label)
+                #     ax.text(rect.get_x() + rect.get_width() / 1.5, height + 5, label,
+                #             ha='center', va='bottom', rotation=90, fontsize=7)
+
+                # Adding extra y ticks
+                yticks = list(plt.yticks()[0])
+                steps = yticks[-1] - yticks[-2]
+                last_tick = yticks[-1]
+                extraticks = list(np.arange(yticks[-1], last_tick+2*steps, steps))
+                plt.yticks(yticks + extraticks)
+
+                # Add x ticks labels
+                ax.set_xticks(N)
+                ax.set_xticklabels(names)
+
+                # Rotate x ticks labels
+                for tick in ax.get_xticklabels():
+                    tick.set_rotation(90)
+                    # tick.set_rotation(45)
+                # for tick in ax.xaxis.get_major_ticks():
+                #     tick.label.set_fontsize(2)
+
+                # Change x ticks size
+                ax.tick_params(axis='x', labelsize=10)
+                # Ajust the bottom of the subplot, to add space
+                fig.subplots_adjust(bottom=0.55)
+
+                # plt.xlabel(diff['xlabel'])
+                # plt.ylabel(diff['ylabel'])
+                plt.xlabel(bar_xlabel)
+                plt.ylabel(bar_ylabel)
+                # plt.title("Top " + str(top_num) + " most used API methods\nby malware in relation to goodware")
+                ax.legend(loc='upper center')
+                # filename = bar_name + "_" + row_name
+                filename = "bar_top_30_most_used_malware_vs_goodware"
+                # plt.savefig(output_dir + "/bar_"+ filename + ".png")
+                # log.info("Bar saved as bar_"+ filename + ".png")
+                plt.savefig(output_dir + "/" + filename + ".pdf")
+                log.info("Bar saved as " + filename + ".pdf")
+                plt.savefig(output_dir + "/" + filename + ".png")
+                log.info("Bar saved as " + filename + ".png")
+
+                plt.figure().clear()
+                plt.close(fig)
+
 
 def output_to_files(datasets, out_dir):
     log.info("Processing finished, outputing files")
@@ -947,6 +1163,7 @@ def output_to_files(datasets, out_dir):
 
     # Dictionary for the output JSON file
     dico = {}
+    # dico = datasets
     # Raw results of the histogram
     raw = {}
     row_num = 1
@@ -970,6 +1187,7 @@ def output_to_files(datasets, out_dir):
 
     row_num += 1
     col_num = 1
+    dataset_dump = {}
 
     # If the result JSON already exists, don't do anything
     # if not os.path.isfile(jsonfile):
@@ -1018,6 +1236,20 @@ def output_to_files(datasets, out_dir):
                 data = row.histogram_collection[histogram_name]['data']
                 raw[row_name][histogram_name] = row.histogram_collection[histogram_name]
 
+        # TODO: Add histograms to dump
+        dataset_dump[row_name] = {'bars': {}}
+        row_dump = dataset_dump[row_name]
+
+        if len(row.bar_collection) != 0:
+            for bar_name in row.bar_collection:
+                bar_dump = {}
+
+                bar = row.bar_collection[bar_name]
+                bar_dump['data'] = bar.data
+                bar_dump['req'] = bar.request
+                bar_dump['type'] = bar.type
+
+                row_dump['bars'][bar_name] = bar_dump
     # Create the output directory if it doesn't exists
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
@@ -1026,9 +1258,19 @@ def output_to_files(datasets, out_dir):
         json.dump(dico, out)
     log.info("File saved at " + jsonfile)
 
+    # with open(rawfile, 'w') as out:
+    #     json.dump(raw, out)
+    # log.info("File saved at " + rawfile)
+
+    # for row_name in datasets:
+    #     print("my name is " + row_name)
+
     with open(rawfile, 'w') as out:
-        json.dump(raw, out)
+        json.dump(dataset_dump, out)
     log.info("File saved at " + rawfile)
+    # with open(rawfile, 'w') as out:
+    #     json.dump(datasets, out)
+    # log.info("File saved at " + rawfile)
 
     # filename = "res.xlsx"
     wb.save(xlsxfile)
@@ -1186,7 +1428,8 @@ class Row:
                         name = json_file['name']
                         log.debugv('the parsed list is: ' + str(parse))
                         log.debugv('My name is: ' + str(parse[2]))
-                        self.var_dict[expression] = json_file[name][parse[2]][parse[3]]  # This may fail
+                        self.var_dict[expression] = json_file[name][parse[2]][parse[3]]  # This may fail:
+                        # The dict doesn't have certain key
                         if self.var_dict[expression] == "":
                             self.var_dict[expression] = 0
                     except Exception as e:
@@ -1223,6 +1466,7 @@ class Row:
                         else:
                             column.poll[val] = 1
 
+        # Creating histograms ==========================================================================================
         if (self.histogram_collection.keys()) != 0:
             for histogram_name in self.histogram_collection:
                 # histogram_dict = self.histogram_collection[histogram_name]
@@ -1281,7 +1525,7 @@ class Row:
         else:
             log.debugv("No histograms, moving on")
 
-        # Moving to bars ================================================================================
+        # Creating bars ================================================================================================
         if (self.bar_collection.keys()) != 0:
             # print("hello")
             for bar_name in self.bar_collection:
@@ -1307,11 +1551,18 @@ class Row:
                             expression_val = json_file[name]
                         elif i > 1:
                             if expr == '*':
-                                request_tail = parse[i+1]
+                                if i+1 == len(parse)-1:
+                                    # For the use of # 
+                                    request_tail = parse[i+1]
+                                else:
+                                    request_tail = expr
                                 break
+                            elif expr == '#':
+                                request_tail = expr
                             else:
                                 expression_val = expression_val[expr]
                     # log.debugv('My name is: ' + str(parse[2]))
+                    log.debugv("expression_val: " + str(expression_val))
                     expression_class = expression_val.__class__
                     log.debugv('expression is of ' + str(expression_class))
                     if expression_class == int or expression_class == float or expression_class == str \
@@ -1327,38 +1578,54 @@ class Row:
                         log.debugv(expression + " is a dictionnary")
                         log.debugv("The request tail is " + str(request_tail))
                         # Add keys and values directly to dictionnary
-                        log.debugv("This dictonnary contains: " + str(expression_val))
+                        # log.debugv("This dictonnary contains: " + str(expression_val))
                         # For each key, add the value
                         for key in expression_val:
                             # Skip status
                             if key == "status":
                                 continue
                             if request_tail == "#":
-                                this_dict = expression_val[key]
-                                value = 0
-                                # log.debug("Adding value of " + key)
-                                for key1 in this_dict:
-                                    value += this_dict[key1]
+                                # If the request has a # at the end, it will count if the package appear
+                                # in the searched
+                                # this_dict = expression_val[key]
+                                # log.debugv("this_dict contains: " + str(this_dict))
+                                # value = 0
+                                # log.debugv(name + ": Adding value of " + key)
+                                # for key in this_dict:
+                                    # value += this_dict[key1]
+                                if key is "status":
+                                    continue
+                                # key.split will devide the string by the character put in parenthesis
+                                # then, join with 'glue' the list with the string that calls the join function
+                                package = '.'.join(key.split('.')[:-1])
+                                if package not in self.var_dict:
+                                    self.var_dict[package] = 1
+                                # else:
+                                #     self.var_dict[key] = 1
                             elif request_tail == '*':
                                 this_dict = expression_val[key]
                                 for key1 in this_dict:
-                                    value = this_dict[key1]
+                                    # value = this_dict[key1]
                                     compound_key_name = key + "." + key1
                                     if compound_key_name in self.var_dict:
-                                        self.var_dict[compound_key_name] += value
+                                        # self.var_dict[compound_key_name] += value
+                                        self.var_dict[compound_key_name] += 1
                                     else:
-                                        self.var_dict[compound_key_name] = value
+                                        # self.var_dict[compound_key_name] = value
+                                        self.var_dict[compound_key_name] = 1
                             else:
                                 value = expression_val[key][request_tail]
                                 log.debugv("The key is:" + str(key) + "and the value is: " + str(value))
 
-                            if request_tail != '*':
-                                if key in self.var_dict:
-                                    self.var_dict[key] += value
-                                else:
-                                    self.var_dict[key] = value
+                            # if request_tail != '*':
+                            #     if key in self.var_dict:
+                            #         self.var_dict[key] += value
+                            #     else:
+                            #         self.var_dict[key] = value
                     elif expression_class == list:
                         log.debugv(expression + " is a list")
+
+                    # time.sleep(30)
 
                     # except Exception as e:
                     #     log.warning("An excepcion occured: " + str(e))
@@ -1426,80 +1693,106 @@ def postprocessing(myjsonconfig, verbose=0):
         log.info("Output dir: " + myjson['output_dir'])
         # jsonfile = myjson['output_dir'] + "/" + OUTPUT_FILENAME + ".json"
 
-        # Initialize Row and Columns objects
-        datasets = {}  # An empty dataset (dictionary)
+        # Initialize Row and Columns objects with an empty dataset (dictionary)
+        datasets = {}
+
+        res_json = myjson['output_dir'] + "/res_raw.json"
+
+        if os.path.isfile(res_json):
+            log.debug("Loading raw JSON file")
+            with open(res_json) as res_json_obj:
+                datasets_raw = json.load(res_json_obj)
+            log.debug("Load complete")
+
+            for row_name in datasets_raw:
+                log.debug("Creating row " + row_name)
+                row_raw = datasets_raw[row_name]
+                datasets[row_name] = Row(row_name)
+                this_row = datasets[row_name]
+                if 'bars' in row_raw.keys():
+                    for bar_name in row_raw['bars']:
+                        log.debug("Creating bar " + bar_name)
+                        bar_raw = row_raw['bars'][bar_name]
+                        bar_request = bar_raw['req']
+                        bar_type = bar_raw['type']
+                        this_row.create_bar(bar_name, bar_request, bar_type)
+                        this_row.bar_collection[bar_name].data = bar_raw['data']
+        else:
+            print("no res json file (?)")
 
         # for each row, because they are different datasets
-        for row in myjson['rows']:
+        log.debug("Length of datasets is " + str(len(datasets)))
+        if len(datasets) == 0:
+            for row in myjson['rows']:
 
-            log.info('Processing ' + row)
+                log.info('Processing ' + row)
 
-            # create row object
-            datasets[row] = Row(row)
+                # create row object
+                datasets[row] = Row(row)
 
-            # create columns
-            if 'columns' in myjson.keys():
-                for column in myjson['columns']:
-                    log.debugv("the column is " + str(column))
-                    # create_column(self,name,req,depends=None):
-                    datasets[row].create_column(column, myjson['columns'][column][0], myjson['columns'][column][1])
-            else:
-                log.debugv("There are no columns in the config file, moving on")
+                # create columns
+                if 'columns' in myjson.keys():
+                    for column in myjson['columns']:
+                        log.debugv("the column is " + str(column))
+                        # create_column(self,name,req,depends=None):
+                        datasets[row].create_column(column, myjson['columns'][column][0], myjson['columns'][column][1])
+                else:
+                    log.debugv("There are no columns in the config file, moving on")
 
-            # Create histograms
-            if 'histograms' in myjson.keys():
-                for histogram in myjson['histograms']:
-                    log.debugv("Adding " + histogram + " histogram")
-                    # Each row will contain the same values: name, request (JSONPath), and type
-                    histogram_request = myjson['histograms'][histogram][0]
-                    histogram_type = myjson['histograms'][histogram][1]
-                    datasets[row].create_histogram(histogram, histogram_request, histogram_type)
-            else:
-                log.debugv("There are no histograms in the config file, moving on")
-
-            # Create bars
-            if 'bars' in myjson.keys():
-                for bar in myjson['bars']:
-                    log.debugv("Adding " + bar + " bar")
-                    # Each row will contain the same values: name, request (JSONPath), and type
-                    bar_request = myjson['bars'][bar][0]
-                    bar_type = myjson['bars'][bar][1]
-                    datasets[row].create_bar(bar, bar_request, bar_type)
-            else:
-                log.debugv("There are no bars in the config file, moving on")
-
-            # TODO: If dataset dir doesn't exists, continue
-            mypath = myjson['rows'][row]
-
-            try:
-                files = [f for f in listdir(mypath) if isfile(join(mypath, f)) and f.endswith(".json")]
-            except Exception:
-                raise Exception("Cannot open dir")
-                continue
-
-            # Process each file into the rows
-            numFiles = len(files)
-            log.info("Processing " + str(numFiles) + " files")
-            for filename in files:
-
-                log.debugv(row + ": Processing file number " + str(numFiles) + ": " + filename + " JSON file")
-                numFiles -= 1
-                with open(mypath + "/" + filename) as f:
-                    mwjson = json.load(f)
-
-                # Get the name of the file (without the extension)
-                mwjson['name'] = filename.split('.')[0]
-                datasets[row].process(mwjson)
-
-            if verbose >= 1:
+                # Create histograms
                 if 'histograms' in myjson.keys():
-                    for histo in myjson['histograms']:
-                        log.debug("Dataset " + row + " has " + str(len(datasets[row].histogram_collection[histo].data)) + " entries in " + histo)
+                    for histogram in myjson['histograms']:
+                        log.debugv("Adding " + histogram + " histogram")
+                        # Each row will contain the same values: name, request (JSONPath), and type
+                        histogram_request = myjson['histograms'][histogram][0]
+                        histogram_type = myjson['histograms'][histogram][1]
+                        datasets[row].create_histogram(histogram, histogram_request, histogram_type)
+                else:
+                    log.debugv("There are no histograms in the config file, moving on")
 
-        output_to_files(datasets, myjson['output_dir'])
+                # Create bars
+                if 'bars' in myjson.keys():
+                    for bar in myjson['bars']:
+                        log.debugv("Adding " + bar + " bar")
+                        # Each row will contain the same values: name, request (JSONPath), and type
+                        bar_request = myjson['bars'][bar][0]
+                        bar_type = myjson['bars'][bar][1]
+                        datasets[row].create_bar(bar, bar_request, bar_type)
+                else:
+                    log.debugv("There are no bars in the config file, moving on")
 
-        t_end = time.time()
-        log.info("PROCESS TIME: " + str(round(t_end - t_start, 1)) + " s")
+                # TODO: If dataset dir doesn't exists, continue
+                mypath = myjson['rows'][row]
+
+                try:
+                    files = [f for f in listdir(mypath) if isfile(join(mypath, f)) and f.endswith(".json")]
+                except Exception:
+                    raise Exception("Cannot open dir")
+                    continue
+
+                # Process each file into the rows
+                numFiles = len(files)
+                log.info("Processing " + str(numFiles) + " files")
+                for filename in files:
+
+                    log.debugv(row + ": Processing file number " + str(numFiles) + ": " + filename + " JSON file")
+                    numFiles -= 1
+                    with open(mypath + "/" + filename) as f:
+                        mwjson = json.load(f)
+
+                    # Get the name of the file (without the extension)
+                    mwjson['name'] = filename.split('.')[0]
+                    datasets[row].process(mwjson)
+
+                if verbose >= 1:
+                    if 'histograms' in myjson.keys():
+                        for histo in myjson['histograms']:
+                            log.debug("Dataset " + row + " has " + str(len(datasets[row].histogram_collection[histo].data)) + " entries in " + histo)
+
+            output_to_files(datasets, myjson['output_dir'])
+
+            t_end = time.time()
+            log.info("PROCESS TIME: " + str(round(t_end - t_start, 1)) + " s")
 
         if 'histograms' in myjson.keys():
             if verbose == 2:
