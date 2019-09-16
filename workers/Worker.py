@@ -40,6 +40,7 @@ def doJob(queue, xp, worker_nb):
 
         apkname = next(iter(jsondata))
         jsonanalyses = jsondata[apkname]
+        filename = jsondata[apkname]["filename"]
 
         log.info("Worker " + str(xp.worker_nb) + " : Job " + str(Statistics.getNbJobs()) + " ==== Doing " + str(apkname) + ".apk ====")
 
@@ -98,14 +99,14 @@ def doJob(queue, xp, worker_nb):
 
 
         # Erasing .json file
-        writeJson(apkname, xp, jsondata)
+        writeJson(filename, apkname, xp, jsondata)
         log.debug("Finished " + apkname)
         log.debugv("==> JSON: " + str(jsondata))
 
 
 """Rewrites the JSON file for an apk"""
-def writeJson(name, xp, jsondata):
-    jsonfilename = os.path.join(xp.config.jsonbase, name + ".json")
+def writeJson(filename, name, xp, jsondata):
+    jsonfilename = os.path.join(xp.config.getJsonbase(filename), name + ".json")
 
     if not xp.config.simulate_json_write:
         with open(jsonfilename, 'w') as json_file:

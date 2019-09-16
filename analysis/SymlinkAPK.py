@@ -14,17 +14,22 @@ class SymlinkAPK(Analysis):
     def __init__(self, xp_, targetDirectory=None):
         super().__init__(xp_)
         # By default, use the parameter targetsymlink that comes from the config file
-        if targetDirectory == None:
-            self.targetDirectory = xp_.config.targetsymlink
+        self.targetDirectory = targetDirectory
+
+    def getTargetDirectory(self, jsonanalyses):
+        if self.targetDirectory == None:
+            return self.xp.config.getTargetsymlink(jsonanalyses["filename"])
+        else:
+            return self.targetDirectory
 
     def analysis(self, analysis, analysis_name, basename, jsonanalyses):
         log.debug("Symlink APK.")
 
-        relative = relpath(jsonanalyses["filename"], self.targetDirectory)
+        relative = relpath(jsonanalyses["filename"], self.getTargetDirectory(jsonanalyses))
 
         try:
-            log.debug("Symlink: " + self.targetDirectory + "/" + basename + ".apk" + " => " + relative)
-            os.symlink(relative, self.targetDirectory + "/" + basename + ".apk")
+            log.debug("Symlink: " + self.getTargetDirectory(jsonanalyses) + "/" + basename + ".apk" + " => " + relative)
+            os.symlink(relative, self.getTargetDirectory(jsonanalyses) + "/" + basename + ".apk")
         except OSError as e:
             # If the symlink exists, probably it's because of a previous execution and all is fine
             if e.errno != errno.EEXIST:
