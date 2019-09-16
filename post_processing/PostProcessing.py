@@ -1417,7 +1417,7 @@ class Row:
         if len(self.columns) != 0:
             for column in self.columns:
                 log.debugv('Processing data ' + str(self.total))
-                log.debugv('parsing: ' + str(column.name))
+                log.debugv('Parsing: ' + str(column.name))
 
                 # Find the value of the JSONPath expression if it's not in the dictionary
                 expression = column.jpath
@@ -1444,7 +1444,8 @@ class Row:
                     val = self.var_dict[expression]
                     log.debugv("The value for " + str(expression) + " is: " + str(val))
                     # Put some quotes to strings, so Jason can be happy :DDDD
-                    if not isinstance(val, int) or isinstance(val, float):
+                    # Check if string is not int or float
+                    if not isinstance(val, int) and not isinstance(val, float):
                         log.debugv('There is an instance of string for val: ' + str(val))
                         val = "\"" + val + "\""
                     elif isinstance(val, bool):
@@ -1641,8 +1642,6 @@ class Row:
                     else:
                         bar.data[label] = self.var_dict[label]
 
-                self.var_dict = {}
-
             # bar.data = Counter(bar.data) + Counter(self.var_dict)
 
             # log.info("bar data is of " + str(bar.data.__class__))
@@ -1661,8 +1660,9 @@ class Row:
             log.debugv("No bars, moving on")
 
         # time.sleep(1)
+
         # Reinitialize the dictionary
-        # self.var_dict = {}
+        self.var_dict = {}
 
 ################################################################################
 #                                                                              #
