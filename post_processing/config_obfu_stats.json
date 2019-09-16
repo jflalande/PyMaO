@@ -1,0 +1,37 @@
+{
+    "rows":{
+	"GOOD":"/home/pgraux/good_mal/json/good",
+	"MAL":"/home/pgraux/good_mal/json/mal"
+    },
+    "columns":{
+	"Packer used":[
+	    "$..Packer.packer == \"True\"",
+	    null
+	],
+	"Packer not used":[
+	    "$..Packer.packer == \"False\"",
+	    null
+	],
+	"Native methods":[
+	    "$..Native.native_methods == \"True\"",
+	    "Packer not used"
+	],
+	"DCL used":[
+	    "$..GrepDCL.dcl_usage == \"True\"",
+	    "Packer not used"
+	],
+	"Reflection used":[
+	    "$..GrepReflection.reflection_usage == \"True\"",
+	    "Packer not used"
+	],
+	"Strings encrypted":[
+	    "$..CheckEncryptedStrings.nb_over_7 > 0",
+	    "Packer not used"
+	],
+	"Identifiers renamed":[
+	    "$..CheckRenamedIdentifiers.non_word_identifier_ratio > 0.6",
+	    "Packer not used"
+	]
+    },
+    "output_dir":"/home/pgraux/good_mal"
+}
