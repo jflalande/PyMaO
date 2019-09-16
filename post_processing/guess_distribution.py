@@ -169,12 +169,12 @@ def best_fit_distribution(data, bins=None, ax=None, kde=False):
 
     # Distributions to check
     DISTRIBUTIONS = [
-        st.alpha,st.anglit,st.arcsine,st.beta,st.betaprime,st.bradford,st.burr,st.cauchy,st.chi,st.chi2,st.cosine,
-        st.dgamma,st.dweibull,st.erlang,st.expon,st.exponnorm,st.exponweib,st.exponpow,st.f,st.fatiguelife,st.fisk,
-        st.foldcauchy,st.foldnorm,st.frechet_r,st.frechet_l,st.genlogistic,st.genpareto,st.gennorm,st.genexpon,
-        st.genextreme,st.gausshyper,st.gamma,st.gengamma,st.genhalflogistic,st.gilbrat,st.gompertz,st.gumbel_r,
-        st.gumbel_l,st.halfcauchy,st.halflogistic,st.halfnorm,st.halfgennorm,st.hypsecant,st.invgamma,st.invgauss,
-        st.invweibull,st.johnsonsb,st.johnsonsu,st.ksone,st.kstwobign,st.laplace,st.levy,st.levy_l,# st.levy_stable,
+        st.alpha, st.anglit, st.arcsine, st.beta, st.betaprime, st.bradford, st.burr, st.cauchy, st.chi, st.chi2, st.cosine,
+        st.dgamma, st.dweibull, st.erlang,st.expon,st.exponnorm,st.exponweib, st.exponpow, st.f, st.fatiguelife, st.fisk,
+        st.foldcauchy, st.foldnorm, st.frechet_r,st.frechet_l,st.genlogistic, st.genpareto, st.gennorm, st.genexpon,
+        st.genextreme, st.gausshyper,st.gamma,st.gengamma,st.genhalflogistic, st.gilbrat, st.gompertz, st.gumbel_r,
+        st.gumbel_l, st.halfcauchy,st.halflogistic,st.halfnorm,st.halfgennorm,st.hypsecant,st.invgamma,st.invgauss,
+        st.invweibull, st.johnsonsb,st.johnsonsu,st.ksone,st.kstwobign,st.laplace,st.levy,st.levy_l,# st.levy_stable,
         st.logistic,st.loggamma,st.loglaplace,st.lognorm,st.lomax,st.maxwell,st.mielke,st.nakagami,st.ncx2,st.ncf,
         st.nct,st.norm,st.pareto,st.pearson3,st.powerlaw,st.powerlognorm,st.powernorm,st.rdist,st.reciprocal,
         st.rayleigh,st.rice,st.recipinvgauss,st.semicircular,st.t,st.triang,st.truncexpon,st.truncnorm,st.tukeylambda,
@@ -249,7 +249,7 @@ def best_fit_distribution(data, bins=None, ax=None, kde=False):
 
     log.info("That's all folks!")
 
-    time.sleep(30)
+    # time.sleep(30)
 
     return best_distribution, best_params
     # return best_distribution.name, best_params
@@ -411,7 +411,7 @@ def create_list_by_dist(data, androzoo, dist=None, use_kde=False, kde_bandwidth=
             rand_from_guesses = next(sample)
             # log.info("rand len: " + str(len(rand_from_guesses)))
         else:
-            rand_from_guesses = dist.rvs()
+            rand_from_guesses = guessed_dist.rvs()
 
     orig_androzoo = androzoo
 
@@ -448,7 +448,7 @@ def create_list_by_dist(data, androzoo, dist=None, use_kde=False, kde_bandwidth=
                                         kde_exausted = True
                                         break
                                 else:
-                                    rand_from_guesses = dist.rvs()
+                                    rand_from_guesses = guessed_dist.rvs()
                             # while rand_from_guesses <= 0:
                             #     rand_from_guesses = guessed_dist.rvs()
                     except KeyError:
@@ -479,7 +479,7 @@ def create_list_by_dist(data, androzoo, dist=None, use_kde=False, kde_bandwidth=
                     kde_exausted = True
                     break
             else:
-                rand_from_guesses = dist.rvs()
+                rand_from_guesses = guessed_dist.rvs()
 
         if len(androzoo) != len(relist_androzoo) and kde_exausted is False:
             androzoo = relist_androzoo
@@ -529,8 +529,12 @@ def create_list_by_dist(data, androzoo, dist=None, use_kde=False, kde_bandwidth=
             time.sleep(1)
 
     log.info("Processing GW num: " + str(len(new_data)))
-    log.info("By year, 2015: " + str(years['2015']) + " 2016: " + str(years['2016']) +
-             " 2017: " + str(years['2017']) + " 2018:" + str(years['2018']))
+    log.info("2015: " + str(years['2015']))
+    log.info("2016: " + str(years['2016']))
+    log.info("2017: " + str(years['2017']))
+    log.info("2018: " + str(years['2018']))
+    # log.info("By year, 2015: " + str(years['2015']) + " 2016: " + str(years['2016']) +
+    #          " 2017: " + str(years['2017']) + " 2018:" + str(years['2018']))
 
     return new_data
 
@@ -576,11 +580,11 @@ if __name__ == '__main__':
     # my_dist = st.gennorm(loc=loc, scale=scale, *arg)
     # res_data = create_list_by_dist(data, androzoo, my_dist)
 
-    # res_data = create_list_by_dist(data, androzoo)
+    res_data = create_list_by_dist(data, androzoo)
 
-    res_data = create_list_by_dist(data, androzoo, use_kde=True, kde_bandwidth=0.05)
+    # res_data = create_list_by_dist(data, androzoo, use_kde=True, kde_bandwidth=0.05)
 
-    print("res_data size: " + str(len(res_data)))
+    # print("res_data size: " + str(len(res_data)))
 
     # with open('res4.txt', 'w') as f:
     with open(args.output_file, 'w') as f:
@@ -588,7 +592,7 @@ if __name__ == '__main__':
             f.write("{},{:d},{}\n".format(item['name'], item['size'], item['year']))
 
     # res_data = create_list_by_dist(data, androzoo)
-    print(len(res_data))
+    # print(len(res_data))
 
 # ------------------------------------------
 

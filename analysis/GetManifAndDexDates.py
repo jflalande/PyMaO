@@ -10,6 +10,8 @@ log = logging.getLogger("orchestrator")
 GetManifAndDexDates may fail
 Errors are captured.
 """
+
+
 def grep_date_unzip(unzip_res,search):
     for line in unzip_res.split("\n"):
         if search in line:
@@ -17,11 +19,14 @@ def grep_date_unzip(unzip_res,search):
             return  date[2] + " " + date[3]
     return ""
 
+
 def epoch2date(epoch):
     return datetime.datetime.fromtimestamp(epoch).strftime('%Y-%m-%d %H:%M:%S')
 
+
 def date2epoch(my_time):
     return int(time.mktime(time.strptime(my_time,"%Y-%m-%d %H:%M")))
+
 
 class GetManifAndDexDates(Analysis):
 
@@ -40,13 +45,15 @@ class GetManifAndDexDates(Analysis):
         if errcode != 0:
             if not res:
                 log.error("unzip command failed for " + jsonanalyses["filename"])
-                return 0
+                manif_date = ""
+                self.updateJsonAnalyses(analysis_name, jsonanalyses, {"manif_date": manif_date})
+                return 1
             else:
                 log.warning("unzip returned " + str(errcode))
         else:
             log.debug("unzip manifest successful: got \'" + str(res) + "\'")
 
-        date = grep_date_unzip(res,"AndroidManifest.xml")
+        date = grep_date_unzip(res, "AndroidManifest.xml")
         
         if date:
             try:
@@ -72,7 +79,9 @@ class GetManifAndDexDates(Analysis):
         if errcode != 0:
             if not res:
                 log.error("unzip command failed for " + jsonanalyses["filename"])
-                return 0
+                dex_date = ""
+                self.updateJsonAnalyses(analysis_name, jsonanalyses, {"dex_date": dex_date})
+                return 1
             else:
                 log.warning("unzip returned " + str(errcode))
         else:
