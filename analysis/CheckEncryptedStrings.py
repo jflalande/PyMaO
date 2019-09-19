@@ -17,7 +17,10 @@ class CheckEncryptedStrings(Analysis):
         log.debug("Running CheckEncryptedStrings analysis.")
 
         # Get all DEX files
-        apk = zipfile.ZipFile(jsonanalyses["filename"])
+        try:
+            apk = zipfile.ZipFile(jsonanalyses["filename"])
+        except zipfile.BadZipFile:
+            return False
         dexs = [dex_file for dex_file in apk.infolist()
                if dex_file.filename.startswith("classes")
                and dex_file.filename.endswith(".dex")]
@@ -93,5 +96,4 @@ class CheckEncryptedStrings(Analysis):
                                  "strs": strings})
                                  # "std_deviation_entropy": current_deviation})
 
-        # This analysis cannot fail
         return True
