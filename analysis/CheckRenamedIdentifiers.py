@@ -50,7 +50,10 @@ class CheckRenamedIdentifiers(Analysis):
         log.debug("Running CheckRenamedIdentifiers analysis.")
 
         # Get all DEX files
-        apk = zipfile.ZipFile(jsonanalyses["filename"])
+        try:
+            apk = zipfile.ZipFile(jsonanalyses["filename"])
+        except zipfile.BadZipFile:
+            return False
         dexs = [dex_file for dex_file in apk.infolist()
                if dex_file.filename.startswith("classes")
                and dex_file.filename.endswith(".dex")]
@@ -92,5 +95,4 @@ class CheckRenamedIdentifiers(Analysis):
                                  "nb_non_word_identifier": len(id_set) - len(correct_word),
                                  "non_word_identifier_ratio": (len(id_set)-len(correct_word)) / len(id_set)})
 
-        # This analysis cannot fail
         return True
