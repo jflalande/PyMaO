@@ -7,11 +7,14 @@ from json import JSONDecodeError
 log = logging.getLogger("orchestrator")
 
 def getRecursiveFilenames(basedir):
-    log.debugv("Walking folder " + str(basedir))
-    for (dirpath, _, filenames) in os.walk(basedir):
-        for filename in filenames:
-            log.debugv("This is filename " + filename)
-            yield os.path.join(dirpath,filename)
+    if not isinstance(basedir, list):
+        basedir = [basedir]
+    for bd in basedir:
+        log.debugv("Walking folder " + str(bd))
+        for (dirpath, _, filenames) in os.walk(bd):
+            for filename in filenames:
+                log.debugv("This is filename " + filename)
+                yield os.path.join(dirpath,filename)
 
 def createJobs(queue, xp):
 
@@ -26,7 +29,7 @@ def createJobs(queue, xp):
             log.debugv("Producer: basename " + basename)
 
             # Reading the JSON backup for this malware from the disk
-            json = readJson(basename, xp)
+            json = readJson(filename, xp)
             json[basename]["filename"] = filename # Storing filename
             # At this stage, the JSON file is:
             # { hashcode: { "filename" : "/var/here/hashcode.apk" }}
@@ -85,8 +88,9 @@ def redoAnalyses(packagename, json, xp):
 def getMalwareName(filename):
     return os.path.splitext(os.path.basename(filename))[0]
 
-def readJson(name, xp):
-    jsonfilename = os.path.join(xp.config.jsonbase, name + ".json")
+def readJson(filename, xp):
+    name = getMalwareName(filename)
+    jsonfilename = os.path.join(xp.config.getJsonbase(filename), name + ".json")
     log.debugv("Producer: will read JSON " + str(jsonfilename))
 
     try:
