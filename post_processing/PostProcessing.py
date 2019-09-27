@@ -1160,6 +1160,7 @@ def output_to_files(datasets, out_dir):
     jsonfile = out_dir + "/" + OUTPUT_FILENAME + ".json"
     xlsxfile = out_dir + "/" + OUTPUT_FILENAME + ".xlsx"
     rawfile = out_dir + "/" + OUTPUT_FILENAME + "_raw.json"
+    latexfile = out_dir + "/" + OUTPUT_FILENAME + ".tex"
 
     # Dictionary for the output JSON file
     dico = {}
@@ -1277,6 +1278,36 @@ def output_to_files(datasets, out_dir):
     log.info("File saved at " + xlsxfile)
     # else:
     #     log.warning("file already written. finishing")
+
+
+    # Output latex file
+    with open(latexfile, 'w') as out:
+        if len(datasets) > 0:
+            first_row = list(datasets.items())[0]
+            
+            nb_column = len(first_row.columns)
+            out.write('\begin{tabular}{|%s|}\n' % ('|'.join('c'*len(nb_column))))
+
+            columns_names = [column.name for column in first_row.columns]
+            columns_names = ["", "Total"] + columns_names
+            out.write(" & ".join(columns_names) + "\\ \hline\n")
+            
+            for (row_name, row) in datasets.items():
+                line1 = []
+                line2 = []
+                line1.append('\multirow{2}{*}{%s}' % row_name)
+                line1.append('\multirow{2}{*}{%s}' % str(row.total))
+                line2.append('')
+                line2.append('')
+                for column in row.columns:
+                    line1.append(str(column.total))
+                    line2.append(str(column.pct_depen)+"\%")
+                out.write(" & ".join(line1) + "\\\n")
+                out.write(" & ".join(line2) + "\\ \hline\n")
+            out.write('\end{tabular}\n')
+
+    log.info("File saved at " + latexfile)
+        
 
 
 def topN(dico, N, poll_type):

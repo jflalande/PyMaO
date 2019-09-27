@@ -23,7 +23,7 @@ def createJobs(queue, xp):
 
     log.info("Producer: iterating over apk files in " + str(xp.config.apkbase) + " - It can take some time...")
     for filename in getRecursiveFilenames(xp.config.apkbase):
-        if filename.endswith(".apk"):
+        if filename.endswith(".apk") or filename.endswith(".odex"):
             log.debugv("Producer: doing " + filename)
             basename = getMalwareName(filename)
             log.debugv("Producer: basename " + basename)
