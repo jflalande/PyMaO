@@ -4,6 +4,8 @@ from analysis.Apkid import Apkid
 from analysis.Apktool import Apktool
 from analysis.CheckEncryptedStrings import CheckEncryptedStrings
 from analysis.CheckRenamedIdentifiers import CheckRenamedIdentifiers
+from analysis.CheckFilteredEncryptedStrings import CheckFilteredEncryptedStrings
+from analysis.CheckFilteredRenamedIdentifiers import CheckFilteredRenamedIdentifiers
 from analysis.Native import Native
 from analysis.GetManifAndDexDates import GetManifAndDexDates
 from analysis.GrepDCL import GrepDCL
@@ -45,4 +47,12 @@ class XPObfuStats(Experiment):
 
         # Check if identifiers are renamed
         self.analyses.append((CheckRenamedIdentifiers(self),
+                              [{"Packer" : {"packer": False}}]))
+
+        # Check if filtered strings are encrypted
+        self.analyses.append((CheckFilteredEncryptedStrings(self),
+                              [{"Packer" : {"packer": False}}]))
+
+        # Check if filtered identifiers are renamed
+        self.analyses.append((CheckFilteredRenamedIdentifiers(self),
                               [{"Packer" : {"packer": False}}]))

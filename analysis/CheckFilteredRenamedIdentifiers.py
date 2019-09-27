@@ -8,7 +8,13 @@ from androguard.core.bytecodes.dvm import DalvikVMFormat
 
 log = logging.getLogger("orchestrator")
 
-class CheckRenamedIdentifiers(Analysis):
+class CheckFilteredRenamedIdentifiers(Analysis):
+
+    def isClassBlacklisted(self, clsName):
+        for pref in ["Landroid/", "Lcom/google/"]:
+            if clsName.startswith(pref):
+                return True
+        return False
 
     def dependencies(self):
         return []
@@ -69,25 +75,29 @@ class CheckRenamedIdentifiers(Analysis):
 
                 for c in d.get_classes():
                     c.get_name()
-                    cls_id = c.name[c.name.rfind('/')+1:c.name.find(';')]
-                    for w in self._split_id_by_maj(cls_id):
-                        id_set.update(self._split_id_by_underscore(cls_id))
-                    # id_set.update(self._split_id_by_maj(cls_id))
-                    # id_set.update(self._split_id_by_underscore(cls_id))
+                    if not self.isClassBlacklisted(c.name):
+                        cls_id = c.name[c.name.rfind('/')+1:c.name.find(';')]
+                        for w in self._split_id_by_maj(cls_id):
+                            for s in self._split_id_by_underscore(cls_id):
+                                id_set.add(s)
+                        # id_set.update(self._split_id_by_maj(cls_id))
+                        # id_set.update(self._split_id_by_underscore(cls_id))
 
                 for m in d.get_methods():
-                    mtd_id = m.get_name()
-                    for w in self._split_id_by_maj(mtd_id):
-                        id_set.update(self._split_id_by_underscore(mtd_id))
-                    # id_set.update(self._split_id_by_maj(mtd_id))
-                    # id_set.update(self._split_id_by_underscore(mtd_id))
+                    if not self.isClassBlacklisted(m.get_class_name()):
+                        mtd_id = m.get_name()
+                        for w in self._split_id_by_maj(mtd_id):
+                            id_set.update(self._split_id_by_underscore(mtd_id))
+                        # id_set.update(self._split_id_by_maj(mtd_id))
+                        # id_set.update(self._split_id_by_underscore(mtd_id))
 
                 for f in d.get_fields():
-                    fld_id = f.get_name()
-                    for w in self._split_id_by_maj(fld_id):
-                        id_set.update(self._split_id_by_underscore(fld_id))
-                    # id_set.update(self._split_id_by_maj(fld_id))
-                    # id_set.update(self._split_id_by_underscore(fld_id))
+                    if not self.isClassBlacklisted(f.get_class_name()):
+                        fld_id = f.get_name()
+                        for w in self._split_id_by_maj(fld_id):
+                            id_set.update(self._split_id_by_underscore(fld_id))
+                        # id_set.update(self._split_id_by_maj(fld_id))
+                        # id_set.update(self._split_id_by_underscore(fld_id))
 
             correct_word = self._are_words(sorted([w.lower() for w in list(id_set) if w.isalpha() and len(w)>3]))
 
