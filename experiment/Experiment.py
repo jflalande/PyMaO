@@ -141,9 +141,9 @@ class Experiment:
 
     """ One time check a device """
     def setupDeviceUsingAdb(self):
-        log.info(self.me() + "Checking and preparing device " + str(self.deviceserial))
         if self.deviceserial == None:
             return
+        log.info(self.me() + "Checking and preparing device " + str(self.deviceserial))
         exitcode, res = self.adb_send_command(["devices"])
         for line in res.split('\n'):
             if line.startswith(self.deviceserial):
