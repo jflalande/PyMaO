@@ -1,7 +1,9 @@
 {
     "rows":{
-	"GOOD":"/home/pgraux/good_mal/json/good",
-	"MAL":"/home/pgraux/good_mal/json/mal"
+	"GOOD":"/home/user/json/good",
+	"MAL":"/home/user/json/mal",
+	"AMD":"/home/user/json/amd_data",
+	"Drebin":"/home/user/json/drebin"
     },
     "columns":{
 	"Packer used":[
@@ -24,8 +26,32 @@
 	    "$..GrepReflection.reflection_usage == \"True\"",
 	    "Packer not used"
 	],
-	"Strings encrypted":[
-	    "$..CheckEncryptedStrings.nb_over_7 > 0",
+	"Strings encrypted (1)":[
+	    "$..CheckEncryptedStrings.nb_over_1 > 10",
+	    "Packer not used"
+	],
+	"Strings encrypted (2)":[
+	    "$..CheckEncryptedStrings.nb_over_2 > 10",
+	    "Packer not used"
+	],
+	"Strings encrypted (3)":[
+	    "$..CheckEncryptedStrings.nb_over_3 > 10",
+	    "Packer not used"
+	],
+	"Strings encrypted (4)":[
+	    "$..CheckEncryptedStrings.nb_over_4 > 10",
+	    "Packer not used"
+	],
+	"Strings encrypted (5)":[
+	    "$..CheckEncryptedStrings.nb_over_5 > 10",
+	    "Packer not used"
+	],
+	"Strings encrypted (6)":[
+	    "$..CheckEncryptedStrings.nb_over_6 > 10",
+	    "Packer not used"
+	],
+	"Strings encrypted (7)":[
+	    "$..CheckEncryptedStrings.nb_over_7 > 10",
 	    "Packer not used"
 	],
 	"Identifiers renamed":[
@@ -33,5 +59,5 @@
 	    "Packer not used"
 	]
     },
-    "output_dir":"/home/pgraux/good_mal"
+    "output_dir":"/home/user/json/post_process/"
 }

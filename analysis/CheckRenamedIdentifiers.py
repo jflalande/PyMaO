@@ -49,50 +49,53 @@ class CheckRenamedIdentifiers(Analysis):
     def analysis(self, analysis, analysis_name, basename, jsonanalyses):
         log.debug("Running CheckRenamedIdentifiers analysis.")
 
-        # Get all DEX files
         try:
-            apk = zipfile.ZipFile(jsonanalyses["filename"])
-        except zipfile.BadZipFile:
+            # Get all DEX files
+            try:
+                apk = zipfile.ZipFile(jsonanalyses["filename"])
+            except zipfile.BadZipFile:
+                return False
+            dexs = [dex_file for dex_file in apk.infolist()
+                   if dex_file.filename.startswith("classes")
+                   and dex_file.filename.endswith(".dex")]
+
+            id_set = set()
+
+            # Todo: If one word of an identifier is recognized, then the identifier is not renamed
+
+            # For each DEX file get the classes, methods and fields identifiers
+            for dex in dexs:
+                d = DalvikVMFormat(apk.read(dex))
+
+                for c in d.get_classes():
+                    c.get_name()
+                    cls_id = c.name[c.name.rfind('/')+1:c.name.find(';')]
+                    for w in self._split_id_by_maj(cls_id):
+                        id_set.update(self._split_id_by_underscore(cls_id))
+                    # id_set.update(self._split_id_by_maj(cls_id))
+                    # id_set.update(self._split_id_by_underscore(cls_id))
+
+                for m in d.get_methods():
+                    mtd_id = m.get_name()
+                    for w in self._split_id_by_maj(mtd_id):
+                        id_set.update(self._split_id_by_underscore(mtd_id))
+                    # id_set.update(self._split_id_by_maj(mtd_id))
+                    # id_set.update(self._split_id_by_underscore(mtd_id))
+
+                for f in d.get_fields():
+                    fld_id = f.get_name()
+                    for w in self._split_id_by_maj(fld_id):
+                        id_set.update(self._split_id_by_underscore(fld_id))
+                    # id_set.update(self._split_id_by_maj(fld_id))
+                    # id_set.update(self._split_id_by_underscore(fld_id))
+
+            correct_word = self._are_words(sorted([w.lower() for w in list(id_set) if w.isalpha() and len(w)>3]))
+
+            self.updateJsonAnalyses(analysis_name, jsonanalyses,
+                                    {"nb_word_identifier": len(correct_word),
+                                     "nb_non_word_identifier": len(id_set) - len(correct_word),
+                                     "non_word_identifier_ratio": (len(id_set)-len(correct_word)) / len(id_set)})
+
+            return True
+        except:
             return False
-        dexs = [dex_file for dex_file in apk.infolist()
-               if dex_file.filename.startswith("classes")
-               and dex_file.filename.endswith(".dex")]
-
-        id_set = set()
-
-        # Todo: If one word of an identifier is recognized, then the identifier is not renamed
-        
-        # For each DEX file get the classes, methods and fields identifiers
-        for dex in dexs:
-            d = DalvikVMFormat(apk.read(dex))
-
-            for c in d.get_classes():
-                c.get_name()
-                cls_id = c.name[c.name.rfind('/')+1:c.name.find(';')]
-                for w in self._split_id_by_maj(cls_id):
-                    id_set.update(self._split_id_by_underscore(cls_id))
-                # id_set.update(self._split_id_by_maj(cls_id))
-                # id_set.update(self._split_id_by_underscore(cls_id))
-
-            for m in d.get_methods():
-                mtd_id = m.get_name()
-                for w in self._split_id_by_maj(mtd_id):
-                    id_set.update(self._split_id_by_underscore(mtd_id))
-                # id_set.update(self._split_id_by_maj(mtd_id))
-                # id_set.update(self._split_id_by_underscore(mtd_id))
-
-            for f in d.get_fields():
-                fld_id = f.get_name()
-                for w in self._split_id_by_maj(fld_id):
-                    id_set.update(self._split_id_by_underscore(fld_id))
-                # id_set.update(self._split_id_by_maj(fld_id))
-                # id_set.update(self._split_id_by_underscore(fld_id))
-
-        correct_word = self._are_words(sorted([w.lower() for w in list(id_set) if w.isalpha() and len(w)>3]))
-
-        self.updateJsonAnalyses(analysis_name, jsonanalyses,
-                                {"nb_word_identifier": len(correct_word),
-                                 "nb_non_word_identifier": len(id_set) - len(correct_word),
-                                 "non_word_identifier_ratio": (len(id_set)-len(correct_word)) / len(id_set)})
-
-        return True
