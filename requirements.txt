@@ -3,4 +3,5 @@ jsonpath_ng
 openpyxl
 numpy
 matplotlib
+scipy
 # tkinter
