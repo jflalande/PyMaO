@@ -1283,28 +1283,28 @@ def output_to_files(datasets, out_dir):
     # Output latex file
     with open(latexfile, 'w') as out:
         if len(datasets) > 0:
-            first_row = list(datasets.items())[0]
-            
+            first_row = list(datasets.values())[0]
+
             nb_column = len(first_row.columns)
-            out.write('\begin{tabular}{|%s|}\n' % ('|'.join('c'*len(nb_column))))
+            out.write('\\begin{tabular}{|%s|}\n' % ('|'.join('c'*(nb_column+2))))
 
             columns_names = [column.name for column in first_row.columns]
             columns_names = ["", "Total"] + columns_names
-            out.write(" & ".join(columns_names) + "\\ \hline\n")
+            out.write(" & ".join(columns_names) + " \\\\ \\hline\n")
             
             for (row_name, row) in datasets.items():
                 line1 = []
                 line2 = []
-                line1.append('\multirow{2}{*}{%s}' % row_name)
-                line1.append('\multirow{2}{*}{%s}' % str(row.total))
+                line1.append('\\multirow{2}{*}{%s}' % row_name)
+                line1.append('\\multirow{2}{*}{%s}' % str(row.total))
                 line2.append('')
                 line2.append('')
                 for column in row.columns:
                     line1.append(str(column.total))
-                    line2.append(str(column.pct_depen)+"\%")
-                out.write(" & ".join(line1) + "\\\n")
-                out.write(" & ".join(line2) + "\\ \hline\n")
-            out.write('\end{tabular}\n')
+                    line2.append(str(column.pct_depend)+"\\%")
+                out.write(" & ".join(line1) + " \\\\\n")
+                out.write(" & ".join(line2) + " \\\\ \\hline\n")
+            out.write('\\end{tabular}\n')
 
     log.info("File saved at " + latexfile)
         
