@@ -43,6 +43,7 @@ def doJob(queue, xp, worker_nb):
         filename = jsondata[apkname]["filename"]
 
         log.info("Worker " + str(xp.worker_nb) + " : Job " + str(Statistics.getNbJobs()) + " ==== Doing " + str(apkname) + ".apk ====")
+        analysis_performed = " > "
 
         # Setup of the working directory
         xp.setupWorkingDirectory()
@@ -88,6 +89,7 @@ def doJob(queue, xp, worker_nb):
                     log.debug("Worker " + str(xp.worker_nb) + " : Job " + str(
                         Statistics.getNbJobs()) + " ==== Performing analysis " + str(analysis_name) + " on " + str(
                         apkname) + ".apk ====")
+                    analysis_performed = analysis_performed + analysis_name + " - "
                     analysis.run(analysis, analysis_name, apkname, jsonanalyses)
 
             # Updating statistics
@@ -100,6 +102,7 @@ def doJob(queue, xp, worker_nb):
 
         # Erasing .json file
         writeJson(filename, apkname, xp, jsondata)
+        log.info("Worker " + str(xp.worker_nb) + " : " + analysis_performed)
         log.debug("Finished " + apkname)
         log.debugv("==> JSON: " + str(jsondata))
 

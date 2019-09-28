@@ -107,7 +107,7 @@ try:
     maxy, maxx = screen.getmaxyx()
     height = maxy - 2
     width = maxx - 2
-    rightcol=30
+    rightcol=34
     log_width=width-rightcol
 
     screen.border('|', '|', '-', '-', '+', '+', '+', '+')
