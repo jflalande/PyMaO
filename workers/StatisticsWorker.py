@@ -5,6 +5,7 @@ from threading import Thread
 from utils.Statistics import Statistics
 from utils.Colors import Colors
 from utils.DeviceStatus import DeviceStatus
+from utils.PrintCursesScreen import PrintCursesScreen
 
 log = logging.getLogger("orchestrator")
 
@@ -29,10 +30,12 @@ class StatisticsWorker(Thread):
     # color is the color to use
     # value is the string to print
     def print_right(self, y, x, strip, color, value):
-        self.win_right.addstr(y, x, value, curses.color_pair(color))
+        #self.win_right.addstr(y, x, value, curses.color_pair(color))
+        PrintCursesScreen.addstrXY(self.win_right, y, x, value, curses.color_pair(color))
         remaining_space = strip-len(value)
         if remaining_space > 0:
-            self.win_right.addstr(y, x + len(value), " " * remaining_space, curses.color_pair(color))
+            #self.win_right.addstr(y, x + len(value), " " * remaining_space, curses.color_pair(color))
+            PrintCursesScreen.addstrXY(self.win_right, y, x + len(value), " " * remaining_space, curses.color_pair(color))
             return strip
         return len(value)
 
@@ -90,4 +93,4 @@ class StatisticsWorker(Thread):
             self.print_right(y, 2, 20, Colors.WHITE, "Time: " + Statistics.getTime())
 
 
-            self.win_right.refresh()
+            PrintCursesScreen.refresh(self.win_right)

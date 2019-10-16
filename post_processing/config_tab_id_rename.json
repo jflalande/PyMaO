@@ -1,0 +1,51 @@
+{
+    "rows":{
+	"GOOD":"/home/user/json/good",
+	"MAL":"/home/user/json/mal",
+	"AMD":"/home/user/json/amd_data",
+	"Drebin":"/home/user/json/drebin"
+    },
+    "columns":{
+	"Packer not used":[
+	    "$..Packer.packer == \"False\"",
+	    null
+	],
+	"Identifiers renamed":[
+	    "$..CheckFilteredRenamedIdentifiers.non_word_identifier_ratio > 0.1",
+	    "Packer not used"
+	],
+	"Identifiers renamed":[
+	    "$..CheckFilteredRenamedIdentifiers.non_word_identifier_ratio > 0.2",
+	    "Packer not used"
+	],
+	"Identifiers renamed":[
+	    "$..CheckFilteredRenamedIdentifiers.non_word_identifier_ratio > 0.3",
+	    "Packer not used"
+	],
+	"Identifiers renamed":[
+	    "$..CheckFilteredRenamedIdentifiers.non_word_identifier_ratio > 0.4",
+	    "Packer not used"
+	],
+	"Identifiers renamed":[
+	    "$..CheckFilteredRenamedIdentifiers.non_word_identifier_ratio > 0.5",
+	    "Packer not used"
+	],
+	"Identifiers renamed":[
+	    "$..CheckFilteredRenamedIdentifiers.non_word_identifier_ratio > 0.6",
+	    "Packer not used"
+	],
+	"Identifiers renamed":[
+	    "$..CheckFilteredRenamedIdentifiers.non_word_identifier_ratio > 0.7",
+	    "Packer not used"
+	],
+	"Identifiers renamed":[
+	    "$..CheckFilteredRenamedIdentifiers.non_word_identifier_ratio > 0.8",
+	    "Packer not used"
+	],
+	"Identifiers renamed":[
+	    "$..CheckFilteredRenamedIdentifiers.non_word_identifier_ratio > 0.9",
+	    "Packer not used"
+	]
+    },
+    "output_dir":"/home/user/json/post_process/"
+}

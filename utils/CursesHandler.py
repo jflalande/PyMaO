@@ -2,6 +2,7 @@ import logging
 import curses
 from utils.Colors import Colors
 import collections
+from utils.PrintCursesScreen import PrintCursesScreen
 
 class CursesHandler(logging.Handler):
     def __init__(self, screen, log_trace):
@@ -49,10 +50,13 @@ class CursesHandler(logging.Handler):
             col = Colors.RED
             LVL = "ERROR  "
 
-        self.screen.addstr(LVL, curses.color_pair(col))
-        self.screen.addstr(" | ", curses.color_pair(Colors.WHITE))
-        self.screen.addstr(msg + "\n",  curses.color_pair(col))
-        self.screen.refresh()
+        #self.screen.addstr(LVL, curses.color_pair(col))
+
+        #self.screen.addstr(" | ", curses.color_pair(Colors.WHITE))
+        PrintCursesScreen.addstr(self.screen, " | ", curses.color_pair(Colors.WHITE))
+        #self.screen.addstr(msg + "\n",  curses.color_pair(col))
+        PrintCursesScreen.addstr(self.screen, msg + "\n",  curses.color_pair(col))
+        PrintCursesScreen.refresh(self.screen)
 
         # Saving message for further output when ncurses ends
         self.saveMessageInDeque(LVL + "| " + msg)
