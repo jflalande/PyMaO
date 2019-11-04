@@ -89,8 +89,8 @@ class DHTCheck(Analysis):
 
         # Dumping in a file for DEBUG purpose
         filename = jsonanalyses["filename"]
-        log.debug("Dumping in the file: " + self.xp.config.jsonbase + "/" + basename + ".log")
-        with open(self.xp.config.jsonbase + "/" + basename + ".log" , "w" ) as f:
+        log.debug("Dumping in the file: " + self.xp.config.getJsonbase(filename) + "/" + basename + ".log")
+        with open(self.xp.config.getJsonbase(filename) + "/" + basename + ".log" , "w" ) as f:
            f.write(res)
 
         return True
