@@ -1,19 +1,25 @@
 # PyMaO
 
-PyMaO is a tool that helps to orchestrate experiments involving Android applications and smartphones. PyMaO chains several analysis that are part of an experiment. An analysis is most of the time, a call to an external tools that returns a result, for example apktool, grep, Androguard, Apkid. An experiment is a collection of analysis that are run one by one, chained, if some conditions hold. For example, if the unpacking of an application with Apktool succeeds, then you can grep the code for searching a string.
+PyMaO (**Py**thon **Ma**lware **O**rhestrator) is a tool that helps to orchestrate experiments involving Android applications and smartphones. PyMaO chains several analyses that are part of an experiment. An analysis is most of the time, a call to an external tool that returns a result, for example apktool, grep, Androguard, Apkid. An experiment is a collection of analyses that are run one by one, chained, if some conditions hold. For example, if the unpacking of an application with Apktool succeeds, then you can grep the code for searching a string. PyMaO has a nice old-fashion graphical interface (ncurses).
+
+## News
+
+- Nov. 19: We have pushed the source code online !
+- Oct. 19: A demo of PyMaO will be presented at MASCOTS 2019
+- Apr. 19: Pierre's student just started the development.
+
+## Screenshots
 
 ## Publications
 
 PyMaO has been first presented at the demo session of the conference MASCOTS 2019. You can find more information about this demo by looking at:
 
-- the demo paper [https://hal-centralesupelec.archives-ouvertes.fr/hal-02305473](Orchestrating Android Malware Experiments) (IEEE)
-- the [http://people.rennes.inria.fr/Jean-Francois.Lalande/talks/MASCOTS19-lalande.pdf](presentation slides)
+- the demo paper [Orchestrating Android Malware Experiments](https://hal-centralesupelec.archives-ouvertes.fr/hal-02305473) (IEEE)
+- the [presentation slides](http://people.rennes.inria.fr/Jean-Francois.Lalande/talks/MASCOTS19-lalande.pdf)
 
 If you use this software for your experiments, please cite the paper:
 
 Jean-François Lalande, Pierre Graux, Tomás Concepción Miranda. Orchestrating Android Malware Experiments. MASCOTS 2019 - 27th IEEE International Symposium on the Modeling, Analysis, and Simulation of Computer and Telecommunication Systems, Oct 2019, Rennes, France. 
-
-## Screenshots
 
 
 # Installation process
