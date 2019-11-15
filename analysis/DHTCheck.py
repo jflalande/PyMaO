@@ -89,10 +89,9 @@ class DHTCheck(Analysis):
 
         # Dumping in a file for DEBUG purpose
         filename = jsonanalyses["filename"]
-        #FIXME: this is not working anymore (call to getJsonbase)
-        #log.debug("Dumping in the file: " + self.xp.getJsonbase(filename) + basename + ".log")
-        #with open(self.xp.getJsonbase(filename) + "/" + basename + ".log" , "w" ) as f:
-        #    f.write(res)
+        log.debug("Dumping in the file: " + self.xp.config.getJsonbase(filename) + "/" + basename + ".log")
+        with open(self.xp.config.getJsonbase(filename) + "/" + basename + ".log" , "w" ) as f:
+           f.write(res)
 
         return True
 
