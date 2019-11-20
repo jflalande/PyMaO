@@ -10,6 +10,9 @@ PyMaO (**Py**thon **Ma**lware **O**rhestrator) is a tool that helps to orchestra
 
 ## Screenshots
 
+[![PyMaO view with 4 smartphones](documentation/PyMaO_4_smartphones_1-small.jpg)](documentation/PyMaO_4_smartphones_1.jpg)
+[![PyMaO GUI](documentation/PyMaO_4_smartphones_2-small.png)](documentation/PyMaO_4_smartphones_2.png)
+
 ## Publications
 
 PyMaO has been first presented at the demo session of the conference MASCOTS 2019. You can find more information about this demo by looking at:

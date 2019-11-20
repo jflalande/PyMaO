@@ -20,8 +20,7 @@ class XPDemo(Experiment):
 
     def appendAnalysis(self):
 
-        # Decodes the manifest and checks that the minSdkVersion is 24
-        # For apps that have native methods
+        # Decode the manifest
         self.analyses.append((ManifestDecoding(self),[]))
 
         # Runs AdbInstall
@@ -33,10 +32,15 @@ class XPDemo(Experiment):
                                {"ManifestDecoding": {"launchable": True}},
                                {"AdbInstall" : {"install": True }}]))
 
-        # Runs AdbUninstall if installed
+        # Runs adb uninstall if installed
         self.analyses.append((AdbUninstall(self),
                               [{"ManifestDecoding": {"status": "done"}},
                                {"AdbInstall" : {"install": True }}]))
 
+        # Create a symlink to the original APK in an output directory if some conditions holds:
+        # - if the app has survive for the analysis LaunchAndSurvive
+        # - if the targetSdkVersion equals 27
+        self.analyses.append((SymlinkAPK(self),[{"LaunchAndSurvive": {"running": True}},
+            {"ManifestDecoding": {"targetSdkVersion": 27}}]))
 
 
